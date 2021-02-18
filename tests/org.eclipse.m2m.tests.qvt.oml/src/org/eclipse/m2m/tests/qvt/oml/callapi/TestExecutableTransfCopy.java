@@ -58,7 +58,8 @@ public class TestExecutableTransfCopy extends TestCase {
 	// TODO - the following tests redefine virtual operations which are called from imported modules
 	private static final Set<String> BANNED_TASKS = new HashSet<String>(Arrays.asList(
 			"importedvirtuals", //$NON-NLS-1$
-			"virt" //$NON-NLS-1$
+			"virt", //$NON-NLS-1$
+			"bug566236"
 			));
 
     @Parameters(name="{0}")
