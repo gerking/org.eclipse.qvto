@@ -361,7 +361,7 @@ public class TestUtil extends Assert {
 		if (!metamodels.isEmpty() && resSet instanceof ResourceSetImpl) {
 			((ResourceSetImpl) resSet).setURIResourceMap(new PlatformNamespaceUriResourceMap(packageRegistry));
 		}
-		
+
 		return resSet;
 	}
 
