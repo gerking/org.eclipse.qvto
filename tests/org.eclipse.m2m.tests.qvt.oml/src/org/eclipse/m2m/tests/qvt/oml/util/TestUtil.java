@@ -355,7 +355,7 @@ public class TestUtil extends Assert {
 
 			packageRegistry.put(metamodelPackage.getNsURI(), metamodelPackage);
 		}
-
+		
 		return resSet;
 	}
 

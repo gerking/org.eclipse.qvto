@@ -253,6 +253,7 @@ public class TestQvtParser extends TestCase {
 						TestData.createSourceChecked("bug565747", 0, 0), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566216", 1, 2), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566230", 2, 0), //$NON-NLS-1$
+						TestData.createSourceChecked("bug570407", 0, 0).includeMetamodel("bug570407.ecore"), //$NON-NLS-1$
 						TestData.createSourceChecked("bug573449", 0, 0).includeMetamodel("bug573449.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				);
@@ -282,11 +283,11 @@ public class TestQvtParser extends TestCase {
 		if (destinationFolder.exists()) {
 			FileUtil.delete(destinationFolder);
 		}
-				
+
 		BlackboxRegistry.INSTANCE.cleanup();
-						
+
 		IJavaProject javaProject = JavaCore.create(myProject.getProject());
-		if (javaProject.exists()) {		
+		if (javaProject.exists()) {
 			javaProject.setOutputLocation(javaProject.getPath().append("bin"), new NullProgressMonitor());
 			IProjectDescription desc = myProject.getProject().getDescription();
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
@@ -302,20 +303,21 @@ public class TestQvtParser extends TestCase {
 	@Test
 	public void runTest() throws Exception {
 		copyData("sources/" + myData.getDir(), "parserTestData/sources/" + myData.getDir()); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		prepareJava();
-		
+
 		final File folder = getDestinationFolder();
 		assertTrue("Invalid folder " + folder, folder.exists() && folder.isDirectory()); //$NON-NLS-1$
 
 		resSet = TestUtil.getMetamodelResolutionRS(new ResourceSetImpl(), myData.getMetamodels(), new TestUtil.UriProvider() {
 
+			@Override
 			public URI getModelUri(String model) {
 				String absolutePath = getFile(folder, model).getAbsolutePath();
 				return URI.createFileURI(absolutePath);
 			}
 		});
-		
+
 		if (!myData.getMetamodels().isEmpty()) {
 			setupPluginXml();
 		}
@@ -360,50 +362,50 @@ public class TestQvtParser extends TestCase {
 			// }
 		}
 	}
-	
+
 	private void setupPluginXml() throws CoreException {
-				
+
 		IWorkspace workspace = myProject.getProject().getWorkspace();
 		IPath workspacePath = workspace.getRoot().getLocation();
-		
+
 		IPath destinationPath = new Path(getDestinationFolder().getPath());
 		IPath relativePath = destinationPath.makeRelativeTo(workspacePath).makeAbsolute();
-		
+
 		if (workspace.getRoot().exists(relativePath)) {
-		
+
 			CoreUtility.addNatureToProject(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE, new NullProgressMonitor());
-					
+
 			IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
-			IFile manifest = PDEProject.getManifest(myProject.getProject());					
+			IFile manifest = PDEProject.getManifest(myProject.getProject());
 			WorkspacePluginModelBase pluginModel = new WorkspaceBundlePluginModel(manifest, pluginXml);
-			
+
 			IPluginBase pluginBase = pluginModel.getPluginBase();
 			pluginBase.setId(myProject.getProject().getName());
-					
+
 			IPluginExtension pluginExtension = pluginModel.createExtension();
 			pluginExtension.setPoint("org.eclipse.emf.ecore.generated_package");
-									
-			for (URI metamodelUri : myData.getMetamodels()) {								
+
+			for (URI metamodelUri : myData.getMetamodels()) {
 				String metamodelFileName = metamodelUri.trimFileExtension().lastSegment();
 				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension("genmodel");
 				IPath genmodelPath = relativePath.append(genmodelUri.toString());
-				
+
 				if (workspace.getRoot().exists(genmodelPath)) {
 					URI fileUri = URI.createFileURI(destinationPath.append(metamodelUri.toString()).toString());
 					EPackage ePackage = EmfUtil.getFirstEPackageContent(resSet.getResource(fileUri, true));
-					
-					IPluginElement element = pluginModel.createElement(pluginExtension);				
+
+					IPluginElement element = pluginModel.createElement(pluginExtension);
 					element.setName("package");
 					element.setAttribute("uri", ePackage.getNsURI().toString());
 					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString());
 					pluginExtension.add(element);
-					
+
 					URI platformUri = URI.createPlatformResourceURI(relativePath.append(metamodelUri.toString()).toString(), false);
 					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
 				}
 			}
-					
-			pluginModel.getExtensions().add(pluginExtension);		
+
+			pluginModel.getExtensions().add(pluginExtension);
 			pluginModel.save();
 		}
 	}
@@ -507,7 +509,7 @@ public class TestQvtParser extends TestCase {
 		FileUtil.copyFolder(sourceFolder, destFolder);
 		myProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
-	
+
 	private void prepareJava() throws CoreException {
 		IPath destPath = new Path(getDestinationFolder().getPath());
 
@@ -527,7 +529,7 @@ public class TestQvtParser extends TestCase {
 					new NullProgressMonitor());
 
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
-			
+
 			if (workspace.getRoot().exists(binPath)) {
 				javaProject.setOutputLocation(binPath,
 						new NullProgressMonitor());
