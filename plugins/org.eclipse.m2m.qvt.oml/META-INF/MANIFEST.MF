@@ -106,7 +106,8 @@ Require-Bundle: org.eclipse.equinox.common;bundle-version="[3.8.0,4.0.0)";resolu
  org.eclipse.m2m.qvt.oml.cst.parser;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
  org.eclipse.ocl.ecore;bundle-version="[3.1.0,4.0.0)";visibility:=reexport,
  org.eclipse.m2m.qvt.oml.ecore.imperativeocl;bundle-version="[3.0.0,4.0.0)";visibility:=reexport,
- org.eclipse.ocl;visibility:=reexport
+ org.eclipse.ocl;visibility:=reexport,
+ org.eclipse.emf.codegen.ecore;bundle-version="[2.8.0,3.0.0)"
 Eclipse-BuddyPolicy: registered
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

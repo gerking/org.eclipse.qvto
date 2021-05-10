@@ -242,6 +242,14 @@ public abstract class JavaBlackboxProvider extends BlackboxProvider {
 			return unit;
 		}
 		
+		protected void unload() {
+			for (Map<String, List<EOperation>> operations : fModules.values()) {
+				operations.clear();
+			}
+			
+			unit = null;
+		}
+		
 	}
 
 }

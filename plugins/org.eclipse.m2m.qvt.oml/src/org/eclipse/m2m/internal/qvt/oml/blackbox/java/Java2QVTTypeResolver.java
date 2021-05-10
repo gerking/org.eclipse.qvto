@@ -20,22 +20,31 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.eclipse.emf.codegen.ecore.genmodel.GenClassifier;
 import org.eclipse.emf.common.util.BasicDiagnostic;
 import org.eclipse.emf.common.util.DiagnosticChain;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EGenericType;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.ETypeParameter;
 import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.plugin.EcorePlugin;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.m2m.internal.qvt.oml.NLS;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.ModelContent;
 import org.eclipse.m2m.qvt.oml.blackbox.java.JavaModelInstance;
 import org.eclipse.m2m.qvt.oml.util.Dictionary;
 import org.eclipse.m2m.qvt.oml.util.MutableList;
@@ -233,7 +242,7 @@ class Java2QVTTypeResolver {
 		
 		SortedSet<EClassifier> subtypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_DESC);
 		SortedSet<EClassifier> supertypes = new TreeSet<EClassifier>(HIERARCHY_COMPARATOR_ASC);
-				
+								
 		Iterable<String> packageURIs = fPackageURIs.isEmpty() ? fEnv.getEPackageRegistry().keySet() : fPackageURIs;
 				
 		for (String nsURI : packageURIs) {
@@ -243,15 +252,18 @@ class Java2QVTTypeResolver {
 				// early return for same-named classifier
 				EClassifier sameNamedClassifier = ePackage.getEClassifier(type.getSimpleName());
 								
-				if (sameNamedClassifier != null && type == sameNamedClassifier.getInstanceClass()) {
-					return sameNamedClassifier;
+				if (sameNamedClassifier != null) {
+					if (isMatchingInstanceClass(sameNamedClassifier, type)) {
+						return sameNamedClassifier;
+					}
 				}
 				
 				for (EClassifier eClassifier : ePackage.getEClassifiers()) {
-					Class<?> instanceClass = eClassifier.getInstanceClass();
-					if(type == instanceClass) {
+					if (isMatchingInstanceClass(eClassifier, type)) {
 						return eClassifier;
 					}
+					
+					Class<?> instanceClass = eClassifier.getInstanceClass();
 	
 					// fall-back strategy for resolving sub/super types 
 					if ((relationship & ALLOW_SUBTYPE) == ALLOW_SUBTYPE) {
@@ -278,7 +290,7 @@ class Java2QVTTypeResolver {
 		
 		return null;
 	}
-	
+		
 	private boolean isAssignableFromTo(Class<?> from, Class<?> to) {
 		return from != null && to != null && to.isAssignableFrom(from);
 	}
@@ -390,6 +402,51 @@ class Java2QVTTypeResolver {
 		}
 		
 		return null;
+	}
+	
+	private static boolean isMatchingInstanceClass(EClassifier eClassifier, Class<?> type) {
+		
+		Class<?> instanceClass = eClassifier.getInstanceClass();
+		
+		if(type == instanceClass) {
+			return true;
+		}
+		else if (instanceClass == null && EmfUtil.isDynamic(eClassifier)) {
+			EPackage ePackage = eClassifier.getEPackage();
+			String nsURI = ePackage.getNsURI();
+			
+			Map<String, URI> genModelMap = EcorePlugin.getEPackageNsURIToGenModelLocationMap(true);
+			URI genModelUri = genModelMap.get(nsURI);
+			
+			if (genModelUri != null) {														
+				ResourceSet resourceSet = ePackage.eResource().getResourceSet();
+				ModelContent genModelContent = EmfUtil.safeLoadModel(genModelUri, resourceSet);
+				
+				if (genModelContent != null) {
+					Iterator<EObject> iterator = EcoreUtil.getAllContents(genModelContent.getContent());
+									
+					while (iterator.hasNext()) {
+						EObject eObject = iterator.next();
+						
+						if (eObject instanceof GenClassifier) {
+							GenClassifier genClassifier = (GenClassifier) eObject;
+							
+							EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
+																
+							if (ecoreClassifier == eClassifier) {
+								String classifierInstanceName = genClassifier.getRawInstanceClassName();
+								
+								if (type.getName().equals(classifierInstanceName)) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 
 }

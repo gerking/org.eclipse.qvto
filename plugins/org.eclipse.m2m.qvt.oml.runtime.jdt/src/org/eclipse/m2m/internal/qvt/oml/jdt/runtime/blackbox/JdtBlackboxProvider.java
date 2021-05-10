@@ -25,10 +25,14 @@ import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
+import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxException;
+import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnit;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnitDescriptor;
+import org.eclipse.m2m.internal.qvt.oml.blackbox.LoadContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
@@ -39,6 +43,8 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	public static final String URI_BLACKBOX_JDT_QUERY = "jdt"; //$NON-NLS-1$
 	
 	private static Map<IProject, Map<String, JdtDescriptor>> descriptors = new HashMap<IProject, Map<String, JdtDescriptor>>();
+	
+	private EPackage.Registry fPackageRegistry;
 	
 	@Override
 	public Collection<? extends BlackboxUnitDescriptor> getUnitDescriptors(ResolutionContext resolutionContext) {
@@ -250,6 +256,16 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 			}
 						
 			return result;
+		}
+				
+		@Override
+		public BlackboxUnit load(LoadContext context) throws BlackboxException {
+			if (fPackageRegistry != context.getMetamodelRegistry()) {
+				unload();
+				fPackageRegistry = context.getMetamodelRegistry();
+			}
+						
+			return super.load(context);
 		}
 	}
 
