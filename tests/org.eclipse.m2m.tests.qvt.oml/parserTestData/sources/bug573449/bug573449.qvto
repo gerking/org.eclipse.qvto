@@ -1,0 +1,9 @@
+import org.eclipse.m2m.tests.qvt.oml.bbox.Bug573449_Library;
+
+modeltype bug573449 uses 'http://bug573449';
+
+transformation bug573449();
+
+main() {}
+
+blackbox query test(str : MyEClass) : MyEClass;

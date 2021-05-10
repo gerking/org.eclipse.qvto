@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -44,6 +45,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jdt.core.IJavaProject;
@@ -56,12 +58,21 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
+import org.eclipse.m2m.internal.qvt.oml.emf.util.EmfUtil;
 import org.eclipse.m2m.internal.qvt.oml.project.builder.WorkspaceUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.project.nature.NatureUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.TransformationUtil;
 import org.eclipse.m2m.tests.qvt.oml.ParserTests.TestData;
 import org.eclipse.m2m.tests.qvt.oml.util.ProblemSourceAnnotationHelper;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
+import org.eclipse.pde.core.plugin.IPluginBase;
+import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.pde.core.plugin.IPluginExtension;
+import org.eclipse.pde.core.project.IBundleProjectDescription;
+import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
+import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
+import org.eclipse.pde.internal.core.project.PDEProject;
+import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +86,7 @@ import junit.framework.TestCase;
  * @author pkobiakov
  */
 @RunWith(Parameterized.class)
+@SuppressWarnings("restriction")
 public class TestQvtParser extends TestCase {
 
 	public TestQvtParser(TestData data) {
@@ -241,6 +253,7 @@ public class TestQvtParser extends TestCase {
 						TestData.createSourceChecked("bug565747", 0, 0), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566216", 1, 2), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566230", 2, 0), //$NON-NLS-1$
+						TestData.createSourceChecked("bug573449", 0, 0).includeMetamodel("bug573449.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
 				}
 				);
 	}
@@ -302,6 +315,10 @@ public class TestQvtParser extends TestCase {
 				return URI.createFileURI(absolutePath);
 			}
 		});
+		
+		if (!myData.getMetamodels().isEmpty()) {
+			setupPluginXml();
+		}
 
 		myCompiled = compile(folder);
 
@@ -341,6 +358,53 @@ public class TestQvtParser extends TestCase {
 			// if (expectedProblemCount >= 0) {
 			// 		TestCase.assertEquals(expectedProblemCount, foundProblemCount);
 			// }
+		}
+	}
+	
+	private void setupPluginXml() throws CoreException {
+				
+		IWorkspace workspace = myProject.getProject().getWorkspace();
+		IPath workspacePath = workspace.getRoot().getLocation();
+		
+		IPath destinationPath = new Path(getDestinationFolder().getPath());
+		IPath relativePath = destinationPath.makeRelativeTo(workspacePath).makeAbsolute();
+		
+		if (workspace.getRoot().exists(relativePath)) {
+		
+			CoreUtility.addNatureToProject(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE, new NullProgressMonitor());
+					
+			IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
+			IFile manifest = PDEProject.getManifest(myProject.getProject());					
+			WorkspacePluginModelBase pluginModel = new WorkspaceBundlePluginModel(manifest, pluginXml);
+			
+			IPluginBase pluginBase = pluginModel.getPluginBase();
+			pluginBase.setId(myProject.getProject().getName());
+					
+			IPluginExtension pluginExtension = pluginModel.createExtension();
+			pluginExtension.setPoint("org.eclipse.emf.ecore.generated_package");
+									
+			for (URI metamodelUri : myData.getMetamodels()) {								
+				String metamodelFileName = metamodelUri.trimFileExtension().lastSegment();
+				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension("genmodel");
+				IPath genmodelPath = relativePath.append(genmodelUri.toString());
+				
+				if (workspace.getRoot().exists(genmodelPath)) {
+					URI fileUri = URI.createFileURI(destinationPath.append(metamodelUri.toString()).toString());
+					EPackage ePackage = EmfUtil.getFirstEPackageContent(resSet.getResource(fileUri, true));
+					
+					IPluginElement element = pluginModel.createElement(pluginExtension);				
+					element.setName("package");
+					element.setAttribute("uri", ePackage.getNsURI().toString());
+					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString());
+					pluginExtension.add(element);
+					
+					URI platformUri = URI.createPlatformResourceURI(relativePath.append(metamodelUri.toString()).toString(), false);
+					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
+				}
+			}
+					
+			pluginModel.getExtensions().add(pluginExtension);		
+			pluginModel.save();
 		}
 	}
 
