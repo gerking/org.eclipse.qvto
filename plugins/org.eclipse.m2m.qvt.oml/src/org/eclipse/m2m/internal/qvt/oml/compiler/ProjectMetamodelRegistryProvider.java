@@ -62,6 +62,10 @@ public class ProjectMetamodelRegistryProvider implements IMetamodelRegistryProvi
 			resourceSet.setPackageRegistry(new EPackageRegistryImpl(registry));
 		}
 		
+		if (resourceSet instanceof ResourceSetImpl) {
+			((ResourceSetImpl) resourceSet).setURIResourceMap(new PlatformNamespaceUriResourceMap(registry));
+		}
+		
 		resolutionRSet = resourceSet;
 		
 		delegateRegistry = registry;

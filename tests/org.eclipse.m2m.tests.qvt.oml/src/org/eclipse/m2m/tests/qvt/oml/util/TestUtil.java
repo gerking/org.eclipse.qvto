@@ -50,11 +50,13 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2m.internal.qvt.oml.common.MdaException;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
+import org.eclipse.m2m.internal.qvt.oml.compiler.PlatformNamespaceUriResourceMap;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QvtCompilerOptions;
 import org.eclipse.m2m.internal.qvt.oml.compiler.UnitProxy;
@@ -354,6 +356,10 @@ public class TestUtil extends Assert {
 			}
 
 			packageRegistry.put(metamodelPackage.getNsURI(), metamodelPackage);
+		}
+		
+		if (!metamodels.isEmpty() && resSet instanceof ResourceSetImpl) {
+			((ResourceSetImpl) resSet).setURIResourceMap(new PlatformNamespaceUriResourceMap(packageRegistry));
 		}
 		
 		return resSet;
