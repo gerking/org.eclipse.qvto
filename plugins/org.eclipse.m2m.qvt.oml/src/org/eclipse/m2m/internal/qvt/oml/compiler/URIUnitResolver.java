@@ -61,8 +61,12 @@ public class URIUnitResolver extends DelegatingUnitResolver {
 	public URIUnitResolver(URI baseURI) {
 		this(Collections.singletonList(baseURI));
 	}
-			
+	
 	public URIUnitResolver(List<URI> baseURIs) {
+		this(baseURIs, true);
+	}
+			
+	public URIUnitResolver(List<URI> baseURIs, boolean classpath) {
 		if(baseURIs == null || baseURIs.contains(null)) {
 			throw new IllegalArgumentException();
 		}
@@ -84,11 +88,9 @@ public class URIUnitResolver extends DelegatingUnitResolver {
 			fBaseURIs.add(normalizedURI);
 		}
 		
-		// enable resolution of black-box module dependencies and classpath imports
-		setParent(new CompositeUnitResolver(
-				BlackboxUnitResolver.DEFAULT,
-				ClassPathUnitResolver.INSTANCE)
-		);		
+		// enable resolution of black-box module dependencies and (if applicable) classpath imports
+		UnitResolver parentResolver = classpath ? new CompositeUnitResolver(BlackboxUnitResolver.DEFAULT, ClassPathUnitResolver.INSTANCE) : BlackboxUnitResolver.DEFAULT;
+		setParent(parentResolver);
 	}
 		
 	@Override

@@ -12,6 +12,7 @@
 package org.eclipse.m2m.internal.qvt.oml.compiler;
 
 import java.net.URL;
+import java.util.Collections;
 
 import org.eclipse.emf.common.util.URI;
 
@@ -31,8 +32,7 @@ public class ClassPathUnitResolver implements UnitResolver {
 			int numberOfNameSegments = ResolverUtils.getNameSegments(qualifiedName).length;
 			URI baseUri = URI.createURI(resourceUrl.toString()).trimSegments(numberOfNameSegments);
 			
-			DelegatingUnitResolver delegateResolver = new URIUnitResolver(baseUri);
-			delegateResolver.setParent(BlackboxUnitResolver.DEFAULT);
+			DelegatingUnitResolver delegateResolver = new URIUnitResolver(Collections.singletonList(baseUri), false);
 			return delegateResolver.resolveUnit(qualifiedName);
 		}
 		
