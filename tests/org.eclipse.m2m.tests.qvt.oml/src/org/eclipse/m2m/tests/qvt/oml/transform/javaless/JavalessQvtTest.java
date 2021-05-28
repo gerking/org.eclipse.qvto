@@ -153,8 +153,10 @@ public class JavalessQvtTest extends TestQvtInterpreter {
             "bug463572", //$NON-NLS-1$ 
                   	
             // use of Eclipse project references or plug-in dependencies requires patching across multiple projects
-          	"bug433937", "bug573659" //$NON-NLS-1$ //$NON-NLS-2$
+          	"bug433937", "bug573659", //$NON-NLS-1$ //$NON-NLS-2$
           	
+          	// use of custom metamodel that refers to Ecore by means of a platform URI 
+            "bug570407" //$NON-NLS-1$
     }));
 
     private static final Set<String> JAVALESS_PATCH_OUTPUT = new HashSet<String>(Arrays.asList(new String[] {

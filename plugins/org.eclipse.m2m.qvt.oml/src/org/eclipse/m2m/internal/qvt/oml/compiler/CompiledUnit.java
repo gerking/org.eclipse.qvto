@@ -97,6 +97,9 @@ public class CompiledUnit {
 		if(registry != null) {
 			rs.setPackageRegistry(registry);
 		}
+		
+		rs.setURIResourceMap(new PlatformNamespaceUriResourceMap(rs));
+		
 		return rs;
 	}
 	

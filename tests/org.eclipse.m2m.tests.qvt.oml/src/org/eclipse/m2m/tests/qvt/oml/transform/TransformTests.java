@@ -596,7 +596,8 @@ public class TransformTests extends TestCase {
         				blackboxRegistry.registerModule(AnnotatedJavaLibrary.class, "org.bar.Foo", "Bug566216_Lib");
         			}
         		},
-        		new PluginDependencyProjectData("bug573659", "bug573659_referenced") //$NON-NLS-1$ //$NON-NLS-2$
+        		new PluginDependencyProjectData("bug573659", "bug573659_referenced"), //$NON-NLS-1$ //$NON-NLS-2$
+        		new FilesToFilesData("bug570407").includeMetamodelFile("bug570407.ecore"),
         	};
     }
 

@@ -1,0 +1,14 @@
+modeltype bug570407 uses "http://www.bug570407.ecore";
+modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
+
+transformation bug570407;
+
+main() {
+	var c = object ecore::EClass {};
+
+    var tc = object TestClass {
+        ref := c;
+    };
+    
+    assert fatal (tc.ref = c);
+}
