@@ -13,10 +13,14 @@ package org.eclipse.m2m.tests.qvt.oml.callapi;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Map;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.impl.EcoreResourceFactoryImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl;
 import org.eclipse.m2m.internal.qvt.oml.common.MDAConstants;
@@ -58,6 +62,7 @@ public class TestQvtStandaloneExecutor extends TestQvtExecutor {
     	return rs;
 	}
 	
+	@Override
 	protected ResourceSet getMetamodelResolutionRS() {
 		ResourceSet rs = super.getMetamodelResolutionRS();
 		
@@ -74,7 +79,17 @@ public class TestQvtStandaloneExecutor extends TestQvtExecutor {
 		for(EPackage pack : data.getUsedPackages()) {
 			rs.getPackageRegistry().put(pack.getNsURI(), pack);
 		}
-				
+		
+    	if (rs instanceof ResourceSetImpl) {    		
+    		Map<URI, Resource> uriResourceMap = ((ResourceSetImpl) rs).getURIResourceMap();
+    		    		
+    		if (uriResourceMap != null) {
+	    		URI ecoreResourceUri = URI.createPlatformResourceURI("org.eclipse.emf.ecore/model/Ecore.ecore", true); //$NON-NLS-1$
+	    		EPackage ecorePackage = rs.getPackageRegistry().getEPackage(EcorePackage.eNS_URI);
+	    		uriResourceMap.put(ecoreResourceUri, ecorePackage.eResource());
+    		}
+    	}
+						
 		return rs;
 	}
 	
