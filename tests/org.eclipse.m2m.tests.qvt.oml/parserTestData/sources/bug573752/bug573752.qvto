@@ -1,0 +1,9 @@
+import org.eclipse.m2m.tests.qvt.oml.bbox.Bug573752_Library;
+
+modeltype testqvt uses 'http://www.eclipse.org/m2m/qvt/oml/testqvt';
+
+transformation bug573752();
+
+main() {}
+
+blackbox query test(numbers : Numbers) : BooleanElement;

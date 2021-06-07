@@ -68,6 +68,7 @@ import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
 import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.pde.core.plugin.IPluginExtension;
+import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
@@ -253,8 +254,9 @@ public class TestQvtParser extends TestCase {
 						TestData.createSourceChecked("bug565747", 0, 0), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566216", 1, 2), //$NON-NLS-1$
 						TestData.createSourceChecked("bug566230", 2, 0), //$NON-NLS-1$
-						TestData.createSourceChecked("bug570407", 0, 0).includeMetamodel("bug570407.ecore"), //$NON-NLS-1$
-						TestData.createSourceChecked("bug573449", 0, 0).includeMetamodel("bug573449.ecore"), //$NON-NLS-1$
+						TestData.createSourceChecked("bug570407", 0, 0).includeMetamodel("bug570407.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
+						TestData.createSourceChecked("bug573449", 0, 0).includeMetamodel("bug573449.ecore"), //$NON-NLS-1$ //$NON-NLS-2$
+						TestData.createSourceChecked("bug573752", 0, 0), //$NON-NLS-1$
 				}
 				);
 	}
@@ -293,6 +295,12 @@ public class TestQvtParser extends TestCase {
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
 			myProject.getProject().setDescription(desc, new NullProgressMonitor());
 		}
+		
+		IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
+		IFile manifest = PDEProject.getManifest(myProject.getProject());
+		
+		pluginXml.delete(true, null);
+		manifest.delete(true, null);
 	}
 
 	public TestProject getTestProject() {
@@ -318,9 +326,7 @@ public class TestQvtParser extends TestCase {
 			}
 		});
 
-		if (!myData.getMetamodels().isEmpty()) {
-			setupPluginXml();
-		}
+		setupPluginXml();
 
 		myCompiled = compile(folder);
 
@@ -404,6 +410,9 @@ public class TestQvtParser extends TestCase {
 					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
 				}
 			}
+			
+			IPluginImport qvtTestImport = pluginModel.createImport(AllTests.BUNDLE_ID);
+			pluginBase.add(qvtTestImport);
 
 			pluginModel.getExtensions().add(pluginExtension);
 			pluginModel.save();
