@@ -423,28 +423,12 @@ class Java2QVTTypeResolver {
 				ModelContent genModelContent = EmfUtil.safeLoadModel(genModelUri, resourceSet);
 				
 				if (genModelContent != null) {
-					Iterator<EObject> iterator = EcoreUtil.getAllContents(genModelContent.getContent());
-									
-					while (iterator.hasNext()) {
-						EObject eObject = iterator.next();
-						
-						try {
-							if (eObject instanceof GenClassifier) {
-								GenClassifier genClassifier = (GenClassifier) eObject;
-								
-								EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
-																	
-								if (ecoreClassifier == eClassifier) {
-									String classifierInstanceName = genClassifier.getRawInstanceClassName();
-									
-									if (type.getName().equals(classifierInstanceName)) {
-										return true;
-									}
-								}
-							}
-						} catch(NoClassDefFoundError e) {
-							break;
+					try {
+						if (isMatchingInstanceGenClassifier(eClassifier, type, genModelContent)) {
+							return true;
 						}
+					} catch(NoClassDefFoundError e) {
+						// Ignore failure due to missing org.eclipse.emf.ecore.codegen support
 					}
 				}
 			}
@@ -453,4 +437,21 @@ class Java2QVTTypeResolver {
 		return false;
 	}
 
+	private static boolean isMatchingInstanceGenClassifier(EClassifier eClassifier, Class<?> type, ModelContent genModelContent) {
+		Iterator<EObject> iterator = EcoreUtil.getAllContents(genModelContent.getContent());
+		while (iterator.hasNext()) {
+			EObject eObject = iterator.next();
+			if (eObject instanceof GenClassifier) {
+				GenClassifier genClassifier = (GenClassifier) eObject;
+				EClassifier ecoreClassifier = genClassifier.getEcoreClassifier();
+				if (ecoreClassifier == eClassifier) {
+					String classifierInstanceName = genClassifier.getRawInstanceClassName();
+					if (type.getName().equals(classifierInstanceName)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
 }
