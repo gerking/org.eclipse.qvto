@@ -64,7 +64,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 			final List<String> classes = getAllClasses(p, resolutionContext);
 			
 			for (String qualifiedName : classes) {
-				BlackboxUnitDescriptor jdtUnitDescriptor = getJdtUnitDescriptor(p, qualifiedName);
+				BlackboxUnitDescriptor jdtUnitDescriptor = getJdtUnitDescriptor(project, qualifiedName);
 				if (jdtUnitDescriptor != null) {
 					descriptors.add(jdtUnitDescriptor);
 				}

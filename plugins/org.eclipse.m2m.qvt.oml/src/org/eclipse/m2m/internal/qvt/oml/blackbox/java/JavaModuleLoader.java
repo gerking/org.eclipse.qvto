@@ -134,6 +134,8 @@ abstract class JavaModuleLoader {
 			return false;
 		} catch (NoClassDefFoundError e) {
 			return false;
+		} catch(LinkageError e) {
+			return false;
 		}
 		
 		return Modifier.isPublic(javaClass.getModifiers());
