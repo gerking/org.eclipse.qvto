@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.filesystem.URIUtil;
 import org.eclipse.core.resources.IContainer;
@@ -299,7 +301,30 @@ public class ProjectClassLoader extends URLClassLoader {
 			return new ClassLoader() {
 				
 				private Map<String, Class<?>> loadedClasses = new HashMap<String, Class<?>>();
-																
+				
+				private Map<String, Set<String>> package2plugins = new HashMap<String, Set<String>>();
+				
+				private Set<String> getCandidateHostPlugins(String className) {
+					
+					String packageName = getPrefix(className);
+					
+					if (package2plugins.containsKey(packageName)) {
+						return package2plugins.get(packageName);
+					};
+					
+					while (packageName != null) {
+						IPluginModelBase pluginModel = PluginRegistry.findModel(packageName);
+						
+						if (pluginModel != null && importedPlugins.contains(pluginModel)) {
+							return Collections.singleton(pluginModel.getPluginBase().getId());
+						}
+						
+						packageName = getPrefix(packageName);
+					};
+					
+					return Collections.emptySet();
+				}
+								
 				private Class<?> loadClassFromPlugin(String name, boolean resolve, String pluginId) throws ClassNotFoundException {
 					Class<?> result = CommonPlugin.loadClass(pluginId, name);
 					
@@ -307,11 +332,31 @@ public class ProjectClassLoader extends URLClassLoader {
 			            resolveClass(result);
 			        }
 					
-			        loadedClasses.put(name, result);
+			        register(result, pluginId);
 					
 					return result;
 				}
-												
+				
+				private void register(Class<?> c, String pluginId) {
+					loadedClasses.put(c.getName(), c);
+			        
+					Package p = c.getPackage();
+					
+					if (p != null) {
+						String packageName = p.getName();
+				        Set<String> plugins = package2plugins.get(packageName);
+				        
+				        if (plugins == null) {
+				        	plugins = new LinkedHashSet<String>(1);
+				        	package2plugins.put(packageName, plugins);
+				        }
+				        
+				        if(!plugins.contains(pluginId)) {
+				        	plugins.add(pluginId);
+				        }
+					}
+				}
+								
 				@Override
 				protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 													
@@ -325,13 +370,26 @@ public class ProjectClassLoader extends URLClassLoader {
 							return result;
 						}
 					}
-									
+					
+					Set<String> candidateHosts = getCandidateHostPlugins(name);
+										
+					for(String host : candidateHosts) {
+						try {							
+							return loadClassFromPlugin(name, resolve, host);
+						}
+						catch(ClassNotFoundException e) {
+							continue;
+						}
+					}
+				
 					for(IPluginModelBase importedPlugin : importedPlugins) {
 																	
 						try {
 							String pluginId = importedPlugin.getPluginBase().getId();
 							
-							return loadClassFromPlugin(name, resolve, pluginId);
+							if(!candidateHosts.contains(pluginId)) {
+								return loadClassFromPlugin(name, resolve, pluginId);
+							}
 						}
 						catch (ClassNotFoundException e) {
 							continue;
@@ -343,6 +401,17 @@ public class ProjectClassLoader extends URLClassLoader {
 					throw new ClassNotFoundException();
 				}
 			};
+		}
+		
+		private static String getPrefix(String fullyQualifiedName) {
+			int lastIndex = fullyQualifiedName.lastIndexOf('.');
+			
+			if (lastIndex == -1) {
+				return null;
+			}
+			else {
+				return fullyQualifiedName.substring(0, lastIndex);
+			}
 		}
 	}
 }
