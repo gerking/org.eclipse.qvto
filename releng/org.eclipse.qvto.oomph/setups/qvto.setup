@@ -5,21 +5,231 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:git="http://www.eclipse.org/oomph/setup/git/1.0"
     xmlns:jdt="http://www.eclipse.org/oomph/setup/jdt/1.0"
-    xmlns:mylyn="http://www.eclipse.org/oomph/setup/mylyn/1.0"
     xmlns:predicates="http://www.eclipse.org/oomph/predicates/1.0"
     xmlns:projects="http://www.eclipse.org/oomph/setup/projects/1.0"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/setup/mylyn/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Mylyn.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/JDT.ecore http://www.eclipse.org/oomph/predicates/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/SetupWorkingSets.ecore"
     name="qvto"
     label="QVTo">
   <setupTask
+      xsi:type="jdt:JRETask"
+      version="JavaSE-11"
+      location="${jre.location-11}"/>
+  <setupTask
+      xsi:type="setup:EclipseIniTask"
+      option="-Xmx"
+      value="2048m"
+      vm="true"/>
+  <setupTask
+      xsi:type="setup:ResourceCreationTask"
+      excludedTriggers="STARTUP MANUAL"
+      targetURL="${workspace.location|uri}/.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml"
+      encoding="UTF-8">
+    <content>
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>
+      &lt;section name=&quot;Workbench&quot;>
+      	&lt;section name=&quot;org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart&quot;>
+      		&lt;item value=&quot;true&quot; key=&quot;group_libraries&quot;/>
+      		&lt;item value=&quot;false&quot; key=&quot;linkWithEditor&quot;/>
+      		&lt;item value=&quot;2&quot; key=&quot;layout&quot;/>
+      		&lt;item value=&quot;2&quot; key=&quot;rootMode&quot;/>
+      		&lt;item value=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;packageExplorer configured=&amp;quot;true&amp;quot; group_libraries=&amp;quot;1&amp;quot; layout=&amp;quot;2&amp;quot; linkWithEditor=&amp;quot;0&amp;quot; rootMode=&amp;quot;2&amp;quot; sortWorkingSets=&amp;quot;false&amp;quot; workingSetName=&amp;quot;&amp;quot;&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;localWorkingSetManager&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;workingSet editPageId=&amp;quot;org.eclipse.jdt.internal.ui.OthersWorkingSet&amp;quot; factoryID=&amp;quot;org.eclipse.ui.internal.WorkingSetFactory&amp;quot; id=&amp;quot;1382792884467_1&amp;quot; label=&amp;quot;Other Projects&amp;quot; name=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;/localWorkingSetManager&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;activeWorkingSet workingSetName=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;allWorkingSets workingSetName=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;/packageExplorer&amp;gt;&quot; key=&quot;memento&quot;/>
+      	&lt;/section>
+      &lt;/section>
+
+    </content>
+  </setupTask>
+  <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="Photon"
+      defaultValue="2021-09"
       storageURI="scope://Workspace"/>
+  <setupTask
+      xsi:type="setup.p2:P2Task">
+    <requirement
+        name="org.eclipse.jdt.junit4.runtime"/>
+    <description>Mandatory IDE for QVTo Developers</description>
+  </setupTask>
+  <setupTask
+      xsi:type="setup:CompoundTask"
+      name="Preferences">
+    <setupTask
+        xsi:type="setup:PreferenceTask"
+        key="instance/org.eclipse.jdt.launching/org.eclipse.jdt.launching.PREF_STRICTLY_COMPATIBLE_JRE_NOT_AVAILABLE"
+        value="ignore"/>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        name="org.eclipse.pde.api.tools">
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.pde.api.tools/missing_default_api_profile"
+          value="Ignore"/>
+    </setupTask>
+  </setupTask>
+  <setupTask
+      xsi:type="setup.targlets:TargletTask">
+    <targlet
+        name="${scope.project.root.label} Target Platform"
+        activeRepositoryList="${eclipse.target.platform}">
+      <requirement
+          name="com.google.guava"/>
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.validation.feature.group"/>
+      <requirement
+          name="org.eclipse.ocl.all.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.uml2.sdk.feature.group"/>
+      <repositoryList
+          name="Latest">
+        <repository
+            url="https://download.eclipse.org/releases/latest"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+      </repositoryList>
+      <repositoryList
+          name="2021-12">
+        <repository
+            url="https://download.eclipse.org/releases/latest"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+      </repositoryList>
+      <repositoryList
+          name="2021-09">
+        <repository
+            url="https://download.eclipse.org/releases/2021-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20210825222808/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2021-06">
+        <repository
+            url="https://download.eclipse.org/releases/2021-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20210602031627/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2021-03">
+        <repository
+            url="https://download.eclipse.org/releases/2021-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20210223232630/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2020-12">
+        <repository
+            url="https://download.eclipse.org/releases/2020-12"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20201130205003/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2020-09">
+        <repository
+            url="https://download.eclipse.org/releases/2020-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200831200620/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2020-06">
+        <repository
+            url="https://download.eclipse.org/releases/2020-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2020-03">
+        <repository
+            url="https://download.eclipse.org/releases/2020-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20200224183213/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2019-12">
+        <repository
+            url="https://download.eclipse.org/releases/2019-12"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2019-09">
+        <repository
+            url="https://download.eclipse.org/releases/2019-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2019-06">
+        <repository
+            url="https://download.eclipse.org/releases/2019-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2019-03">
+        <repository
+            url="https://download.eclipse.org/releases/2019-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2018-12">
+        <repository
+            url="https://download.eclipse.org/releases/2018-12"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="2018-09">
+        <repository
+            url="https://download.eclipse.org/releases/2018-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="Photon">
+        <repository
+            url="https://download.eclipse.org/releases/photon"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="Oxygen">
+        <repository
+            url="https://download.eclipse.org/releases/oxygen"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20180330011457/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="Neon">
+        <repository
+            url="https://download.eclipse.org/releases/neon"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="Mars">
+        <repository
+            url="https://download.eclipse.org/releases/mars"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository/"/>
+      </repositoryList>
+      <repositoryList
+          name="Luna">
+        <repository
+            url="https://download.eclipse.org/releases/luna"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/"/>
+        <repository
+            url="https://download.eclipse.org/modeling/mdt/papyrus/updates/releases/luna"/>
+      </repositoryList>
+    </targlet>
+  </setupTask>
   <setupTask
       xsi:type="git:GitCloneTask"
       id="qvto.git.clone"
@@ -41,239 +251,8 @@
     </annotation>
     <description>QVTo Git repository clone</description>
   </setupTask>
-  <setupTask
-      xsi:type="setup:CompoundTask"
-      name="Eclipse Installation">
-    <setupTask
-        xsi:type="jdt:JRETask"
-        version="J2SE-1.6"
-        location="${jre.location-1.6}"
-        executionEnvironmentDefault="false"/>
-    <setupTask
-        xsi:type="jdt:JRETask"
-        version="JavaSE-1.8"
-        location="${jre.location-1.8}"/>
-    <setupTask
-        xsi:type="setup:EclipseIniTask"
-        option="-Xmx"
-        value="2048m"
-        vm="true"/>
-    <setupTask
-        xsi:type="setup:ResourceCreationTask"
-        excludedTriggers="STARTUP MANUAL"
-        content="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;section name=&quot;Workbench&quot;>&#xD;&#xA;&#x9;&lt;section name=&quot;org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart&quot;>&#xD;&#xA;&#x9;&#x9;&lt;item value=&quot;true&quot; key=&quot;group_libraries&quot;/>&#xD;&#xA;&#x9;&#x9;&lt;item value=&quot;false&quot; key=&quot;linkWithEditor&quot;/>&#xD;&#xA;&#x9;&#x9;&lt;item value=&quot;2&quot; key=&quot;layout&quot;/>&#xD;&#xA;&#x9;&#x9;&lt;item value=&quot;2&quot; key=&quot;rootMode&quot;/>&#xD;&#xA;&#x9;&#x9;&lt;item value=&quot;&amp;lt;?xml version=&amp;quot;1.0&amp;quot; encoding=&amp;quot;UTF-8&amp;quot;?&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;packageExplorer configured=&amp;quot;true&amp;quot; group_libraries=&amp;quot;1&amp;quot; layout=&amp;quot;2&amp;quot; linkWithEditor=&amp;quot;0&amp;quot; rootMode=&amp;quot;2&amp;quot; sortWorkingSets=&amp;quot;false&amp;quot; workingSetName=&amp;quot;&amp;quot;&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;localWorkingSetManager&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;workingSet editPageId=&amp;quot;org.eclipse.jdt.internal.ui.OthersWorkingSet&amp;quot; factoryID=&amp;quot;org.eclipse.ui.internal.WorkingSetFactory&amp;quot; id=&amp;quot;1382792884467_1&amp;quot; label=&amp;quot;Other Projects&amp;quot; name=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;/localWorkingSetManager&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;activeWorkingSet workingSetName=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;allWorkingSets workingSetName=&amp;quot;Other Projects&amp;quot;/&amp;gt;&amp;#x0D;&amp;#x0A;&amp;lt;/packageExplorer&amp;gt;&quot; key=&quot;memento&quot;/>&#xD;&#xA;&#x9;&lt;/section>&#xD;&#xA;&lt;/section>&#xD;&#xA;"
-        targetURL="${workspace.location|uri}/.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml"
-        encoding="UTF-8"/>
-    <setupTask
-        xsi:type="setup.targlets:TargletTask">
-      <targlet
-          name="QVTo Target Platform"
-          activeRepositoryList="${eclipse.target.platform}">
-        <requirement
-            name="org.eclipse.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.emf.validation.feature.group"/>
-        <requirement
-            name="org.eclipse.uml2.sdk.feature.group"/>
-        <requirement
-            name="org.eclipse.ocl.all.sdk.feature.group"/>
-        <requirement
-            name="com.google.guava"/>
-        <repositoryList
-            name="Latest">
-          <repository
-              url="http://download.eclipse.org/releases/latest"/>
-          <repository
-              url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
-        </repositoryList>
-        <repositoryList
-            name="2020-06">
-          <repository
-              url="http://download.eclipse.org/releases/2020-06"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20200529191137/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2020-03">
-          <repository
-              url="http://download.eclipse.org/releases/2020-03"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20200224183213/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2019-12">
-          <repository
-              url="http://download.eclipse.org/releases/2019-12"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2019-09">
-          <repository
-              url="http://download.eclipse.org/releases/2019-09"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190827152740/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2019-06">
-          <repository
-              url="http://download.eclipse.org/releases/2019-06"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190602212107/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2019-03">
-          <repository
-              url="http://download.eclipse.org/releases/2019-03"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20190226160451/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2018-12">
-          <repository
-              url="http://download.eclipse.org/releases/2018-12"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="2018-09">
-          <repository
-              url="http://download.eclipse.org/releases/2018-09"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20181128170323/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="Photon">
-          <repository
-              url="http://download.eclipse.org/releases/photon"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180606145124/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="Oxygen">
-          <repository
-              url="http://download.eclipse.org/releases/oxygen"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20180330011457/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="Neon">
-          <repository
-              url="http://download.eclipse.org/releases/neon"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/R-builds/R20170307180635/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="Mars">
-          <repository
-              url="http://download.eclipse.org/releases/mars"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository/"/>
-        </repositoryList>
-        <repositoryList
-            name="Luna">
-          <repository
-              url="http://download.eclipse.org/releases/luna"/>
-          <repository
-              url="http://download.eclipse.org/tools/orbit/downloads/drops/R20150124073747/repository/"/>
-          <repository
-              url="http://download.eclipse.org/modeling/mdt/papyrus/updates/releases/luna"/>
-        </repositoryList>
-      </targlet>
-    </setupTask>
-    <setupTask
-        xsi:type="setup.p2:P2Task"
-        label="QVTo Developer IDE ">
-      <requirement
-          name="org.eclipse.emf.sdk.feature.group"/>
-      <requirement
-          name="org.eclipse.ocl.all.sdk.feature.group"/>
-      <description>Mandatory IDE for QVTo Developers</description>
-    </setupTask>
-  </setupTask>
-  <setupTask
-      xsi:type="setup:CompoundTask"
-      name="Mylyn IDE">
-    <setupTask
-        xsi:type="setup.p2:P2Task"
-        label="Mylyn Tools">
-      <requirement
-          name="org.eclipse.mylyn.ide_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.java_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.pde_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.team_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.gerrit.feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.bugzilla_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.git.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.hudson.feature.group"/>
-      <requirement
-          name="org.eclipse.mylyn.wikitext_feature.feature.group"/>
-      <requirement
-          name="org.eclipse.egit.mylyn.feature.group"/>
-    </setupTask>
-    <setupTask
-        xsi:type="mylyn:MylynQueriesTask"
-        repositoryURL="https://bugs.eclipse.org/bugs"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <query
-          summary="QVTo New/Open"
-          url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;classification=Modeling&amp;list_id=8653934&amp;product=QVTo&amp;query_format=advanced"/>
-      <query
-          summary="QVTo Resolved"
-          url="https://bugs.eclipse.org/bugs/buglist.cgi?bug_status=RESOLVED&amp;classification=Modeling&amp;list_id=8654045&amp;product=QVTo&amp;query_format=advanced"/>
-    </setupTask>
-    <setupTask
-        xsi:type="mylyn:MylynQueriesTask"
-        connectorKind="org.eclipse.mylyn.gerrit"
-        repositoryURL="https://git.eclipse.org/r"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <query
-          summary="QVTo Gerrit Reviews">
-        <attribute
-            key="gerrit query type"
-            value="custom"/>
-        <attribute
-            key="gerrit query project"
-            value="mmt/org.eclipse.qvto"/>
-        <attribute
-            key="gerrit query string"
-            value="project:mmt/org.eclipse.qvto status:open branch:master"/>
-      </query>
-    </setupTask>
-    <setupTask
-        xsi:type="mylyn:MylynBuildsTask"
-        serverURL="https://ci.eclipse.org/qvto/"
-        userID="${bugzilla.id}"
-        password="${eclipse.user.password}">
-      <buildPlan
-          name="qvto-master"/>
-      <buildPlan
-          name="qvto-branch-tests"/>
-    </setupTask>
-  </setupTask>
-  <setupTask
-      xsi:type="setup:CompoundTask"
-      name="Java Compiler">
-    <setupTask
-        xsi:type="setup:PreferenceTask"
-        key="instance/org.eclipse.jdt.launching/org.eclipse.jdt.launching.PREF_STRICTLY_COMPATIBLE_JRE_NOT_AVAILABLE"
-        value="ignore"/>
-  </setupTask>
   <project name="dev"
-      label="Development">
+      label="Development (required)">
     <setupTask
         xsi:type="projects:ProjectsImportTask">
       <sourceLocator
@@ -294,7 +273,7 @@
     <setupTask
         xsi:type="setup.workingsets:WorkingSetTask">
       <workingSet
-          name="QVTo Plugins">
+          name="${scope.project.root.label} Plugins">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.qvt.oml*"/>
@@ -336,13 +315,13 @@
         </predicate>
       </workingSet>
       <workingSet
-          name="QVTo Tests">
+          name="${scope.project.root.label} Tests">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.tests.*"/>
       </workingSet>
       <workingSet
-          name="QVTo Examples">
+          name="${scope.project.root.label} Examples">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.qvt.oml.econ2009.tutorial"/>
@@ -354,6 +333,12 @@
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.10.4"
+        label="3.10.4 (2021-06)"/>
+    <stream
+        name="3.10.3"
+        label="3.10.3 (2021-03)"/>
     <stream
         name="3.10.2"
         label="3.10.2 (2020-06)"/>
@@ -383,7 +368,8 @@
         label="3.7.0 (Oxygen)"/>
     <description>The development environment for the QVTo project</description>
   </project>
-  <project name="Releng">
+  <project name="releng"
+      label="Releng (optional)">
     <setupTask
         xsi:type="setup.p2:P2Task"
         label="Releng Tools">
@@ -404,13 +390,13 @@
     <setupTask
         xsi:type="setup.workingsets:WorkingSetTask">
       <workingSet
-          name="QVTo Doc">
+          name="${scope.project.root.label} Doc">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
       </workingSet>
       <workingSet
-          name="QVTo Features">
+          name="${scope.project.root.label} Features">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
@@ -419,7 +405,7 @@
             pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
       </workingSet>
       <workingSet
-          name="QVTo Releng">
+          name="${scope.project.root.label} Releng">
         <predicate
             xsi:type="predicates:NamePredicate"
             pattern="org.eclipse.qvto.oomph"/>
@@ -434,6 +420,12 @@
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.10.4"
+        label="3.10.4 (2021-06)"/>
+    <stream
+        name="3.10.3"
+        label="3.10.3 (2021-03)"/>
     <stream
         name="3.10.2"
         label="3.10.2 (2020-06)"/>
@@ -461,7 +453,7 @@
     <stream
         name="3.7.0"
         label="3.7.0 (Oxygen)"/>
-    <description>The release engineering for the QVTo project</description>
+    <description>Omit this unless you want to build a QVTo distribution or update documentation.</description>
   </project>
   <logicalProjectContainer
       xsi:type="setup:ProjectCatalog"
