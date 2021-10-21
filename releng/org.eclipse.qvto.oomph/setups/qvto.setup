@@ -24,6 +24,11 @@
       value="2048m"
       vm="true"/>
   <setupTask
+      xsi:type="setup:EclipseIniTask"
+      excludedTriggers="STARTUP"
+      option="-perspective"
+      value="org.eclipse.jdt.ui.JavaPerspective"/>
+  <setupTask
       xsi:type="setup:ResourceCreationTask"
       excludedTriggers="STARTUP MANUAL"
       targetURL="${workspace.location|uri}/.metadata/.plugins/org.eclipse.jdt.ui/dialog_settings.xml"
@@ -249,6 +254,11 @@
         <value>remoteURI</value>
       </detail>
     </annotation>
+    <configSections
+        name="core">
+      <properties
+          key="autocrlf"/>
+    </configSections>
     <description>QVTo Git repository clone</description>
   </setupTask>
   <project name="dev"
