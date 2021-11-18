@@ -2,7 +2,6 @@ package org.eclipse.m2m.tests.qvt.oml.transform;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2m.tests.qvt.oml.TestProject;
 import org.eclipse.pde.core.plugin.IPluginBase;
@@ -12,13 +11,12 @@ import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.core.util.CoreUtility;
-import org.junit.Assert;
 
 @SuppressWarnings("restriction")
 public class PluginDependencyProjectData extends ReferencedProjectData {
 	
-	public PluginDependencyProjectData(String myName, String referencedName) {
-		super(myName, referencedName, false);
+	public PluginDependencyProjectData(String myName, String referencedName, boolean useCycleReferences) {
+		super(myName, referencedName, useCycleReferences);
 	}
 	
 	private WorkspacePluginModelBase myPluginModel;
@@ -38,12 +36,6 @@ public class PluginDependencyProjectData extends ReferencedProjectData {
 		myPluginBase.setId(myProject.getName());
 		
 		IProject[] referencedProjects = myProject.getReferencedProjects();
-		
-		IProjectDescription desc = myProject.getDescription();
-		desc.setReferencedProjects(new IProject[] {});
-		myProject.setDescription(desc, null);
-		Assert.assertEquals(myProject.getReferencedProjects().length, 0);
-		
 		for (IProject referencedProject : referencedProjects) {
 							
 			CoreUtility.addNatureToProject(referencedProject, IBundleProjectDescription.PLUGIN_NATURE, new NullProgressMonitor());
@@ -53,11 +45,26 @@ public class PluginDependencyProjectData extends ReferencedProjectData {
 			referencedPluginModel = new WorkspaceBundlePluginModel(referencedManifest, referencedPluginXml);
 			IPluginBase referencedPluginBase = referencedPluginModel.getPluginBase();
 			referencedPluginBase.setId(referencedProject.getName());
+			IProject[] referencedReferencedProjects = referencedProject.getReferencedProjects();
+			for (IProject referencedReferencedProject : referencedReferencedProjects) {
+				IPluginImport pluginImport;
+				if (referencedReferencedProject == myProject) {
+					pluginImport = myPluginModel.createImport(myPluginBase.getId());
+				}
+				else {
+					IFile referencedReferencedPluginXml = PDEProject.getPluginXml(referencedReferencedProject);
+					IFile referencedReferencedManifest = PDEProject.getManifest(referencedReferencedProject);					
+					WorkspacePluginModelBase referencedReferencedPluginModel = new WorkspaceBundlePluginModel(referencedReferencedManifest, referencedReferencedPluginXml);
+					IPluginBase referencedReferencedPluginBase = referencedReferencedPluginModel.getPluginBase();
+					referencedReferencedPluginBase.setId(referencedReferencedProject.getName());
+					pluginImport = referencedReferencedPluginModel.createImport(referencedReferencedPluginBase.getId());
+				}
+				referencedPluginBase.add(pluginImport);
+			}
 			referencedPluginModel.save();
 			
-			IPluginImport pluginImport = myPluginModel.createImport(referencedPluginBase.getId());
-			IPluginBase pluginBase = myPluginModel.getPluginBase();
-			pluginBase.add(pluginImport);
+			IPluginImport pluginImport = referencedPluginModel.createImport(referencedPluginBase.getId());
+			myPluginBase.add(pluginImport);
 		}
 				
 		myPluginModel.save();
