@@ -97,7 +97,7 @@ public class WorkspaceUnitResolver extends DelegatingUnitResolver implements Uni
 
 		List<UnitResolver> resolvers = Collections.emptyList();
 		try {
-			Set<IProject> referencedProjects = ProjectDependencyTracker.getAllReferencedProjects(project, true);
+			Set<IProject> referencedProjects = ProjectDependencyTracker.getAllReferencedProjects(project, false);
 			resolvers = new ArrayList<UnitResolver>(referencedProjects.size());
 
 			for (IProject referenced : referencedProjects) {

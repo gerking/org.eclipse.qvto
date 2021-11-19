@@ -18,7 +18,7 @@ import org.eclipse.m2m.tests.qvt.oml.TestProject;
 public class ReferencedProjectData extends FilesToFilesData {
 	
 	private TestTransformation referencedProjectTestCase;
-	private boolean isUseCycleReferences;
+	protected boolean isUseCycleReferences;
 	
 	public ReferencedProjectData(String myName, String referencedName, boolean useCycleReferences) {
 		super(myName);
