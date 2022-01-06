@@ -43,9 +43,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 	public static final String URI_BLACKBOX_JDT_QUERY = "jdt"; //$NON-NLS-1$
 	
 	private static Map<IProject, Map<String, JdtDescriptor>> descriptors = new HashMap<IProject, Map<String, JdtDescriptor>>();
-	
-	private EPackage.Registry fPackageRegistry;
-	
+		
 	@Override
 	public Collection<? extends BlackboxUnitDescriptor> getUnitDescriptors(ResolutionContext resolutionContext) {
 		IProject project = getProject(resolutionContext);
@@ -220,6 +218,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		
 		private final Class<?> fModuleJavaClass;
 		private volatile int hashCode;
+		private EPackage.Registry fPackageRegistry;
 		
 		public JdtDescriptor(String unitQualifiedName, Class<?> moduleJavaClass) {
 			super(unitQualifiedName);
