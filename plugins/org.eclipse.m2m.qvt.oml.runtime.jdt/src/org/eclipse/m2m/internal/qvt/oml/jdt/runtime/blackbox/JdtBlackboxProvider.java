@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -35,6 +36,7 @@ import org.eclipse.m2m.internal.qvt.oml.blackbox.BlackboxUnitDescriptor;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.LoadContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.ResolutionContext;
 import org.eclipse.m2m.internal.qvt.oml.blackbox.java.JavaBlackboxProvider;
+import org.eclipse.m2m.internal.qvt.oml.compiler.BlackboxUnitResolver;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.internal.qvt.oml.runtime.project.ProjectDependencyTracker;
 
@@ -265,6 +267,17 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 			}
 						
 			return super.load(context);
+		}
+		
+		@Override
+		public URI reconvertURI() {
+			URI uri = getURI();
+			
+			if (BlackboxUnitResolver.isBlackboxUnitURI(uri) && uri.hasFragment()) {
+				return URI.createPlatformResourceURI(uri.fragment(), true);
+			}
+			
+			return uri;
 		}
 	}
 

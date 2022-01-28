@@ -71,7 +71,11 @@ public abstract class BlackboxUnitDescriptor {
 
 	public final URI getURI() {
 		return fURI;
-	}	
+	}
+	
+	public URI reconvertURI() {
+		return getURI();
+	}
 	
 	public String getDescription() {
 		return fDescription; 

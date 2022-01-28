@@ -113,7 +113,7 @@ public class BlackboxUnitResolver implements UnitResolver {
 		public CompiledUnit load(IMetamodelRegistryProvider provider) {
 			BlackboxUnitContents contents = getContents();
 	    	
-	    	List<Module> modules = contents.loadElements(CompilerUtils.getEPackageRegistry(getURI(), provider));
+	    	List<Module> modules = contents.loadElements(CompilerUtils.getEPackageRegistry(fDescriptor.reconvertURI(), provider));
 	    	List<QvtOperationalModuleEnv> modelEnvs = new ArrayList<QvtOperationalModuleEnv>(modules.size());
 	    	
 	    	for (Module nextModule : modules) {
