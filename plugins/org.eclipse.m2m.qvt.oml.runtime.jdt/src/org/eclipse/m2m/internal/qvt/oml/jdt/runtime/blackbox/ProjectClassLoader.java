@@ -168,21 +168,7 @@ public class ProjectClassLoader extends URLClassLoader {
 		
 		return null;
 	}
-	
-	private static IPluginModelBase getPluginModel(String pluginLocation) {
-		IPath pluginPath = new Path(pluginLocation);
 		
-		for (IPluginModelBase base : PluginRegistry.getAllModels()) {	
-			IPath basePath = new Path(base.getInstallLocation());
-			
-			if (basePath.isPrefixOf(pluginPath)) {
-				return base;
-			}
-		}
-		
-		return null;
-	}
-	
 	@Override
 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		
@@ -212,18 +198,22 @@ public class ProjectClassLoader extends URLClassLoader {
 	private static class WorkspaceDependencyAnalyzer {
 		
 		private final Map<String, Boolean> dependencyCache = new HashMap<String, Boolean>();
-		
-		private boolean hasWorkspaceDependency(IPluginModelBase pluginModel) throws CoreException {
-			return hasWorkspaceDependency(pluginModel.getInstallLocation());
-		}
+		private final IPluginModelBase[] pluginModels = PluginRegistry.getAllModels();
 		
 		private boolean hasWorkspaceDependency(String pluginLocation) throws CoreException {
+			IPluginModelBase pluginModel = getPluginModel(pluginLocation);
+			return pluginModel != null ? hasWorkspaceDependency(pluginModel) : false;
+		}
+		
+		private boolean hasWorkspaceDependency(IPluginModelBase pluginModel) throws CoreException {
+			String pluginLocation = pluginModel.getInstallLocation();
 			
 			if (dependencyCache.containsKey(pluginLocation)) {
 				return dependencyCache.get(pluginLocation);
 			}
 			
 			boolean result = false;
+			dependencyCache.put(pluginLocation, result);
 			
 			URI uri = URIUtil.toURI(pluginLocation);
 			IProject pluginProject = getProject(uri);
@@ -231,27 +221,51 @@ public class ProjectClassLoader extends URLClassLoader {
 			if (pluginProject != null) {
 				result = true;
 			}
-			else {	
-				IPluginModelBase pluginModel = getPluginModel(pluginLocation);
+			else {
+				IPluginImport[] imports = pluginModel.getPluginBase().getImports();
 				
-				if (pluginModel != null) {
-					IPluginImport[] imports = pluginModel.getPluginBase().getImports();
+				for(IPluginImport i : imports) {
+					IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
 					
-					for(IPluginImport i : imports) {
-						IPluginModelBase importedPlugin = PluginRegistry.findModel(i.getId());
-						
-						if (importedPlugin != null) {							
-							if (hasWorkspaceDependency(importedPlugin)) {
-								result = true;
-								break;
-							}
+					if (importedPlugin != null) {							
+						if (hasWorkspaceDependency(importedPlugin)) {
+							result = true;
+							break;
 						}
 					}
-				}				
+				}			
 			}
 			
 			dependencyCache.put(pluginLocation, result);
 			return result;
+		}
+		
+		private IPluginModelBase getPluginModel(String location) {
+			IPath locationPath = new Path(location).removeTrailingSeparator();
+			
+			Map<IPluginModelBase, IPath> pluginLocations = new HashMap<IPluginModelBase, IPath>(1);
+					
+			for (IPluginModelBase pluginModel : pluginModels) {
+				IPath pluginPath = new Path(pluginModel.getInstallLocation()).removeTrailingSeparator();
+				
+				if (pluginPath.isPrefixOf(locationPath)) {
+					pluginLocations.put(pluginModel, pluginPath);
+				}
+			}
+					
+			do {		
+				for (IPluginModelBase pluginModel : pluginLocations.keySet()) {
+					IPath pluginPath = pluginLocations.get(pluginModel);
+									
+					if (pluginPath.equals(locationPath)) {	
+						return pluginModel;
+					}
+				}
+			
+				locationPath = locationPath.removeLastSegments(1);
+			} while (!locationPath.isEmpty());
+			
+			return null;
 		}
 		
 		URL[] getProjectClassPath(IJavaProject javaProject) throws CoreException, MalformedURLException {
