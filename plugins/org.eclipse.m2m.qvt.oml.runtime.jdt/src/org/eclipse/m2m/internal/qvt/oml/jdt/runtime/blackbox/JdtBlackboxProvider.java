@@ -253,7 +253,7 @@ public class JdtBlackboxProvider extends JavaBlackboxProvider {
 		
 		public JdtDescriptor(String unitQualifiedName, Class<?> moduleJavaClass) {
 			super(unitQualifiedName);
-			addModuleHandle(new JdtModuleHandle(unitQualifiedName, moduleJavaClass));
+			addModuleHandle(new JdtModuleHandle(moduleJavaClass.getSimpleName(), moduleJavaClass));
 			
 			fModuleJavaClass = moduleJavaClass;
 		}
