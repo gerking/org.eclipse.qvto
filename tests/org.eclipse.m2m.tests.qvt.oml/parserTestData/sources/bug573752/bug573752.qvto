@@ -1,9 +1,9 @@
 import org.eclipse.m2m.tests.qvt.oml.bbox.Bug573752_Library;
 
-modeltype testqvt uses 'http://www.eclipse.org/m2m/qvt/oml/testqvt';
+modeltype simpleuml uses 'http://www.eclipse.org/qvt/1.0.0/Operational/examples/simpleuml';
 
 transformation bug573752();
 
 main() {}
 
-blackbox query test(numbers : Numbers) : BooleanElement;
+blackbox query test(dataType : DataType) : Class;

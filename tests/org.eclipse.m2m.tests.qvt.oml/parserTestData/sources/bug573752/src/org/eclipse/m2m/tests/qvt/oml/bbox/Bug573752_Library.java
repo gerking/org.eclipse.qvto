@@ -12,15 +12,16 @@ package org.eclipse.m2m.tests.qvt.oml.bbox;
 
 import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
-import testqvt.BooleanElement;
-import testqvt.Numbers;
-import testqvt.TestqvtFactory;
+import simpleuml.Class;
+import simpleuml.DataType;
+import simpleuml.SimpleumlFactory;
+import simpleuml.SimpleumlPackage;
 
-@Module(packageURIs={"http://www.eclipse.org/m2m/qvt/oml/testqvt"})
+@Module(packageURIs={SimpleumlPackage.eNS_URI})
 public class Bug573752_Library {
 	
-	public BooleanElement test(Numbers numbers) {
-		return TestqvtFactory.eINSTANCE.createBooleanElement();
+	public Class test(DataType dataType) {
+		return SimpleumlFactory.eINSTANCE.createClass();
 	}
 
 }

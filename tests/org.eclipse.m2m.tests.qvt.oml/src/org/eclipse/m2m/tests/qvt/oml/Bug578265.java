@@ -10,15 +10,11 @@
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.compiler.ExeXMISerializer;
 import org.eclipse.m2m.internal.qvt.oml.compiler.QVTOCompiler;
@@ -35,23 +31,7 @@ public class Bug578265 extends TestQvtParser {
 	public Bug578265() {
 		super(TestData.createSourceChecked("bug578265", 0, 0)); //$NON-NLS-1$
 	}
-		
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		
-		TestProject testProject = getTestProject();
-		
-		testProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
-		
-	    IMarker[] markers = testProject.getProject().findMarkers(IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
-	    for (IMarker marker : markers) {
-	    	String message = marker.getAttribute(IMarker.MESSAGE).toString();
-	    	Integer severity = (Integer) marker.getAttribute(IMarker.SEVERITY);
-	    	assertTrue(message, severity < IMarker.SEVERITY_ERROR);
-	    }
-	}
-		
+	
 	@Override
 	public void runTest() throws Exception {
 				
