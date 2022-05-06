@@ -59,7 +59,7 @@ public class TestExecutableTransfCopy extends TestCase {
 			// TODO - the following tests redefine virtual operations which are called from imported modules
 			"importedvirtuals", //$NON-NLS-1$
 			"virt", //$NON-NLS-1$
-			"bug566236", //$NON-NLS-1$
+			
 			// TODO - the following test uses a workspace blackbox which is not copied
 			"bug507955" //$NON-NLS-1$
 			));
@@ -104,6 +104,7 @@ public class TestExecutableTransfCopy extends TestCase {
     	};
     	
     	transfParamURIs.add(uriCreator.getTransformationUri());
+
     	final URI execTransfURI = URI.createFileURI(getDestFile(myData.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION).getAbsolutePath());
     	transfParamURIs.add(execTransfURI);
     	
