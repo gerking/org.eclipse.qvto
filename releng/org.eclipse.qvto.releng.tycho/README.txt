@@ -73,15 +73,15 @@ ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf  /home/data/httpd/download
 -- Updates maintenance -- https://download.eclipse.org/mmt/qvto/updates/releases
 ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases
 ssh genie.qvt-oml@projects-storage.eclipse.org pwd ; cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; pwd ; ls -la
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
 
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/nightly ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/nightly ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
 ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/mmt/qvto/updates/nightly/3.4.1
 
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/interim ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/interim ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
 ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/mmt/qvto/updates/interim/3.4.1
 
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/milestones ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/milestones ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.1
 ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/download.eclipse.org/mmt/qvto/updates/milestones/3.4.1
 
 -- Drops archiving -- https://archive.eclipse.org/mmt/qvto/downloads/drops ---- and edit GIT\mmt\downloads\extras-qvto.php
@@ -92,6 +92,6 @@ ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.ecli
 ssh genie.qvt-oml@projects-storage.eclipse.org ls -la /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases
 ssh genie.qvt-oml@projects-storage.eclipse.org rm -rf /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases/zz*
 
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.0
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml remove -Dchild.repository=3.4.0
 ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/download.eclipse.org/mmt/qvto/updates/releases ; mv 3.4.0 /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases
-ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases ; ant -f /shared/modeling/tools/promotion/manage-composite.xml add -Dchild.repository=3.4.0
+ssh genie.qvt-oml@projects-storage.eclipse.org cd /home/data/httpd/archive.eclipse.org/mmt/qvto/updates/releases ; export JAVA_HOME=/shared/common/jdk1.8.0_x64-latest ; java -version ; /shared/common/apache-ant-latest/bin/ant -f /shared/modeling/tools/promotion/manage-composite.xml add -Dchild.repository=3.4.0
