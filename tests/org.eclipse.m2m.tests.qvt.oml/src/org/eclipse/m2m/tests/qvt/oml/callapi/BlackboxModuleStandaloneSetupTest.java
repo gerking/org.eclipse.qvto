@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.eclipse.m2m.qvt.oml.TransformationExecutor;
-import org.eclipse.m2m.tests.qvt.oml.bbox.StandaloneBBoxModule2;
+import org.eclipse.m2m.tests.qvt.oml.bbox.StandaloneBBoxModuleRegistered;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,7 +41,7 @@ public class BlackboxModuleStandaloneSetupTest extends TransformationExecutorTes
 	@Override
 	@Before
 	public void setUp() {
-		TransformationExecutor.BlackboxRegistry.INSTANCE.registerModules(StandaloneBBoxModule2.class);
+		TransformationExecutor.BlackboxRegistry.INSTANCE.registerModules(StandaloneBBoxModuleRegistered.class);
 		super.setUp();
 	}	
 }

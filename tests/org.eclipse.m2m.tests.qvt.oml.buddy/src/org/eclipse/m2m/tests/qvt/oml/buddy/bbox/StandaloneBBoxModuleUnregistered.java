@@ -9,23 +9,23 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2m.tests.qvt.oml.bbox;
+package org.eclipse.m2m.tests.qvt.oml.buddy.bbox;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
 @Module(packageURIs={"http://www.eclipse.org/emf/2002/Ecore"})
-public class StandaloneBBoxModule {
+public class StandaloneBBoxModuleUnregistered {
 
-	public StandaloneBBoxModule() {
+	public StandaloneBBoxModuleUnregistered() {
 		 super();
 	}
 	
-	public String echoFromBBoxModule(String str) {
+	public String echoFromBBoxModuleUnregistered(String str) {
 		return str;
 	}
 	
-	public EClass modifyClassName(EClass cls, String name) {
+	public EClass modifyClassNameUnregistered(EClass cls, String name) {
 		cls.setName(name);
 		return cls;
 	}

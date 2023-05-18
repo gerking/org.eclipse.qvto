@@ -2,6 +2,6 @@ modeltype Ecore "strict" uses ecore('http://www.eclipse.org/emf/2002/Ecore');
 
 library bug326871_lib;
 
-blackbox helper echoFromBBoxModule2(s : String) : String;
+blackbox helper echoFromBBoxModuleRegistered(s : String) : String;
 	
-blackbox helper modifyClassName2(e : EClass, s: String) : EClass;
+blackbox helper modifyClassNameRegistered(e : EClass, s: String) : EClass;

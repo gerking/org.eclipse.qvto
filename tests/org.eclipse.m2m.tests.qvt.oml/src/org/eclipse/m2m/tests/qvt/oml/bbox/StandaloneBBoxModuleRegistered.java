@@ -15,17 +15,17 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
 
 @Module(packageURIs={"http://www.eclipse.org/emf/2002/Ecore"})
-public class StandaloneBBoxModule2 {
+public class StandaloneBBoxModuleRegistered {
 
-	public StandaloneBBoxModule2() {
+	public StandaloneBBoxModuleRegistered() {
 		 super();
 	}
 	
-	public String echoFromBBoxModule2(String str) {
+	public String echoFromBBoxModuleRegistered(String str) {
 		return str;
 	}
 	
-	public EClass modifyClassName2(EClass cls, String name) {
+	public EClass modifyClassNameRegistered(EClass cls, String name) {
 		cls.setName(name);
 		return cls;
 	}
