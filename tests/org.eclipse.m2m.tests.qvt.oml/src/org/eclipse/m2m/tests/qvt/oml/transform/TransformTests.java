@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ExpressionsPackage;
 import org.eclipse.m2m.internal.qvt.oml.trace.TracePackage;
@@ -637,6 +638,12 @@ public class TransformTests extends TestCase {
         			@Override
 					public String getTestDataFolder() {
         				return "parserTestData with%20whitespace"; //$NON-NLS-1$
+        			};
+        		},
+        		new FilesToFilesData("bug581992") {
+        			@Override
+					public int getExpectedSeverity() {
+        				return Diagnostic.WARNING;
         			};
         		}
         	};
