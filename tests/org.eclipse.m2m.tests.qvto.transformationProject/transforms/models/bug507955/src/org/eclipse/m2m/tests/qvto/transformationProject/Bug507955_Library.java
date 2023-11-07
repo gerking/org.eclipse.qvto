@@ -8,7 +8,7 @@
  * Contributors:
  *     Christopher Gerking - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2m.tests.qvt.oml.bbox;
+package org.eclipse.m2m.tests.qvto.transformationProject;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.m2m.qvt.oml.blackbox.java.Module;
