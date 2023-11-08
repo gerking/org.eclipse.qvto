@@ -345,6 +345,7 @@ public class CompletionTest extends AbstractCompletionTest {
 		}
 	}
 	
+	@Deprecated /* @deprecated OCL Bug 582625 should provide this */
 	private static void initializeStandardLibrary() {
 		for (EClassifier classifier : QvtOperationalStdLibrary.INSTANCE.getStdLibModule().getEClassifiers()) {
 			if (classifier instanceof PredefinedType) {
