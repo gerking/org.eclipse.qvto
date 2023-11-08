@@ -16,8 +16,8 @@
     label="QVTo">
   <setupTask
       xsi:type="jdt:JRETask"
-      version="JavaSE-11"
-      location="${jre.location-11}"/>
+      version="JavaSE-17"
+      location="${jre.location-17}"/>
   <setupTask
       xsi:type="setup:EclipseIniTask"
       option="-Xmx"
@@ -50,7 +50,7 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="2021-09"
+      defaultValue="2023-09"
       storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup.p2:P2Task">
@@ -99,11 +99,70 @@
             url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
       </repositoryList>
       <repositoryList
+          name="2023-09">
+        <repository
+            url="https://download.eclipse.org/releases/2023-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/release/4.29.0"/>
+      </repositoryList>
+      <repositoryList
+          name="2023-06">
+        <repository
+            url="https://download.eclipse.org/releases/2023-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20230531010532/repository"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
+          name="2023-03">
+        <repository
+            url="https://download.eclipse.org/releases/2023-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20230302014618/repository"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
+          name="2022-12">
+        <repository
+            url="https://download.eclipse.org/releases/2022-12"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20221123021534/repository"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
+          name="2022-09">
+        <repository
+            url="https://download.eclipse.org/releases/2022-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220830213456/repository"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
+          name="2022-06">
+        <repository
+            url="https://download.eclipse.org/releases/2022-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220531185310/repository"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
+          name="2022-03">
+        <repository
+            url="https://download.eclipse.org/releases/2022-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20220302172233/repository"/>
+      </repositoryList>
+      <repositoryList
           name="2021-12">
         <repository
-            url="https://download.eclipse.org/releases/latest"/>
+            url="https://download.eclipse.org/releases/2021-12"/>
         <repository
-            url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+            url="https://download.eclipse.org/tools/orbit/downloads/drops/R20211213173813/repository"/>
       </repositoryList>
       <repositoryList
           name="2021-09">
@@ -264,6 +323,13 @@
   <project name="dev"
       label="Development (required)">
     <setupTask
+        xsi:type="setup.p2:P2Task">
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.m2m.qvt.oml.runtime.feature.group"/>
+    </setupTask>
+    <setupTask
         xsi:type="projects:ProjectsImportTask">
       <sourceLocator
           rootFolder="${qvto.git.clone.location/plugins}"/>
@@ -343,6 +409,18 @@
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.10.8"
+        label="3.10.8 (2023-12)"/>
+    <stream
+        name="3.10.7"
+        label="3.10.7 (2022-06)"/>
+    <stream
+        name="3.10.6"
+        label="3.10.6 (2022-03)"/>
+    <stream
+        name="3.10.5"
+        label="3.10.5 (2021-12)"/>
     <stream
         name="3.10.4"
         label="3.10.4 (2021-06)"/>
@@ -430,6 +508,18 @@
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.10.8"
+        label="3.10.8 (2023-12)"/>
+    <stream
+        name="3.10.7"
+        label="3.10.7 (2022-06)"/>
+    <stream
+        name="3.10.6"
+        label="3.10.6 (2022-03)"/>
+    <stream
+        name="3.10.5"
+        label="3.10.5 (2021-12)"/>
     <stream
         name="3.10.4"
         label="3.10.4 (2021-06)"/>
