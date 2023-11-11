@@ -61,6 +61,7 @@ import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaModelStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaConventions;
@@ -386,9 +387,7 @@ public class TestUtil extends Assert {
 				TestCase.fail("No metamodel EPackage available in " + absoluteURI); //$NON-NLS-1$
 			}
 
-			if (!packageRegistry.containsKey(metamodelPackage.getNsURI())) {
-				packageRegistry.put(metamodelPackage.getNsURI(), metamodelPackage);
-			}
+			packageRegistry.put(metamodelPackage.getNsURI(), metamodelPackage);
 		}
 
 		if (!metamodels.isEmpty() && resSet instanceof ResourceSetImpl) {
@@ -494,6 +493,9 @@ public class TestUtil extends Assert {
 					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
 				}
 			}
+			
+			IPluginImport qvtTestImport = pluginModel.createImport(AllTests.BUNDLE_ID);
+			pluginBase.add(qvtTestImport);
 			
 			IPluginImport qvtImport = pluginModel.createImport(QvtPlugin.ID);
 			pluginBase.add(qvtImport);
