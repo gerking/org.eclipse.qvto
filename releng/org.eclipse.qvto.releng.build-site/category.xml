@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <!--feature id="org.eclipse.qvto.examples" version="0.0.0">
-      <category name="mmt.qvto"/>
-   </feature-->
-   <feature id="org.eclipse.m2m.qvt.oml.tools.coverage" version="0.0.0">
-      <category name="mmt.qvto"/>
-   </feature>
    <feature id="org.eclipse.m2m.qvt.oml.sdk" version="0.0.0">
-      <category name="mmt.qvto"/>
-   </feature>
-   <feature id="org.eclipse.m2m.qvt.oml.tools.source" version="0.0.0">
-      <category name="mmt.qvto"/>
+      <category name="qvto"/>
    </feature>
    <feature id="org.eclipse.m2m.qvt.oml.sdk.source" version="0.0.0">
-      <category name="mmt.qvto"/>
+      <category name="qvto"/>
    </feature>
-   <category-def name="mmt.qvto" label="QVT Operational">
+   <feature id="org.eclipse.m2m.qvt.oml.tests" version="0.0.0">
+      <category name="qvto.tests"/>
+   </feature>
+   <feature id="org.eclipse.m2m.qvt.oml.tests.source" version="0.0.0">
+      <category name="qvto.tests"/>
+   </feature>
+   <feature id="org.eclipse.m2m.qvt.oml.tools" version="0.0.0">
+      <category name="qvto"/>
+   </feature>
+   <feature id="org.eclipse.m2m.qvt.oml.tools.source" version="0.0.0">
+      <category name="qvto"/>
+   </feature>
+   <category-def name="qvto" label="QVT Operational">
       <description>
          QVT Operational SDK (interpreter with support for BlackBox libraries, editor with JDT integration, debugger, metamodel browser, Ant support) and QVTo Tooling (Code coverage with JUnit integration support)
+      </description>
+   </category-def>
+   <category-def name="qvto.tests" label="QVT Operational (tests)">
+      <description>
+         QVT Operational tests and examples source plugins
       </description>
    </category-def>
 </site>
