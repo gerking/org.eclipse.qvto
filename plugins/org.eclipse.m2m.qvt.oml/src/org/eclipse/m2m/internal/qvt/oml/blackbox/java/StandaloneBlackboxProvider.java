@@ -43,6 +43,7 @@ public class StandaloneBlackboxProvider extends JavaBlackboxProvider {
 			return null;
 		}
 		catch(RuntimeException e) {
+			QvtPlugin.error(e);
 			return null;
 		}
 	}
