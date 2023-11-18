@@ -519,20 +519,8 @@ public class TransformTests extends TestCase {
         		new FilesToFilesData("urilessModeltype"), //$NON-NLS-1$
         		new FilesToFilesData("bug449445"), //$NON-NLS-1$
         		new FilesToFilesData("bug449912", Collections.<String>emptyList(), Collections.singletonList("expected.qvtoperational")), //$NON-NLS-1$ //$NON-NLS-2$
-        		new ReferencedProjectData("bug433937", "bug433937_referenced", false) { //$NON-NLS-1$ //$NON-NLS-2$
-        			@Override
-        			public boolean isUseCompiledXmi() {
-        				// TODO it should be possible to run this test with the using of compiled XMI
-        				return false;
-        			}
-        		},
-        		new ReferencedProjectData("bug433937", "bug433937_referenced", true) { //$NON-NLS-1$ //$NON-NLS-2$
-        			@Override
-        			public boolean isUseCompiledXmi() {
-        				// TODO it should be possible to run this test with the using of compiled XMI
-        				return false;
-        			}
-        		},
+        		new ReferencedProjectData("bug433937", "bug433937_referenced", false), //$NON-NLS-1$ //$NON-NLS-2$
+        		new ReferencedProjectData("bug433937", "bug433937_referenced", true), //$NON-NLS-1$ //$NON-NLS-2$
         		new FilesToFilesData("bug457433", Arrays.asList("in.ecore", "in2.ecore"), Collections.<String>emptyList()), //$NON-NLS-1$ //$NON-NLS-2$
         		new FilesToFilesData("bug440514"), //$NON-NLS-1$
         		new FilesToFilesData("bug415024"), //$NON-NLS-1$
