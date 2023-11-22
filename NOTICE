@@ -1,4 +1,4 @@
-# Notices for QVT-OML
+# Notices for Eclipse QVT-OML
 
 This content is produced and maintained by the Eclipse QVT-OML project.
 
@@ -6,7 +6,7 @@ This content is produced and maintained by the Eclipse QVT-OML project.
 
 ## Trademarks
 
-Eclipse QVT-OML, and QVT-OML are trademarks of the Eclipse Foundation.
+QVT-OML™ is a trademark of the Eclipse Foundation.
 
 ## Copyright
 
@@ -18,7 +18,7 @@ source code repository logs.
 
 This program and the accompanying materials are made available under the terms
 of the Eclipse Public License v. 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
+https://www.eclipse.org/legal/epl-2.0.
 
 SPDX-License-Identifier: EPL-2.0
 
@@ -26,11 +26,11 @@ SPDX-License-Identifier: EPL-2.0
 
 The project maintains the following source code repositories:
 
-* http://git.eclipse.org/c/mmt/org.eclipse.qvto.git
+* https://git.eclipse.org/r/mmt/org.eclipse.qvto
 
 ## Third-party Content
 
-Google Guava (15.0.0)
+Google Guava (15.0.0 ...)
 
 * License: Apache License, 2.0
 

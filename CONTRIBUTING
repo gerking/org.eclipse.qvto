@@ -1,13 +1,18 @@
-# Contributing to QVT-OML
+# Contributing to Eclipse QVT-OML
 
 Thanks for your interest in this project.
 
 ## Project description
 
 The Eclipse QVT Operational component is an implementation of the Operational
-Mappings Language defined by Meta Object Facility™ (MOF™) 2.0
+Mappings Language defined by Meta Object Facility™ (MOF™) 2.0
 Query/View/Transformation™ (QVT™). In long term, it aims to provide a
-complete implementation of the operational part of the standard. Operational QVT
+complete implementation of the operational part of the standard. A high level
+overview of the QVT Operational language is available in form of presentations
+Model Transformation with Operational QVT and The Art of Model Transformation
+with Operational QVT.
+
+Operational QVT
 project provides a powerful Eclipse IDE: feature-rich editor (syntax
 highlighting, hovers, hyperlinks, code completion, templates, outlines, markers,
 etc.) debugger (conditional breakpoints, variables view, expressions view,
@@ -18,9 +23,15 @@ support of Java Black-Box units and libraries seamless integration with JDT
 supporting co-development of QVTo and Java in single workspace Additional
 tooling QVTO Code Coverage provides: annotate the Operational QVT Editor to
 highlight covered and non-covered parts of transformation JUnit launch
-configuration to integrate with the JUnit test framework
+configuration to integrate with the JUnit test framework.
 
 * https://projects.eclipse.org/projects/modeling.mmt.qvt-oml
+
+## Terms of Use
+
+This repository is subject to the Terms of Use of the Eclipse Foundation
+
+* https://www.eclipse.org/legal/termsofuse.php
 
 ## Developer resources
 
@@ -31,7 +42,7 @@ more.
 
 The project maintains the following source code repositories
 
-* http://git.eclipse.org/c/mmt/org.eclipse.qvto.git
+* https://git.eclipse.org/r/mmt/org.eclipse.qvto
 
 This project uses Bugzilla to track ongoing development and issues.
 
@@ -41,18 +52,26 @@ This project uses Bugzilla to track ongoing development and issues.
 Be sure to search for existing bugs before you create another one. Remember that
 contributions are always welcome!
 
+## Eclipse Development Process
+
+This Eclipse Foundation open project is governed by the Eclipse Foundation
+Development Process and operates under the terms of the Eclipse IP Policy.
+
+* https://eclipse.org/projects/dev_process
+* https://www.eclipse.org/org/documents/Eclipse_IP_Policy.pdf
+
 ## Eclipse Contributor Agreement
 
-Before your contribution can be accepted by the project team contributors must
+In order to be able to contribute to Eclipse Foundation projects you must
 electronically sign the Eclipse Contributor Agreement (ECA).
 
-* http://www.eclipse.org/legal/ECA.php
+* https://www.eclipse.org/legal/ECA.php
 
-Commits that are provided by non-committers must have a Signed-off-by field in
-the footer indicating that the author is aware of the terms by which the
-contribution has been provided to the project. The non-committer must
-additionally have an Eclipse Foundation account and must have a signed Eclipse
-Contributor Agreement (ECA) on file.
+The ECA provides the Eclipse Foundation with a permanent record that you agree
+that each of your contributions will comply with the commitments documented in
+the Developer Certificate of Origin (DCO). Having an ECA on file associated with
+the email address matching the "Author" field of your contribution's Git commits
+fulfills the DCO's requirement that you sign-off on your contributions.
 
 For more information, please see the Eclipse Committer Handbook:
 https://www.eclipse.org/projects/handbook/#resources-commit
@@ -62,3 +81,4 @@ https://www.eclipse.org/projects/handbook/#resources-commit
 Contact the project developers via the project's "dev" list.
 
 * https://dev.eclipse.org/mailman/listinfo/qvto-dev
+
