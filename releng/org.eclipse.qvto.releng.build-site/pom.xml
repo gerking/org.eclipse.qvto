@@ -19,6 +19,7 @@
         <filtering>true</filtering>
         <includes>
           <include>publisher.properties</include>
+          <include>justj-promoter.properties</include>
         </includes>
       </resource>
       <resource>
