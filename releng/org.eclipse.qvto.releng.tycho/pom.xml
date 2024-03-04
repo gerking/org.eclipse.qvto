@@ -438,16 +438,6 @@
       </properties>
     </profile>
     <profile>
-      <id>interim</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <buildType>I</buildType>
-        <targetPlatform>targetPlatforms/interim</targetPlatform>
-      </properties>
-    </profile>
-    <profile>
       <id>milestone</id>
       <activation>
         <activeByDefault>false</activeByDefault>
@@ -466,30 +456,6 @@
         <buildType>S</buildType>
         <targetPlatform>targetPlatforms/stable</targetPlatform>
       </properties>
-    </profile>
-    <profile>
-      <id>release</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <properties>
-        <buildType>R</buildType>
-        <targetPlatform>targetPlatforms/stable</targetPlatform>
-      </properties>
-       <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-p2-repository-plugin</artifactId>
-            <configuration>
-              <extraArtifactRepositoryProperties>
-                <p2.statsURI>http://download.eclipse.org/stats/mmt/qvto/updates/releases/${unqualifiedVersion}</p2.statsURI>
-                <p2.mirrorsURL>http://www.eclipse.org/downloads/download.php?file=/mmt/qvto/updates/releases/${unqualifiedVersion}&amp;format=xml</p2.mirrorsURL>
-              </extraArtifactRepositoryProperties>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>oxygen</id>
