@@ -22,7 +22,7 @@
         <testClass>org.eclipse.m2m.internal.tests.qvt.oml.ui.AllTests</testClass>
         <useUIHarness>true</useUIHarness>
         <useUIThread>true</useUIThread>
-        <argLine>-Xms128m -Xmx1G -ea</argLine>
+        <argLine>-Xms128m -Xmx1G ${argLineTail}</argLine>
         <reportsDirectory>${project.build.directory}/surefire-reports/plugin</reportsDirectory>
      </configuration>
     </plugin>
