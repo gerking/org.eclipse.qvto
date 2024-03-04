@@ -448,6 +448,16 @@
       </properties>
     </profile>
     <profile>
+      <id>milestone</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <buildType>S</buildType>
+        <targetPlatform>targetPlatforms/stable</targetPlatform>
+      </properties>
+    </profile>
+    <profile>
       <id>stable</id>
       <activation>
         <activeByDefault>false</activeByDefault>
