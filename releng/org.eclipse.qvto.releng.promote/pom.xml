@@ -84,7 +84,7 @@
                               ${BUILD_REMOTE}
                               -retain 5
                               -label "QVTo"
-                              -build-url ${org.eclipse.justj.p2.manager.build.url}
+                              -build-url "${BUILD_URL} and ${env.BUILD_URL}"
                               -root ${BUILD_ROOT}
                               -relative builds
                               -version-iu-pattern org\.eclipse\.m2m\.qvt\.oml\.sdk\.feature.*
