@@ -22,7 +22,7 @@
 		The "JustJ for QVTo" Eclipse launch supports regular Java debugging."
 		-->
 		<BUILD_COMMIT>-commit https://git.eclipse.org/c/mmt/org.eclipse.qvto.git/commit/?id=${env.GIT_COMMIT}</BUILD_COMMIT>
-		<BUILD_PROMOTE>https://ci.eclipse.org/qvto/job/qvto-master/lastSuccessfulBuild/artifact/targetPlatform</BUILD_PROMOTE>
+		<BUILD_PROMOTE>https://ci.eclipse.org/qvto/job/qvto-master/lastSuccessfulBuild/artifact/releng/org.eclipse.ocl.releng.build-site/target/repository</BUILD_PROMOTE>
 		<BUILD_REMOTE>-remote genie.qvt-oml@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/mmt/qvto</BUILD_REMOTE>
 		<BUILD_ROOT>${project.build.directory}/justj-sync</BUILD_ROOT>
 		<BUILD_TIMESTAMP>-timestamp ${build.timestamp}</BUILD_TIMESTAMP>

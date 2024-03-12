@@ -9,7 +9,7 @@
     <listAttribute key="M2_PROPERTIES">
         <listEntry value="BUILD_TYPE=nightly"/>
         <listEntry value="BUILD_ROOT=C:/Temp/qvto-sync"/>
-        <listEntry value="BUILD_PROMOTE=E:\GIT\org.eclipse.qvto\releng\org.eclipse.qvto.releng.promote/../org.eclipse.qvto.releng.build-site/target/repository"/>
+        <listEntry value="BUILD_PROMOTE=https://ci.eclipse.org/qvtd/job/qvtd-master/lastSuccessfulBuild/artifact/releng/org.eclipse.qvtd.releng.build-site/target/repository"/>
         <listEntry value="BUILD_REMOTE=-mapping dummyRemote-&gt;dummyRemote"/>
         <listEntry value="BUILD_COMMIT=-mapping dummyCommit-&gt;dummyCommit"/>
     </listAttribute>
