@@ -14,5 +14,5 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.ocl;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.ocl.metainfo;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.ocl.transformations;x-internal:=true,
  org.eclipse.m2m.qvt.oml.ocl.legacy.libraries
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.ocl

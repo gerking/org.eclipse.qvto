@@ -56,24 +56,25 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 		fSeverityTable.put(JavaCore.ERROR, Integer.valueOf(SEVERITY_ERROR));
 	}
 
+	@Override
 	public void setupProject(IProject project, NewProjectData data, IProgressMonitor monitor) throws CoreException {
-		
+
 		try {
 			SubMonitor subMonitor = SubMonitor.convert(monitor, 6);
-			
+
 			super.setupProject(project, data, subMonitor.split(1));
-			
+
 			if (data.isCreateJava()) {
 				CoreUtility.addNatureToProject(project, JavaCore.NATURE_ID, subMonitor.split(1));
-		
+
 				IContainer srcContainer = getFolder(project, data.getSourceFolderName(), subMonitor.split(1));
 				IContainer binContainer = getFolder(project, data.getOutFolderName(), subMonitor.split(1));
-		
+
 				IJavaProject javaProject = JavaCore.create(project);
 				javaProject.setOutputLocation(binContainer.getFullPath(), subMonitor.split(1));
-		
+
 				subMonitor.subTask(DebugPDEMessages.Setup_SettingClasspath);
-		
+
 				IClasspathEntry[] entries = new IClasspathEntry[data.isPlugin() ? 3 : 1];
 				if (data.isPlugin()) {
 					String executionEnvironment = data.getfExecutionEnv();
@@ -81,20 +82,21 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 					entries[0] = ClasspathComputer.createJREEntry(executionEnvironment);
 					entries[1] = ClasspathComputer.createContainerEntry();
 				}
-		
+
 				entries[entries.length - 1] = JavaCore.newSourceEntry(srcContainer.getFullPath());
 				javaProject.setRawClasspath(entries, subMonitor.split(1));
-				
+
 				if(data.isDoGenerateClass()) {
 					generateTopLevelPluginClass(subMonitor.split(1));
 				}
 			}
-			
+
 		} finally {
 			SubMonitor.done(monitor);
 		}
 	}
 
+	@Override
 	public String getRequiredExecutionEnv(String executionEnv) {
 		if (getEEnv(executionEnv) == null) {
 			return null;
@@ -109,11 +111,13 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 		}
 		return null;
 	}
-	
+
+	@Override
 	protected void createFolder(IFolder folder, IProgressMonitor monitor) throws CoreException {
 		org.eclipse.jdt.internal.ui.util.CoreUtility.createFolder(folder, true, true, monitor);
 	}
 
+	@Override
 	public String getClassField(String id, String suffix) {
 		StringBuffer buffer = new StringBuffer();
 
@@ -152,13 +156,16 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 		return buffer.toString();
 	}
 
+	@Override
 	public IStatus validateJavaTypeName(String name) {
 		return JavaConventions.validateJavaTypeName(name.trim(), JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);
 	}
 
+	@Override
 	public void fillExecutionEnvironments(Combo combo) {
 		IExecutionEnvironment[] fInstalledEEs = JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments();
 		Arrays.sort(fInstalledEEs, new java.util.Comparator<IExecutionEnvironment>() {
+			@Override
 			public int compare(IExecutionEnvironment arg0, IExecutionEnvironment arg1) {
 				return Policy.getComparator().compare(arg0.getId(), arg1.getId());
 			}
@@ -188,7 +195,7 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 			}
 		}
 
-		String defaultCC = "1.5"; //$NON-NLS-1$
+		String defaultCC = "1.8"; //$NON-NLS-1$
 		try {
 			if (JavaModelUtil.class.getDeclaredField("VERSION_LATEST") != null) { //$NON-NLS-1$
 				defaultCC = JavaModelUtil.VERSION_LATEST;
@@ -203,8 +210,8 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 			if (defaultCC.endsWith(eeCompliance))
 				return environments[i].getId();
 		}
-		
-		return "J2SE-1.5"; //$NON-NLS-1$
+
+		return "JavaSE-1.8"; //$NON-NLS-1$
 	}
-	
+
 }

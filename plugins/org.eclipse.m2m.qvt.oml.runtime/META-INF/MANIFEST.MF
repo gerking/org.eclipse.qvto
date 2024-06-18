@@ -34,5 +34,5 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)";resoluti
  org.apache.ant;bundle-version="[1.7.1,2.0.0)";resolution:=optional,
  org.eclipse.m2m.qvt.oml;bundle-version="[3.0.0,4.0.0)"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.runtime

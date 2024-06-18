@@ -45,5 +45,5 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.emf.util;
    org.eclipse.m2m.qvt.oml.debug.core,
    org.eclipse.m2m.qvt.oml.runtime.jdt",
  org.eclipse.m2m.internal.qvt.oml.emf.util.urimap.impl;x-internal:=true
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.emf.util
