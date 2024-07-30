@@ -37,8 +37,8 @@
     <targetPlatform>targetPlatforms/unspecified</targetPlatform>
 
     <tycho.scmUrl>scm:git:https://git.eclipse.org/c/mmt/org.eclipse.qvto.git</tycho.scmUrl>
-    <!--executionEnvironment>J2SE-1.5</executionEnvironment>
-    <source-java-version>1.5</source-java-version>
+    <!--executionEnvironment>J2SE-1.8</executionEnvironment>
+    <source-java-version>1.8</source-java-version>
     <target-java-version>${source-java-version}</target-java-version-->
     <java-source-encoding>UTF-8</java-source-encoding>
     <resource-encoding>UTF-8</resource-encoding>
