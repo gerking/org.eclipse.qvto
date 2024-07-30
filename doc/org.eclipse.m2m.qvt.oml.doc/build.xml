@@ -16,8 +16,8 @@
 	<property name="javacDebugInfo" value="on"/>
 	<property name="javacVerbose" value="true"/>
 	<!-- TODO: set correct Java level -->
-	<property name="javacSource" value="1.5"/>
-	<property name="javacTarget" value="1.5"/>
+	<property name="javacSource" value="1.8"/>
+	<property name="javacTarget" value="1.8"/>
 	<property name="compilerArg" value=""/>
 	<path id="path_bootclasspath">
 		<fileset dir="${java.home}/lib">

@@ -100,9 +100,6 @@
                 <requireMavenVersion>
                   <version>3.6.3</version>
                 </requireMavenVersion>
-                <!--requireJavaVersion>
-                  <version>1.5</version>
-                </requireJavaVersion-->
               </rules>
             </configuration>
           </execution>

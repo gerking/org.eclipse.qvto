@@ -158,7 +158,7 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 
 	@Override
 	public IStatus validateJavaTypeName(String name) {
-		return JavaConventions.validateJavaTypeName(name.trim(), JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);
+		return JavaConventions.validateJavaTypeName(name.trim(), JavaCore.VERSION_1_8, JavaCore.VERSION_1_8, null);
 	}
 
 	@Override
@@ -180,7 +180,7 @@ public class JdtProjectIntegrationImpl extends PdeProjectIntegrationImpl {
 	}
 
 	private static IStatus validatePackageName(String name) {
-		return JavaConventions.validatePackageName(name, JavaCore.VERSION_1_3, JavaCore.VERSION_1_3);
+		return JavaConventions.validatePackageName(name, JavaCore.VERSION_1_8, JavaCore.VERSION_1_8);
 	}
 
 	private static String getDefaultEEName() {

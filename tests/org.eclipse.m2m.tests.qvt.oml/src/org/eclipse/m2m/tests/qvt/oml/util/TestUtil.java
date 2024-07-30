@@ -257,10 +257,12 @@ public class TestUtil extends Assert {
 
 	public static void deleteJavaFiles(final IProject project) throws CoreException {
 		IWorkspaceRunnable runnable = new IWorkspaceRunnable() {
+			@Override
 			public void run(IProgressMonitor monitor) throws CoreException {
 				final List<IFile> filesToDelete = new ArrayList<IFile>();
 
 				project.accept(new IResourceVisitor() {
+					@Override
 					public boolean visit(final IResource resource) {
 						if(resource.getType() == IResource.FILE) {
 							String extension = resource.getFileExtension();
@@ -397,7 +399,7 @@ public class TestUtil extends Assert {
 
 		return resSet;
 	}
-	
+
 	public static void prepareJava(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
 		IPath destPath = new Path(destFolder.getPath());
 
@@ -407,50 +409,50 @@ public class TestUtil extends Assert {
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
 
 		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
-				
+
 		if (workspace.getRoot().exists(srcPath)) {
 			IProjectDescription desc = myProject.getProject().getDescription();
 
 			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
-			
+
 			IProgressMonitor monitor = new NullProgressMonitor();
-			
+
 			myProject.getProject().setDescription(desc, monitor);
 
 			IJavaProject javaProject = JavaCore.create(myProject.getProject());
-									
-			javaProject.setOption(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5);
-			
-			
+
+			javaProject.setOption(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
+
+
 			IPath binPath = destPath.append("bin"); //$NON-NLS-1$
-			
+
 			if (workspace.getRoot().exists(binPath)) {
 				javaProject.setOutputLocation(binPath, monitor);
 			}
-				
+
 			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
-					
+
 			IClasspathAttribute testAttribute = JavaCore.newClasspathAttribute(IClasspathAttribute.TEST, Boolean.toString(true));
 			classpath.add(JavaCore.newSourceEntry(srcPath, new IPath[] {}, new IPath[] {}, null, new IClasspathAttribute[] {testAttribute}));
-									
-			classpath.add(JavaRuntime.getDefaultJREContainerEntry());				
+
+			classpath.add(JavaRuntime.getDefaultJREContainerEntry());
 			classpath.add(ClasspathComputer.createContainerEntry());
-						
+
 			IClasspathEntry[] entries = classpath.toArray(new IClasspathEntry[classpath.size()]);
-			
+
 			assertFalse(javaProject.hasClasspathCycle(entries));
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, javaProject.getOutputLocation());
 			assertTrue(status.isOK());
 			javaProject.setRawClasspath(entries, monitor);
-			
+
 			setupPluginXml(myProject, destFolder, metamodels, resSet);
-				
+
 			JavaCore.rebuildIndex(null);
-		
-			TestUtil.buildProject(myProject.getProject());		
+
+			TestUtil.buildProject(myProject.getProject());
 		}
 	}
-	
+
 	private static void setupPluginXml(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
 
 		IWorkspace workspace = myProject.getProject().getWorkspace();
@@ -494,10 +496,10 @@ public class TestUtil extends Assert {
 					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
 				}
 			}
-			
+
 			IPluginImport qvtImport = pluginModel.createImport(QvtPlugin.ID);
 			pluginBase.add(qvtImport);
-			
+
 			IPluginImport qvtSamplesImport = pluginModel.createImport(QVTSamplesPlugin.ID);
 			pluginBase.add(qvtSamplesImport);
 
@@ -505,9 +507,9 @@ public class TestUtil extends Assert {
 			pluginModel.save();
 		}
 	}
-	
+
 	public static void disposeJava(TestProject project) throws CoreException {
-				
+
 		IJavaProject javaProject = JavaCore.create(project.getProject());
 		if (javaProject.exists()) {
 			IProgressMonitor monitor = new NullProgressMonitor();
@@ -517,10 +519,10 @@ public class TestUtil extends Assert {
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
 			project.getProject().setDescription(desc, monitor);
 		}
-		
+
 		IFile pluginXml = PDEProject.getPluginXml(project.getProject());
 		IFile manifest = PDEProject.getManifest(project.getProject());
-		
+
 		pluginXml.delete(true, null);
 		manifest.delete(true, null);
 	}
