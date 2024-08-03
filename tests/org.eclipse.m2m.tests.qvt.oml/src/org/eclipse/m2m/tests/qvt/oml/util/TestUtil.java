@@ -48,6 +48,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.common.util.WrappedException;
@@ -228,6 +229,12 @@ public class TestUtil extends Assert {
 		IWorkspaceDescription workspaceDescription = ResourcesPlugin.getWorkspace().getDescription();
 		workspaceDescription.setAutoBuilding(true);
 		ResourcesPlugin.getWorkspace().setDescription(workspaceDescription);
+	}
+	
+	public static void turnOffAutoBuildingAndJoinBuildJobs() throws Exception {
+		turnOffAutoBuilding();
+		Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
 	}
 
 	public static void copyFolder(final IProject project, final String folderName) throws Exception {

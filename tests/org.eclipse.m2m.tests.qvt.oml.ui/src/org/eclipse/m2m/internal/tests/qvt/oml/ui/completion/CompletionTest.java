@@ -30,12 +30,10 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
@@ -145,9 +143,7 @@ public class CompletionTest extends AbstractCompletionTest {
 	}
 
 	protected void initializeWorkspace() throws Exception {
-		TestUtil.turnOffAutoBuilding();
-		Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
-		Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
+		TestUtil.turnOffAutoBuildingAndJoinBuildJobs();
 	}
 
 	protected void initializeProject() throws Exception {

@@ -273,14 +273,17 @@ public class TestQvtParser extends TestCase {
 	@After
 	public void tearDown() throws Exception {
 		myCompiled = null;
-		File destinationFolder = getDestinationFolder();
-		if (destinationFolder.exists()) {
-			FileUtil.delete(destinationFolder);
+		
+		if (myProject != null) {
+			File destinationFolder = getDestinationFolder();
+			if (destinationFolder.exists()) {
+				FileUtil.delete(destinationFolder);
+			}
+			
+			TestUtil.disposeJava(myProject);
 		}
 
 		BlackboxRegistry.INSTANCE.cleanup();
-		
-		TestUtil.disposeJava(myProject);
 	}
 
 	public TestProject getTestProject() {
