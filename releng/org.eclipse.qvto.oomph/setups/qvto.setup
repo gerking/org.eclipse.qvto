@@ -438,6 +438,9 @@
         name="master"
         label="Master (Latest)"/>
     <stream
+        name="3.11.0"
+        label="3.11.0 (2024-09)"/>
+    <stream
         name="3.10.8"
         label="3.10.8 (2023-12)"/>
     <stream
@@ -536,6 +539,9 @@
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.11.0"
+        label="3.11.0 (2024-09)"/>
     <stream
         name="3.10.8"
         label="3.10.8 (2023-12)"/>
