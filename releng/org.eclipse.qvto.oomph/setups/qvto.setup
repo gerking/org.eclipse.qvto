@@ -50,7 +50,7 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="2023-09"
+      defaultValue="2024-09"
       storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup.p2:P2Task">
@@ -99,11 +99,39 @@
             url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
       </repositoryList>
       <repositoryList
+          name="2024-09">
+        <repository
+            url="https://download.eclipse.org/releases/2024-09"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-09"/>
+      </repositoryList>
+      <repositoryList
+          name="2024-06">
+        <repository
+            url="https://download.eclipse.org/releases/2024-06"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-06"/>
+      </repositoryList>
+      <repositoryList
+          name="2024-03">
+        <repository
+            url="https://download.eclipse.org/releases/2024-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2024-03"/>
+      </repositoryList>
+      <repositoryList
+          name="2023-12">
+        <repository
+            url="https://download.eclipse.org/releases/2023-12"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2023-12"/>
+      </repositoryList>
+      <repositoryList
           name="2023-09">
         <repository
             url="https://download.eclipse.org/releases/2023-09"/>
         <repository
-            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/release/4.29.0"/>
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2023-09"/>
       </repositoryList>
       <repositoryList
           name="2023-06">
