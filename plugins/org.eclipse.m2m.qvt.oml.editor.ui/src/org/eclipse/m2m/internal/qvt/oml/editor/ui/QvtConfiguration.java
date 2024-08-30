@@ -202,12 +202,15 @@ public class QvtConfiguration extends TextSourceViewerConfiguration {
     	if(myEditor == null) {
     		return null;
     	}
-        QvtReconcilingStrategy strategy = new QvtReconcilingStrategy(myEditor);
-
-		QvtReconciler reconciler = new QvtReconciler(myEditor, strategy, false);
-        reconciler.setDelay(RECONCILER_DELAY);
+    	
+    	if (myReconciler == null) {
+	        QvtReconcilingStrategy strategy = new QvtReconcilingStrategy(myEditor);
+	
+			myReconciler = new QvtReconciler(myEditor, strategy, false);
+	        myReconciler.setDelay(RECONCILER_DELAY);
+    	}
 		
-        return reconciler;
+        return myReconciler;
     }
             
     @Override
@@ -257,7 +260,8 @@ public class QvtConfiguration extends TextSourceViewerConfiguration {
     private QvtScanner scanner;
     private QVTColorManager myColorManager;
     private ContentAssistant myContentAssistant;
-    private ITextEditor myEditor;    
+    private ITextEditor myEditor;
+    private QvtReconciler myReconciler;
 	
 	private static final int ASSIST_AUTO_ACTIVATION_DELAY = 200;
 	private static final int RECONCILER_DELAY = 500;	

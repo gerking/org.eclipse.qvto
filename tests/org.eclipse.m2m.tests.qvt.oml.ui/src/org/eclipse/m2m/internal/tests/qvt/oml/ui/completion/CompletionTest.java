@@ -40,6 +40,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
+import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
@@ -156,13 +157,16 @@ public class CompletionTest extends AbstractCompletionTest {
 		ISourceViewer sourceViewer = editor.getEditorSourceViewer();
 		IContentAssistant contentAssistant = qvtConfiguration.getContentAssistant(sourceViewer);
 		QvtCompletionProcessor processor = (QvtCompletionProcessor) contentAssistant.getContentAssistProcessor(IDocument.DEFAULT_CONTENT_TYPE);
-		do {
-			ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
-			if(proposals != null) {
-				for (ICompletionProposal completionProposal : proposals) {
-					if (completionProposal instanceof QvtCompletionProposal) {
-						String completionProposalStringPresentation = toString((QvtCompletionProposal) completionProposal, processor.getCurrentCategory().getId());
-						myActualProposalStrings.add(completionProposalStringPresentation);
+		IReconciler reconciler = qvtConfiguration.getReconciler(sourceViewer);
+		do {			
+			synchronized (reconciler) {
+				ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
+				if(proposals != null) {
+					for (ICompletionProposal completionProposal : proposals) {
+						if (completionProposal instanceof QvtCompletionProposal) {
+							String completionProposalStringPresentation = toString((QvtCompletionProposal) completionProposal, processor.getCurrentCategory().getId());
+							myActualProposalStrings.add(completionProposalStringPresentation);
+						}
 					}
 				}
 			}
