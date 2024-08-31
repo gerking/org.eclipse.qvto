@@ -74,20 +74,23 @@ public class QvtReconciler extends MonoReconciler {
 	}
 	
 	@Override
-	protected void initialProcess() {
+	protected void process(DirtyRegion dirtyRegion) {		
 		synchronized(this) {
-			super.initialProcess();
-		}
+			if (fIsFinished) throw new IllegalThreadStateException();
+			
+			super.process(dirtyRegion);
+            
+			fIsFinished = true;
+            this.notify();
+       }
 	}
 	
-	@Override
-	protected void process(DirtyRegion dirtyRegion) {
-		synchronized(this) {
-			super.process(dirtyRegion);
-		}
+	public boolean isFinished() {
+		return fIsFinished;
 	}
 	
 	
 	private final ITextEditor myEditor;
 	private PartListener myPartListener;
+	private boolean fIsFinished = false;
 }
