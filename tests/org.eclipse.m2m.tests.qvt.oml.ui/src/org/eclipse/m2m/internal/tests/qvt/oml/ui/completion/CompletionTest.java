@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -103,7 +102,7 @@ public class CompletionTest extends AbstractCompletionTest {
 	@Override
 	protected void setUp() throws Exception {
 		initializeWorkspace();
-		
+
 		if (myTestProject == null) {
 			initializeProject();
 		}
@@ -159,15 +158,10 @@ public class CompletionTest extends AbstractCompletionTest {
 		QvtCompletionProcessor processor = (QvtCompletionProcessor) contentAssistant.getContentAssistProcessor(IDocument.DEFAULT_CONTENT_TYPE);
 
 		QvtReconciler reconciler = (QvtReconciler) qvtConfiguration.getReconciler(sourceViewer);
-		
-		synchronized(reconciler) {
-	        while(!reconciler.isFinished()){
-	            reconciler.wait();
-	        }
-	    }
-		
+		reconciler.waitTillProcessingDone();
+
 		do {
-			ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
+			ICompletionProposal[] proposals = processor.computeCompletionProposals(sourceViewer, myOffset);
 			if(proposals != null) {
 				for (ICompletionProposal completionProposal : proposals) {
 					if (completionProposal instanceof QvtCompletionProposal) {
@@ -318,10 +312,12 @@ public class CompletionTest extends AbstractCompletionTest {
 
 	private static void enableQVTOCapabilities() {
 		String fakeQvtoPluginContributionId = WorkbenchActivityHelper.createUnifiedId(new IPluginContribution() {
+			@Override
 			public String getLocalId() {
 				return "fakeLocalId"; //$NON-NLS-1$
 			}
 
+			@Override
 			public String getPluginId() {
 				return "org.eclipse.m2m.qvt.oml.fakePluginId"; //$NON-NLS-1$
 			}
@@ -348,13 +344,13 @@ public class CompletionTest extends AbstractCompletionTest {
 			PlatformUI.getWorkbench().getActivitySupport().setEnabledActivityIds(enabledActivityIdsCopy);
 		}
 	}
-	
+
 	@Deprecated /* @deprecated OCL Bug 582625 should provide this */
-	private static void initializeStandardLibrary() {		
+	private static void initializeStandardLibrary() {
 		Library stdLibModule = QvtOperationalStdLibrary.INSTANCE.getStdLibModule();
-		
+
 		EcoreUtil.resolveAll(stdLibModule);
-		
+
 		for (EClassifier classifier : stdLibModule.getEClassifiers()) {
 			if (classifier instanceof PredefinedType) {
 				PredefinedType<?> predefinedType = (PredefinedType<?>) classifier;
