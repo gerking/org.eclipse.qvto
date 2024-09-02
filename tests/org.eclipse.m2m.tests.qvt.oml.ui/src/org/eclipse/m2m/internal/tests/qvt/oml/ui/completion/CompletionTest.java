@@ -41,6 +41,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContentAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
@@ -158,8 +159,10 @@ public class CompletionTest extends AbstractCompletionTest {
 		IContentAssistant contentAssistant = qvtConfiguration.getContentAssistant(sourceViewer);
 		QvtCompletionProcessor processor = (QvtCompletionProcessor) contentAssistant.getContentAssistProcessor(IDocument.DEFAULT_CONTENT_TYPE);
 		IReconciler reconciler = qvtConfiguration.getReconciler(sourceViewer);
+		IReconcilingStrategy strategy = reconciler.getReconcilingStrategy(""); //$NON-NLS-1$
+		
 		do {			
-			synchronized (reconciler) {
+			synchronized (strategy) {
 				ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
 				if(proposals != null) {
 					for (ICompletionProposal completionProposal : proposals) {

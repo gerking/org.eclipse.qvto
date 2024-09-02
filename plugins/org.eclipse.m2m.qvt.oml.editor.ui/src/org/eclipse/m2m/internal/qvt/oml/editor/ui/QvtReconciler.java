@@ -12,7 +12,6 @@
 package org.eclipse.m2m.internal.qvt.oml.editor.ui;
 
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.reconciler.DirtyRegion;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.ui.IPartListener;
@@ -72,22 +71,7 @@ public class QvtReconciler extends MonoReconciler {
 
 		super.uninstall();
 	}
-	
-	@Override
-	protected void initialProcess() {
-		synchronized(this) {
-			super.initialProcess();
-		}
-	}
-	
-	@Override
-	protected void process(DirtyRegion dirtyRegion) {
-		synchronized(this) {
-			super.process(dirtyRegion);
-		}
-	}
-	
-	
+		
 	private final ITextEditor myEditor;
 	private PartListener myPartListener;
 }
