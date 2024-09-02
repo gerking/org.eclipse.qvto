@@ -34,6 +34,7 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 	private IQVTReconcilingListener myReconcilingListener;	
 	private final ITextEditor myEditor;
 	private int myLoggedCompilationExceptionsCount = 0;
+	private final Object mySyncMonitor = new Object();
 
     public QvtReconcilingStrategy(final ITextEditor editor) {
         myEditor = editor;
@@ -86,7 +87,7 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 		options.setSourceLineNumbersEnabled(false);
 		options.enableCSTModelToken(true);
 		
-		synchronized(this) {		
+		synchronized(mySyncMonitor) {		
 			return QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
 		}
 	}
@@ -104,5 +105,9 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 		        Activator.log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, Messages.QvtReconcilingStrategy_TooManyExceptions));
 		    }
 		}
+	}
+	
+	public Object getSynchronizationMonitor() {
+		return mySyncMonitor;
 	}
 }
