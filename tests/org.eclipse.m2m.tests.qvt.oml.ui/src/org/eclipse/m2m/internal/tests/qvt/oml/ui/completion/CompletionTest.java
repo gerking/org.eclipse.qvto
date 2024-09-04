@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RunnableFuture;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -161,15 +164,23 @@ public class CompletionTest extends AbstractCompletionTest {
 		IReconciler reconciler = qvtConfiguration.getReconciler(sourceViewer);
 		QvtReconcilingStrategy strategy = (QvtReconcilingStrategy) reconciler.getReconcilingStrategy(""); //$NON-NLS-1$
 		
+		Callable<ICompletionProposal[]> c = new Callable<ICompletionProposal[]>(){
+			@Override
+			public ICompletionProposal[] call() {
+				return processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
+			}
+		};
+		
 		do {			
-			synchronized (strategy.getSynchronizationMonitor()) {
-				ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
-				if(proposals != null) {
-					for (ICompletionProposal completionProposal : proposals) {
-						if (completionProposal instanceof QvtCompletionProposal) {
-							String completionProposalStringPresentation = toString((QvtCompletionProposal) completionProposal, processor.getCurrentCategory().getId());
-							myActualProposalStrings.add(completionProposalStringPresentation);
-						}
+			RunnableFuture<ICompletionProposal[]> r = new FutureTask<ICompletionProposal[]>(c);
+			strategy.runSynchronized(r);
+			
+			ICompletionProposal[] proposals = r.get();
+			if(proposals != null) {
+				for (ICompletionProposal completionProposal : proposals) {
+					if (completionProposal instanceof QvtCompletionProposal) {
+						String completionProposalStringPresentation = toString((QvtCompletionProposal) completionProposal, processor.getCurrentCategory().getId());
+						myActualProposalStrings.add(completionProposalStringPresentation);
 					}
 				}
 			}

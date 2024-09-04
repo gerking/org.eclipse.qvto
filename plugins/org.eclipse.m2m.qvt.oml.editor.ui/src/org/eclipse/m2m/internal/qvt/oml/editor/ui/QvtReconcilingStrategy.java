@@ -106,8 +106,10 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 		    }
 		}
 	}
-	
-	public Object getSynchronizationMonitor() {
-		return mySyncMonitor;
+			
+	public void runSynchronized(Runnable r) {
+		synchronized(mySyncMonitor) {
+			r.run();
+		}
 	}
 }
