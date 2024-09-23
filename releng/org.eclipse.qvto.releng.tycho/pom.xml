@@ -36,7 +36,7 @@
     <buildId>${buildType}${buildTimestamp}</buildId>
     <targetPlatform>targetPlatforms/unspecified</targetPlatform>
 
-    <tycho.scmUrl>scm:git:https://github.com/eclipse-qvt-oml/org.eclipse.qvto</tycho.scmUrl>
+    <tycho.scmUrl>scm:git:https://github.com/eclipse-qvto/org.eclipse.qvto</tycho.scmUrl>
     <!--executionEnvironment>J2SE-1.8</executionEnvironment>
     <source-java-version>1.8</source-java-version>
     <target-java-version>${source-java-version}</target-java-version-->
