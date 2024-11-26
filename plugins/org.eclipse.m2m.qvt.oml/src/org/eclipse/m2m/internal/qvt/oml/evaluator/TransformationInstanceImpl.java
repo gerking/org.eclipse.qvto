@@ -8,13 +8,20 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 583587
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.evaluator;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EStructuralFeature.Internal.DynamicValueHolder;
+import org.eclipse.emf.ecore.EStructuralFeature.Internal.SettingDelegate;
+import org.eclipse.emf.ecore.EStructuralFeature.Setting;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.ModelParameterExtent;
 import org.eclipse.m2m.internal.qvt.oml.ast.parser.IntermediateClassFactory;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.TransformationInstance.InternalTransformation;
@@ -22,6 +29,7 @@ import org.eclipse.m2m.internal.qvt.oml.expressions.ModelParameter;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ModelType;
 import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
 import org.eclipse.m2m.internal.qvt.oml.stdlib.CallHandler;
+import org.eclipse.m2m.internal.qvt.oml.stdlib.QVTUMLReflection;
 
 
 class TransformationInstanceImpl extends ModuleInstanceImpl implements TransformationInstance, InternalTransformation {
@@ -29,6 +37,56 @@ class TransformationInstanceImpl extends ModuleInstanceImpl implements Transform
 	private final Map<ModelParameter, ModelInstance> fModelParams;
 	private ModelInstance fIntermediateData;
 	private CallHandler fTransHandler;
+	private SettingDelegate fSettingDelegate = new SettingDelegate() {
+		
+		@Override
+		public void dynamicUnset(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			TransformationInstanceImpl.this.dynamicUnset(dynamicFeatureID);
+		}
+
+		@Override
+		public void dynamicSet(InternalEObject owner, EStructuralFeature.Internal.DynamicValueHolder settings, int dynamicFeatureID, Object newValue) {						
+			TransformationInstanceImpl.this.dynamicSet(dynamicFeatureID, newValue);
+		}
+
+		@Override
+		public boolean dynamicIsSet(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			return TransformationInstanceImpl.this.dynamicGet(dynamicFeatureID) != null;
+		}
+		
+		@Override
+		public Object dynamicGet(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID, boolean resolve, boolean coreType) {
+			EStructuralFeature feature = owner.eClass().getEStructuralFeature(dynamicFeatureID);
+			Object value = TransformationInstanceImpl.this.dynamicGet(dynamicFeatureID);
+			
+			if (value == null) {
+				return feature.getDefaultValue();
+			}
+			else if (value == NIL) {
+				return null;
+			}
+			else {
+				return value;
+			}
+		}		
+		
+		@Override
+		public Setting dynamicSetting(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			throw new UnsupportedOperationException();
+		}
+				
+		@Override
+		public NotificationChain dynamicInverseRemove(InternalEObject owner, DynamicValueHolder settings,
+				int dynamicFeatureID, InternalEObject otherEnd, NotificationChain notifications) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public NotificationChain dynamicInverseAdd(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID,
+				InternalEObject otherEnd, NotificationChain notifications) {
+			throw new UnsupportedOperationException();
+		}
+	};
 	
 	TransformationInstanceImpl(OperationalTransformation type) {
 		super(type);
@@ -116,5 +174,15 @@ class TransformationInstanceImpl extends ModuleInstanceImpl implements Transform
 				}
 			}
 		}
+	}
+			
+	@Override
+	protected SettingDelegate eSettingDelegate(EStructuralFeature eFeature) {
+						
+		if (!QVTUMLReflection.isUserModelElement(eFeature.getEType())) {			
+			return fSettingDelegate;
+		};
+		
+		return super.eSettingDelegate(eFeature);
 	}
 }

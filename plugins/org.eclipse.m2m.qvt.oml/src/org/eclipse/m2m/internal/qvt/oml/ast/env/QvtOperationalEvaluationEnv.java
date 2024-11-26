@@ -829,7 +829,7 @@ public class QvtOperationalEvaluationEnv extends EcoreEvaluationEnvironment {
 			}
 		}
 		else {		
-			if (isOclInvalid(newValue) || (newValue == null && !acceptsNullValue(expectedClass))) {
+			if ((isOclInvalid(newValue) && eStructuralFeature.getEType() != QvtOperationalStdLibrary.INSTANCE.getOCLStdLib().getOclInvalid()) || (newValue == null && !acceptsNullValue(expectedClass))) {
 				if (isReset) {
 					owner.eUnset(eStructuralFeature);
 				}
