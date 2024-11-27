@@ -8,6 +8,7 @@
  *   
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
+ *     Christopher Gerking - bug 583587
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.evaluator;
 
@@ -17,13 +18,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.EStructuralFeature.Internal.DynamicValueHolder;
+import org.eclipse.emf.ecore.EStructuralFeature.Internal.SettingDelegate;
+import org.eclipse.emf.ecore.EStructuralFeature.Setting;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.DynamicEObjectImpl;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ImperativeOperation;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ImportKind;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Library;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Module;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ModuleImport;
+import org.eclipse.m2m.internal.qvt.oml.stdlib.QVTUMLReflection;
 
 class ModuleInstanceImpl extends DynamicEObjectImpl implements ModuleInstance, ModuleInstance.Internal {
 
@@ -31,7 +39,57 @@ class ModuleInstanceImpl extends DynamicEObjectImpl implements ModuleInstance, M
 	private Map<Module, ModuleInstance> fInstanceMap;
     private Map<Module, OperationOverrideMap> fOverrideMap;	
 	private List<Object> fAdapters = Collections.emptyList();
-	private boolean fIsInitialized = false;	
+	private boolean fIsInitialized = false;
+	private SettingDelegate fSettingDelegate = new SettingDelegate() {
+		
+		@Override
+		public void dynamicUnset(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			ModuleInstanceImpl.this.dynamicUnset(dynamicFeatureID);
+		}
+	
+		@Override
+		public void dynamicSet(InternalEObject owner, EStructuralFeature.Internal.DynamicValueHolder settings, int dynamicFeatureID, Object newValue) {						
+			ModuleInstanceImpl.this.dynamicSet(dynamicFeatureID, newValue);
+		}
+	
+		@Override
+		public boolean dynamicIsSet(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			return ModuleInstanceImpl.this.dynamicGet(dynamicFeatureID) != null;
+		}
+		
+		@Override
+		public Object dynamicGet(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID, boolean resolve, boolean coreType) {
+			EStructuralFeature feature = owner.eClass().getEStructuralFeature(dynamicFeatureID);
+			Object value = ModuleInstanceImpl.this.dynamicGet(dynamicFeatureID);
+			
+			if (value == null) {
+				return feature.getDefaultValue();
+			}
+			else if (value == NIL) {
+				return null;
+			}
+			else {
+				return value;
+			}
+		}		
+		
+		@Override
+		public Setting dynamicSetting(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID) {
+			throw new UnsupportedOperationException();
+		}
+				
+		@Override
+		public NotificationChain dynamicInverseRemove(InternalEObject owner, DynamicValueHolder settings,
+				int dynamicFeatureID, InternalEObject otherEnd, NotificationChain notifications) {
+			throw new UnsupportedOperationException();
+		}
+		
+		@Override
+		public NotificationChain dynamicInverseAdd(InternalEObject owner, DynamicValueHolder settings, int dynamicFeatureID,
+				InternalEObject otherEnd, NotificationChain notifications) {
+			throw new UnsupportedOperationException();
+		}
+	};	
 	
 	ModuleInstanceImpl(Module moduleType) {
 		if(moduleType == null) {
@@ -156,5 +214,15 @@ class ModuleInstanceImpl extends DynamicEObjectImpl implements ModuleInstance, M
 	@Override
 	public String toString() {
 		return eClass().getName() + " @" + Integer.toHexString(System.identityHashCode(this)); //$NON-NLS-1$
+	}
+	
+	@Override
+	protected SettingDelegate eSettingDelegate(EStructuralFeature eFeature) {
+						
+		if (!QVTUMLReflection.isUserModelElement(eFeature.getEType())) {			
+			return fSettingDelegate;
+		};
+		
+		return super.eSettingDelegate(eFeature);
 	}
 }
