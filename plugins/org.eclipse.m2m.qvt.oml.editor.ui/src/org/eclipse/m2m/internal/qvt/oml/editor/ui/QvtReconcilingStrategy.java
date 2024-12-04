@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.editor.ui;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -34,6 +36,7 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 	private IQVTReconcilingListener myReconcilingListener;	
 	private final ITextEditor myEditor;
 	private int myLoggedCompilationExceptionsCount = 0;
+	private CompletableFuture<CompiledUnit> myCompilation = new CompletableFuture<CompiledUnit>();
 
     public QvtReconcilingStrategy(final ITextEditor editor) {
         myEditor = editor;
@@ -81,13 +84,13 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
     }
 
 	private CompiledUnit getCompilationResult(boolean editingInQvtSourceContainer) {
-		CompiledUnit compilationResult;
 		QvtCompilerOptions options = new QvtCompilerOptions();
 		options.setShowAnnotations(editingInQvtSourceContainer);
 		options.setSourceLineNumbersEnabled(false);
 		options.enableCSTModelToken(true);
 		
-		compilationResult = QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
+		CompiledUnit compilationResult = QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
+		myCompilation.complete(compilationResult);		
 		return compilationResult;
 	}
 
@@ -104,5 +107,9 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 		        Activator.log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, Messages.QvtReconcilingStrategy_TooManyExceptions));
 		    }
 		}
+	}
+	
+	public void waitTillProcessingDone() {
+		myCompilation.join();
 	}
 }
