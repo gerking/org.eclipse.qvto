@@ -196,5 +196,13 @@
           </view>
        </perspectiveExtension>
     </extension>   
-
+	
+	<extension
+    	point="org.eclipse.m2m.qvt.oml.editor.ui.editorTextHovers">
+		<textHover
+        	class="org.eclipse.m2m.internal.qvt.oml.debug.ui.hover.QvtDebugTextHover"
+        	id="org.eclipse.m2m.internal.qvt.oml.debug.ui.QvtDebugTextHover">
+        </textHover>
+	</extension>
+	
 </plugin>

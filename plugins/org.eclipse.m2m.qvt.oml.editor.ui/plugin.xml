@@ -302,5 +302,8 @@
 	            id="org.eclipse.m2m.qvt.oml.editor.ui.viewers.QVTContentViewerCreator">
 	      </viewer>
 	</extension>
+	
+	<extension-point id="editorTextHovers" name="%%editorTextHovers" schema="schema/editorTextHovers.exsd"/>
+ 
    
 </plugin>
