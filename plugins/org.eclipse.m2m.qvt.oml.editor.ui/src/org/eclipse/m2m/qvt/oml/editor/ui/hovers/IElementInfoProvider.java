@@ -19,4 +19,12 @@ import org.eclipse.jface.text.ITextViewer;
  */
 public interface IElementInfoProvider {
 	String getElementInfo(Object element, ITextViewer textViewer, IRegion region);
+
+	/**
+	 * @return the priority of this info provider by which the info providers get
+	 *         sorted. A higher int is a higher priority
+	 */
+	default int getPriority() {
+		return 0;
+	}
 }
