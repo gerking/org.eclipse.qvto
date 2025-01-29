@@ -17,6 +17,7 @@ import org.eclipse.m2m.internal.qvt.oml.cst.ResolveInExpCS;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.CSTHelper;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.hyperlinks.ResolveInHyperlinkDetector;
 import org.eclipse.m2m.internal.qvt.oml.expressions.MappingOperation;
+import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.ecore.EcoreEnvironment;
 
 public class ResolveInMappingInfoProvider implements IElementInfoProvider {

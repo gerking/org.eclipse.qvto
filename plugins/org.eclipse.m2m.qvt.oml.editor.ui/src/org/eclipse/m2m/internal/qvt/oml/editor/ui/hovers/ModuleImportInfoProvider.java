@@ -15,6 +15,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.hyperlinks.ImportHyperlinkDetector;
+import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.cst.CSTNode;
 
 
