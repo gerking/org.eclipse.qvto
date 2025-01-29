@@ -197,4 +197,11 @@
        </perspectiveExtension>
     </extension>   
 
+	<extension
+	      point="org.eclipse.m2m.qvt.oml.editor.ui.qvtEditorElementInfoProviders">
+	      <elementInfoProvider 
+            class="org.eclipse.m2m.internal.qvt.oml.debug.ui.QVTODebugElementInfoProvider"
+            id="org.eclipse.m2m.internal.qvt.oml.debug.ui.QVTODebugElementInfoProvider">
+	      </elementInfoProvider>
+	</extension>
 </plugin>
