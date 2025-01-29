@@ -37,7 +37,8 @@ Export-Package: org.eclipse.m2m.internal.qvt.oml.editor.ui;x-friends:="org.eclip
  org.eclipse.m2m.internal.qvt.oml.editor.ui.outline;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.editor.ui.quickoutline;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.editor.ui.quickoutline.actions;x-internal:=true,
- org.eclipse.m2m.internal.qvt.oml.editor.ui.viewers;x-internal:=true
+ org.eclipse.m2m.internal.qvt.oml.editor.ui.viewers;x-internal:=true,
+ org.eclipse.m2m.qvt.oml.editor.ui.hovers
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: org.eclipse.m2m.qvt.oml.editor.ui
  
