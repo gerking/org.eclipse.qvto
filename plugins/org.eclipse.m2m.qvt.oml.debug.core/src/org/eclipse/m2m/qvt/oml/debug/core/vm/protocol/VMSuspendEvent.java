@@ -78,7 +78,7 @@ public class VMSuspendEvent extends VMEvent {
 		}
 		if(reason != null) {
 			buf.append(" reason:").append( //$NON-NLS-1$
-					reason.substring(0, Math.min(50, reason.length())));
+                    reason, 0, Math.min(50, reason.length()));
 		}
 		return buf.toString();
 	}

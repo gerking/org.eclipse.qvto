@@ -149,12 +149,12 @@ abstract class AbstractRequestProcessor {
 	protected abstract VMResponse processRequest(VMRequest request) throws CoreException;
 
 	private VMRequest validateRequestObject(Object rawRequest) {
-		if (rawRequest instanceof VMRequest == false) {
+		if (!(rawRequest instanceof VMRequest vmRequest)) {
 			QVTODebugCore.TRACE.trace("Invalid VM request: " + rawRequest); //$NON-NLS-1$
 			return null;
 		}
 
-		return (VMRequest) rawRequest;
+		return vmRequest;
 	}
 
 	private void reportSendReponseError(VMResponse response, IOException e) {

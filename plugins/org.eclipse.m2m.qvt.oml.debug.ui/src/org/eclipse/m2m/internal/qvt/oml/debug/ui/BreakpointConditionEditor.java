@@ -38,7 +38,6 @@ public class BreakpointConditionEditor {
     private String fOldValue;
     private String fErrorMessage;
     private QVTOLineBreakpointPage fPage;
-    private QVTOBreakpoint fBreakpoint;
     private IHandlerService fHandlerService;
     private IHandler fHandler;
     private IHandlerActivation fActivation;
@@ -51,10 +50,10 @@ public class BreakpointConditionEditor {
      */
     public BreakpointConditionEditor(Composite parent, QVTOLineBreakpointPage page) {
         fPage = page;
-        fBreakpoint = (QVTOBreakpoint) fPage.getBreakpoint();
-        String condition = new String();
+		QVTOBreakpoint breakPoint = fPage.getBreakpoint();
+        String condition;
         try {
-            condition = fBreakpoint.getCondition();
+			condition = breakPoint.getCondition();
             fErrorMessage  = DebugUIMessages.BreakpointConditionEditor_EnterCondition; 
             fOldValue = ""; //$NON-NLS-1$
             
@@ -88,7 +87,7 @@ public class BreakpointConditionEditor {
                     return null;
                 }
             };
-            fHandlerService = (IHandlerService) PlatformUI.getWorkbench().getAdapter(IHandlerService.class);
+            fHandlerService = PlatformUI.getWorkbench().getAdapter(IHandlerService.class);
         } 
         catch (CoreException exception) {
             QVTODebugUIPlugin.log(exception);
@@ -111,7 +110,7 @@ public class BreakpointConditionEditor {
             fPage.removeErrorMessage(fErrorMessage);
         } else {
             String text = fViewer.getDocument().get();
-            if (!(text != null && text.trim().length() > 0)) {
+            if (!(text != null && !text.trim().isEmpty())) {
                 fPage.addErrorMessage(fErrorMessage);
             } else {
                 fPage.removeErrorMessage(fErrorMessage);

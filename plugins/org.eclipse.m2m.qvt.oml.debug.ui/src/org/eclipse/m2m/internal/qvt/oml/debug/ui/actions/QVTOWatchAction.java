@@ -72,8 +72,7 @@ public class QVTOWatchAction implements IPartListener, IWorkbenchWindowActionDel
     
     private void run() {
         Object selectedObject= fSelection;
-        if (selectedObject instanceof IStructuredSelection) {
-            IStructuredSelection selection = (IStructuredSelection) selectedObject;
+        if (selectedObject instanceof IStructuredSelection selection) {
             Iterator<?> elements = selection.iterator();
             while (elements.hasNext()) {
                 try {
@@ -228,17 +227,15 @@ public class QVTOWatchAction implements IPartListener, IWorkbenchWindowActionDel
         Object selectedObject= null;
         fRegion = null;
         ISelection selection= getTargetSelection();
-        if (selection instanceof ITextSelection) {
-            ITextSelection ts = (ITextSelection)selection;
+        if (selection instanceof ITextSelection ts) {
             String text= ts.getText();
             if (textHasContent(text)) {
                 selectedObject= text;
                 fRegion = new Region(ts.getOffset(), ts.getLength());
             }
-            else if (getTargetPart() instanceof IEditorPart) {
-                IEditorPart editor= (IEditorPart) getTargetPart();
+            else if (getTargetPart() instanceof IEditorPart editor) {
                 if (editor instanceof ITextEditor) {
-                    selectedObject = resolveSelectedObjectUsingToken(selectedObject, ts, editor);
+                    selectedObject = resolveSelectedObjectUsingToken(null, ts, editor);
                 }
             }
         }
@@ -249,21 +246,19 @@ public class QVTOWatchAction implements IPartListener, IWorkbenchWindowActionDel
                     IEditorPart editor= getTargetPart().getSite().getPage().getActiveEditor();
                     setTargetPart(editor);
                     selection= getTargetSelection();
-                    if (selection instanceof ITextSelection) {
-                        ITextSelection ts = (ITextSelection)selection;
+                    if (selection instanceof ITextSelection ts) {
                         String text= ts.getText();
                         if (textHasContent(text)) {
                             selectedObject= text;
                         }
                         else if (editor instanceof ITextEditor) {
-                            selectedObject = resolveSelectedObjectUsingToken(selectedObject, ts, editor);
+                            selectedObject = resolveSelectedObjectUsingToken(null, ts, editor);
                         }
                     }
                 } else {
                     IStructuredSelection ss= (IStructuredSelection)selection;
-                    Iterator<?> elements = ss.iterator();
-                    while (elements.hasNext()) {
-                        if (!(elements.next() instanceof QVTOVariable)) {
+                    for (Object s : ss) {
+                        if (!(s instanceof QVTOVariable)) {
                             setSelectedObject(null);
                             return;
                         }

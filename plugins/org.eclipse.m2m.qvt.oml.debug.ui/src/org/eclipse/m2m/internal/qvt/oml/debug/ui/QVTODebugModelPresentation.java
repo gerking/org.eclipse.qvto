@@ -51,9 +51,8 @@ public class QVTODebugModelPresentation implements IDebugModelPresentation, IDeb
 	}
 
     public Image getImage(Object element) {
-    	if(element instanceof QVTOVariable) {
-    		QVTOVariable var = (QVTOVariable) element;
-    		if(var.isModelParameter()) {
+    	if(element instanceof QVTOVariable var) {
+            if(var.isModelParameter()) {
     			return QVTODebugImages.getImage(QVTODebugImages.MODEL_PARAMETER);
     		} else if(var.isReference()) {
     			return QVTODebugImages.getImage(QVTODebugImages.REFERENCE);
@@ -65,20 +64,16 @@ public class QVTODebugModelPresentation implements IDebugModelPresentation, IDeb
     			return QVTODebugImages.getImage(QVTODebugImages.LOCAL_VARIABLE);
     		} else if(var.isPredefinedVariable()) {
     			// TODO - add special case for this
-    			try {
-					if("this".equals(var.getName())) { //$NON-NLS-1$
-						return QVTODebugImages.getImage(QVTODebugImages.THIS_VARIABLE);
-					}
-				} catch (DebugException e) {
-					// do nothing use the std image
+				if("this".equals(var.getName())) { //$NON-NLS-1$
+					return QVTODebugImages.getImage(QVTODebugImages.THIS_VARIABLE);
 				}
-    			return QVTODebugImages.getImage(QVTODebugImages.PREDEFINED_VARIABLE);
+
+				return QVTODebugImages.getImage(QVTODebugImages.PREDEFINED_VARIABLE);
     		} else if(var.isCollectionElement()) {
     			return QVTODebugImages.getImage(QVTODebugImages.COLLECTION_ELEMENT);
     		}
     		
-    	} else if (element instanceof QVTOBreakpoint) {
-            QVTOBreakpoint breakpoint = (QVTOBreakpoint) element;
+    	} else if (element instanceof QVTOBreakpoint breakpoint) {
             try {
                 if (breakpoint.isConditionEnabled()) {                	
                     return breakpoint.isEnabled() ? 
@@ -94,25 +89,21 @@ public class QVTODebugModelPresentation implements IDebugModelPresentation, IDeb
 	}
 
 	public String getText(Object element) {
-        if(element instanceof QVTOStackFrame) {
-        	QVTOStackFrame frame = (QVTOStackFrame) element;
-    		VMLocation location = frame.getLocation();
+        if(element instanceof QVTOStackFrame frame) {
+            VMLocation location = frame.getLocation();
     		String source = frame.getUnitURI().lastSegment();
     		int line = frame.getLineNumber();
-            
-            String text = "<" + location.getModule() + ">::" + //$NON-NLS-1$ //$NON-NLS-2$
-            				location.getOperationSignature() + " - " + source + " : " + line; //$NON-NLS-1$ //$NON-NLS-2$
-            return text;
+
+            return "<" + location.getModule() + ">::" + //$NON-NLS-1$ //$NON-NLS-2$
+					location.getOperationSignature() + " - " + source + " : " + line; //$NON-NLS-1$//$NON-NLS-2$
         } 
-        else if(element instanceof QVTOThread) {
-        	QVTOThread thread = (QVTOThread) element;
-        	String name = "main"; //$NON-NLS-1$
+        else if(element instanceof QVTOThread thread) {
+            String name = "main"; //$NON-NLS-1$
         	String state = thread.isSuspended() ? DebugUIMessages.QVTODebugModelPresentation_Suspended : DebugUIMessages.QVTODebugModelPresentation_Running;
         	return MessageFormat.format(DebugUIMessages.QVTODebugModelPresentation_ThreadLabel, name, state);
         } 
-        else if(element instanceof QVTODebugTarget) {
-        	QVTODebugTarget debugTarget = (QVTODebugTarget) element;
-			String moduleName = debugTarget.getMainModuleName();
+        else if(element instanceof QVTODebugTarget debugTarget) {
+            String moduleName = debugTarget.getMainModuleName();
 			String launchConfigName = debugTarget.getLaunch().getLaunchConfiguration().getName();
 			return NLS.bind(DebugUIMessages.QVTODebugModelPresentation_TransformationLabel, moduleName, launchConfigName);
         }
@@ -121,9 +112,8 @@ public class QVTODebugModelPresentation implements IDebugModelPresentation, IDeb
 	}
 
     public void computeDetail(IValue value, IValueDetailListener listener) {
-    	if(value instanceof QVTOValue) {
-    		QVTOValue qvtValue = (QVTOValue) value;
-    		try {
+    	if(value instanceof QVTOValue qvtValue) {
+            try {
 				listener.detailComputed(value, qvtValue.computeDetail());
 			} catch (DebugException e) {
 				QVTODebugUIPlugin.log(e.getStatus());

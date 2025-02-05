@@ -100,8 +100,7 @@ public class QVTODebugConfiguration extends QvtLaunchConfigurationDelegate {
 	private DebugTransformationRunner createRunner(ILaunchConfiguration configuration) throws CoreException {
 		DebugRunnerFactory runnerFactory = new DebugRunnerFactory();
 
-		String moduleUri = QvtLaunchUtil.getTransformationURI(configuration);
-		runnerFactory.transformationURI = moduleUri;
+        runnerFactory.transformationURI = QvtLaunchUtil.getTransformationURI(configuration);
 		
 		List<String> modelURIs = new ArrayList<String>();
 		for (TargetUriData uriData : QvtLaunchUtil.getTargetUris(configuration)) {
@@ -113,7 +112,7 @@ public class QVTODebugConfiguration extends QvtLaunchConfigurationDelegate {
 		runnerFactory.isSaveTrace = QvtLaunchUtil.shouldGenerateTraceFile(configuration);
 		runnerFactory.isIncrementalUpdate = QvtLaunchUtil.isIncrementalUpdate(configuration);
 		String traceFileURI = QvtLaunchUtil.getTraceFileURI(configuration);
-		if (traceFileURI != null && traceFileURI.trim().length() != 0) {
+		if (traceFileURI != null && !traceFileURI.trim().isEmpty()) {
 			runnerFactory.traceFileURI = traceFileURI;
 		}
 		
@@ -135,16 +134,14 @@ public class QVTODebugConfiguration extends QvtLaunchConfigurationDelegate {
 		DebugPlugin.getDefault().addDebugEventListener(
 				new IDebugEventSetListener() {
 					public void handleDebugEvents(DebugEvent[] events) {
-						for (int i = 0; i < events.length; i++) {
-							DebugEvent event = events[i];
-
-							if (event.getKind() == DebugEvent.TERMINATE && event.getSource().equals(terminate)) {
-								// unregister myself
-								DebugPlugin.getDefault().removeDebugEventListener(this);
-								// unregister workspace listener
-								unitFile.getProject().getWorkspace().removeResourceChangeListener(listener);								
-							}
-						}
+                        for (DebugEvent event : events) {
+                            if (event.getKind() == DebugEvent.TERMINATE && event.getSource().equals(terminate)) {
+                                // unregister myself
+                                DebugPlugin.getDefault().removeDebugEventListener(this);
+                                // unregister workspace listener
+                                unitFile.getProject().getWorkspace().removeResourceChangeListener(listener);
+                            }
+                        }
 					}
 				});
 	

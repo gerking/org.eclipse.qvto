@@ -117,9 +117,8 @@ public class ConditionChecker {
     	if(contextEnv == null) {
     		contextEnv = rootEnv;
     	}
-    	
-    	ASTElementContextEnv targetContextEnv = new ASTElementContextEnv(contextEnv, fTargetASTElement);
-		return targetContextEnv;
+
+        return new ASTElementContextEnv(contextEnv, fTargetASTElement);
     }
     
 	private OCLExpression<EClassifier> getConditionAST() {

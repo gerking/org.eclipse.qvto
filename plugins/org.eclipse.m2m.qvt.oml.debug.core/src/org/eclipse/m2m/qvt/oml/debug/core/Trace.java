@@ -462,7 +462,7 @@ public class Trace {
 	 * @return the string
 	 */
 	public static String toString(Object[] array) {
-		StringBuffer result = new StringBuffer(64);
+		StringBuilder result = new StringBuilder(64);
 		
 		result.append('[');
 		
@@ -480,7 +480,7 @@ public class Trace {
 	}
 	
 	
-    private class Tracing {
+    private static class Tracing {
     	
 		private Plugin fPlugin;
 
@@ -521,7 +521,7 @@ public class Trace {
     	 */
     	public boolean shouldTrace(String option) {
     		if (shouldTrace()) {
-    			Boolean value = null;
+    			Boolean value;
     			
     			synchronized (cachedOptions) {
     				value = cachedOptions.get(option);
@@ -535,7 +535,7 @@ public class Trace {
     				}
     			}
     			
-    			return value.booleanValue();
+    			return value;
     		}
 
     		return false;
@@ -562,17 +562,17 @@ public class Trace {
     	 * 
     	 */
     	protected String getArgumentsString(Object[] arguments) {
-    		StringBuffer buffer = new StringBuffer();
+    		StringBuilder builder = new StringBuilder();
 
     		for (int i = 0; i < arguments.length; i++) {
-    			buffer.append(getArgumentString(arguments[i]));
+    			builder.append(getArgumentString(arguments[i]));
 
     			if (i < arguments.length - 1) {
-    				buffer.append(SEPARATOR_PARAMETER);
+    				builder.append(SEPARATOR_PARAMETER);
     			}
     		}
 
-    		return buffer.toString();
+    		return builder.toString();
     	}
 
     	/**

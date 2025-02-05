@@ -11,7 +11,6 @@
 package org.eclipse.m2m.qvt.oml.debug.core.vm;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
@@ -62,16 +61,10 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	}
 	
 	public List<EStructuralFeature> getAllFeatures(EClass eClass) {
-		List<EStructuralFeature> features = new ArrayList<EStructuralFeature>();
-		features.addAll(eClass.getEAllStructuralFeatures());
+        List<EStructuralFeature> features = new ArrayList<>(eClass.getEAllStructuralFeatures());
 		
 		if(eClass instanceof Module) {
-			for (Iterator<EStructuralFeature> it = features.iterator(); it.hasNext();) {
-				EStructuralFeature feature = it.next();
-				if(feature instanceof ContextualProperty) {
-					it.remove();
-				}
-			}
+            features.removeIf(feature -> feature instanceof ContextualProperty);
 		}
 		
 		collectIntermediateProperties(features, eClass);
@@ -87,8 +80,7 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	}
 
 	private void collectIntermediateProperties(List<EStructuralFeature> properties, EClass targetClass) {
-		QvtOperationalEvaluationEnv evalEnv = fEvalEnv;		
-		InternalEvaluationEnv internEvalEnv = evalEnv.getAdapter(InternalEvaluationEnv.class);
+        InternalEvaluationEnv internEvalEnv = fEvalEnv.getAdapter(InternalEvaluationEnv.class);
 		
 		ModuleInstance currentModule = internEvalEnv.getCurrentModule();
 		// check if we are in transformation execution context
@@ -101,9 +93,8 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	private void collectIntermediateProperties(List<EStructuralFeature> properties, EClass targetClass, TransformationInstance scopeModule) {
 		OperationalTransformation operationalTransformation = scopeModule.getTransformation();
 		for (EStructuralFeature nextProperty : operationalTransformation.getIntermediateProperty()) {
-			if(nextProperty instanceof ContextualProperty) {
-				ContextualProperty ctxProperty = (ContextualProperty) nextProperty;
-				if(ctxProperty.getContext().isSuperTypeOf(targetClass)) {            
+			if(nextProperty instanceof ContextualProperty ctxProperty) {
+                if(ctxProperty.getContext().isSuperTypeOf(targetClass)) {
 		        	properties.add(ctxProperty);
 				}
 			}

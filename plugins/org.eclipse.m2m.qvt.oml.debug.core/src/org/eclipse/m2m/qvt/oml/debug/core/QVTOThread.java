@@ -51,25 +51,25 @@ public class QVTOThread extends QVTODebugElement implements IThread, VMEventList
 		return false;
 	}
 	        
-	public boolean hasStackFrames() throws DebugException {
+	public boolean hasStackFrames() {
 		return isSuspended();
 	}
 	
-	public IStackFrame[] getStackFrames() throws DebugException {
+	public IStackFrame[] getStackFrames() {
 		if(isSuspended()) {
-			if(fFrames.size() == 0) {
+			if(fFrames.isEmpty()) {
 				fillFrames();
 			}
 		}
 		
-		return fFrames.toArray(new QVTOStackFrame[fFrames.size()]);
+		return fFrames.toArray(new QVTOStackFrame[0]);
 	}
 	
-	public int getPriority() throws DebugException {
+	public int getPriority() {
 		return 0; // not it use at the moment //myWorker.getPriority();
 	}
 
-	public IStackFrame getTopStackFrame() throws DebugException {
+	public IStackFrame getTopStackFrame() {
 		if(!hasStackFrames()) {
 			return null;
 		}
@@ -78,15 +78,14 @@ public class QVTOThread extends QVTODebugElement implements IThread, VMEventList
 		return frames.length > 0 ? frames[0] : null;
 	}
 
-	public String getName() throws DebugException {
+	public String getName() {
 		// no underlying thread ID
 		return "QVTOThread"; //$NON-NLS-1$  
 	}
 
 	public IBreakpoint[] getBreakpoints() {
-		IBreakpoint[] hostBreakpoints = new IBreakpoint[0];
-		// FIXME  - add suspedendedBy(IBreakpoint); to be called by the debugger
-		return hostBreakpoints;
+        // FIXME  - add suspedendedBy(IBreakpoint); to be called by the debugger
+		return new IBreakpoint[0];
 	}
 
 	public boolean canResume() {
@@ -178,10 +177,9 @@ public class QVTOThread extends QVTODebugElement implements IThread, VMEventList
 	}
     	
 	public void handleEvent(VMEvent event) {
-		if(event instanceof VMSuspendEvent) {
-			VMSuspendEvent suspendEvent = (VMSuspendEvent) event;
- 			
-			if(!isStepping()) {
+		if(event instanceof VMSuspendEvent suspendEvent) {
+
+            if(!isStepping()) {
 				fFrames.clear();
 			} else {				
 

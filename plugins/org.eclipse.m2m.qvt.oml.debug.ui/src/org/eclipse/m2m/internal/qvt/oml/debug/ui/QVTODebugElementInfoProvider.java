@@ -35,8 +35,7 @@ public class QVTODebugElementInfoProvider implements IElementInfoProvider {
 				return null;
 			}
 			var qvtoValue = (QVTOValue) qvtoVariable.orElseThrow().getValue();
-			var detail = qvtoValue.computeDetail();
-			return detail;
+            return qvtoValue.computeDetail();
 		} catch (DebugException e) {
 			return null;
 		}
@@ -66,7 +65,7 @@ public class QVTODebugElementInfoProvider implements IElementInfoProvider {
 		return Optional.empty();
 	}
 
-	private static Optional<QVTOVariable> tryGetQVTOVariableFor(SimpleNameCS simpleNameCS, IVariable variable) throws DebugException {
+	private static Optional<QVTOVariable> tryGetQVTOVariableFor(SimpleNameCS simpleNameCS, IVariable variable) {
 		if (!(variable instanceof QVTOVariable qvtoVariable)) {
 			return Optional.empty();
 		}

@@ -19,7 +19,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.m2m.internal.qvt.oml.debug.ui.QVTODebugUIPlugin;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOBreakpoint;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -43,11 +42,7 @@ public class QVTOBreakpointPropertiesAction implements IObjectActionDelegate {
 			if (fPart != null) {
 				provider = fPart.getSite();
 			} else {
-				provider = new IShellProvider() {
-					public Shell getShell() {
-						return QVTODebugUIPlugin.getActiveWorkbenchShell();
-					}
-				};
+				provider = QVTODebugUIPlugin::getActiveWorkbenchShell;
 			}
 			PropertyDialogAction propertyAction = new PropertyDialogAction(
 					provider, new ISelectionProvider() {
@@ -74,9 +69,8 @@ public class QVTOBreakpointPropertiesAction implements IObjectActionDelegate {
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
-		if (selection instanceof IStructuredSelection) {
-			IStructuredSelection ss = (IStructuredSelection) selection;
-			if (ss.isEmpty() || ss.size() > 1) {
+		if (selection instanceof IStructuredSelection ss) {
+            if (ss.isEmpty() || ss.size() > 1) {
 				return;
 			}
 			Object element = ss.getFirstElement();

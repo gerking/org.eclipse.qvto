@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.m2m.qvt.oml.debug.core.vm.VMVariable;
@@ -57,22 +56,22 @@ public class QVTOVariable extends QVTODebugElement implements IVariable {
 		return vmVar.kind == VMVariable.REFERENCE;
 	}
 	
-	public IValue getValue() throws DebugException {
+	public IValue getValue() {
 		if (fValue == null) {
 			fValue = new QVTOValue(getQVTODebugTarget(), vmVar, fFrameID);
 		}
 		return fValue;
 	}
 
-	public String getName() throws DebugException {
+	public String getName() {
 		return vmVar.name;
 	}
 	
-	public String getReferenceTypeName() throws DebugException {
+	public String getReferenceTypeName() {
 		return this.vmVar.type.declaringType;
 	}	
 
-	public boolean hasValueChanged() throws DebugException {
+	public boolean hasValueChanged() {
 		return false;
 	}
 
@@ -80,17 +79,17 @@ public class QVTOVariable extends QVTODebugElement implements IVariable {
 		return false;
 	}
 
-	public void setValue(String expression) throws DebugException {
+	public void setValue(String expression) {
 	}
 
-	public void setValue(IValue value) throws DebugException {
+	public void setValue(IValue value) {
 	}
 
-	public boolean verifyValue(String expression) throws DebugException {
+	public boolean verifyValue(String expression) {
 		return false;
 	}
 
-	public boolean verifyValue(IValue value) throws DebugException {
+	public boolean verifyValue(IValue value) {
 		return false;
 	}	
 }

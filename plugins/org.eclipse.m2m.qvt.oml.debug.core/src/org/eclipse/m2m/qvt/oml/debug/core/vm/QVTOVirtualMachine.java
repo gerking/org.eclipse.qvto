@@ -86,7 +86,7 @@ public class QVTOVirtualMachine implements IQVTOVirtualMachineShell {
 		}
 	}
 	
-	public VMResponse sendRequest(VMRequest request) throws IOException {
+	public VMResponse sendRequest(VMRequest request) {
 		try {
 			if(request instanceof VMStartRequest) {
 				return start();
@@ -190,15 +190,14 @@ public class QVTOVirtualMachine implements IQVTOVirtualMachineShell {
 			if(allBpData != null) {
 				List<Long> addedBpIDs = new ArrayList<Long>();
 				for (BreakpointData bpData : allBpData) {
-					if(bpData instanceof NewBreakpointData == false) {
+					if (!(bpData instanceof NewBreakpointData newBreakpoint)) {
 						continue;
 					}
-					
-					NewBreakpointData newBreakpoint = (NewBreakpointData) bpData;
-					VMBreakpoint breakpoint = fBreakpointManager.createBreakpoint(newBreakpoint);
+
+                    VMBreakpoint breakpoint = fBreakpointManager.createBreakpoint(newBreakpoint);
 					
 					if(breakpoint != null) {
-						addedBpIDs.add(new Long(newBreakpoint.ID));
+						addedBpIDs.add(newBreakpoint.ID);
 						
 						QVTODebugCore.TRACE.trace(DebugOptions.VM,
 								"Installing breakpoing: " + " line:" //$NON-NLS-1$ //$NON-NLS-2$
@@ -262,7 +261,7 @@ public class QVTOVirtualMachine implements IQVTOVirtualMachineShell {
 			Diagnostic diagnostic = executorAdapter.execute();
 			int severity = diagnostic.getSeverity();
 			if(severity == Diagnostic.ERROR || severity == Diagnostic.CANCEL) {
-				System.err.println(diagnostic.toString());
+				System.err.println(diagnostic);
 				exitCode = -1;
 			}
 		} catch (Throwable e) {
