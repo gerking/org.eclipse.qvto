@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 R.Dvorak and others.
+ * Copyright (c) 2009, 2026 R.Dvorak and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,7 @@
  *
  * Contributors:
  *     Radek Dvorak - initial API and implementation
+ *     Steffen Steudle - issue #915
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
@@ -14,6 +15,7 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.m2m.qvt.oml.debug.core.vm.VMVariable;
+import org.eclipse.m2m.qvt.oml.debug.core.vm.Value;
 
 public class QVTOVariable extends QVTODebugElement implements IVariable {
 	
@@ -59,7 +61,11 @@ public class QVTOVariable extends QVTODebugElement implements IVariable {
 	
 	public IValue getValue() throws DebugException {
 		if (fValue == null) {
-			fValue = new QVTOValue(getQVTODebugTarget(), vmVar, fFrameID);
+			if (vmVar.type.kind == Value.Type.COLLECTION) {
+				fValue = new QVTOCollectionValue(getQVTODebugTarget(), vmVar, fFrameID);
+			} else {
+				fValue = new QVTOValue(getQVTODebugTarget(), vmVar, fFrameID);
+			}
 		}
 		return fValue;
 	}
