@@ -13,6 +13,7 @@ package org.eclipse.m2m.qvt.oml.debug.core;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.m2m.qvt.oml.debug.core.vm.VMVariable;
+import org.eclipse.m2m.qvt.oml.debug.core.vm.Value;
 
 public class QVTOVariable extends QVTODebugElement implements IVariable {
 	
@@ -58,7 +59,11 @@ public class QVTOVariable extends QVTODebugElement implements IVariable {
 	
 	public IValue getValue() {
 		if (fValue == null) {
-			fValue = new QVTOValue(getQVTODebugTarget(), vmVar, fFrameID);
+			if (vmVar.type.kind == Value.Type.COLLECTION) {
+				fValue = new QVTOCollectionValue(getQVTODebugTarget(), vmVar, fFrameID);
+			} else {
+				fValue = new QVTOValue(getQVTODebugTarget(), vmVar, fFrameID);
+			}
 		}
 		return fValue;
 	}
