@@ -41,7 +41,7 @@ public class QVTOStackFrame extends QVTODebugElement implements IStackFrame {
 	public QVTOStackFrame(QVTOThread thread, VMStackFrame frame) {
 		super(thread.getQVTODebugTarget());
 		
-		if(thread == null || frame == null) {
+		if(frame == null) {
 			throw new IllegalArgumentException();
 		}
 
@@ -68,19 +68,17 @@ public class QVTOStackFrame extends QVTODebugElement implements IStackFrame {
 		return fThread;
 	}
 
-	public boolean hasVariables() throws DebugException {
+	public boolean hasVariables() {
 		return !fUnderlyingFrame.getVisibleVariables().isEmpty();  
 	}
 	
 	public IVariable[] getVariables() throws DebugException {
 		List<IVariable> result = new ArrayList<IVariable>();
 		for (VMVariable next : fUnderlyingFrame.getVisibleVariables()) {
-			final VMVariable vmVar = next;
-			
-			result.add(new QVTOVariable(getQVTODebugTarget(), vmVar, fUnderlyingFrame.id));
+            result.add(new QVTOVariable(getQVTODebugTarget(), next, fUnderlyingFrame.id));
 		}
 		
-		IVariable[] allVars = result.toArray(new IVariable[result.size()]);
+		IVariable[] allVars = result.toArray(new IVariable[0]);
 		Arrays.sort(allVars, new Comparator<IVariable>() {
 			public int compare(IVariable var1, IVariable var2) {
 				try {
@@ -108,28 +106,25 @@ public class QVTOStackFrame extends QVTODebugElement implements IStackFrame {
 		return getLocation().getLineNum();
 	}
 
-	public int getCharStart() throws DebugException {		
-//		return getLocation().getElement().getStartPosition();
+	public int getCharStart() {
 		return -1;
 	}
 
-	public int getCharEnd() throws DebugException {
-//		 int endPos = getLocation().getElement().getEndPosition();
-//		 return (endPos >= 0) ? endPos + 1 : -1;
+	public int getCharEnd() {
 		return -1;
 	}
 
-	public String getName() throws DebugException {
+	public String getName() {
 		int line = getLineNumber();
 		String fileName = getUnitURI().lastSegment();
 		return line < -1 ? fileName : fileName + "(" + line + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
-	public IRegisterGroup[] getRegisterGroups() throws DebugException {
+	public IRegisterGroup[] getRegisterGroups() {
 		return null;
 	}
 
-	public boolean hasRegisterGroups() throws DebugException {
+	public boolean hasRegisterGroups() {
 		return false;
 	}
 
@@ -202,9 +197,8 @@ public class QVTOStackFrame extends QVTODebugElement implements IStackFrame {
 		
 		VMStackFrameRequest frameRequest = new VMStackFrameRequest(fUnderlyingFrame.id);
 		VMResponse response = getQVTODebugTarget().sendRequest(frameRequest);
-		if(response instanceof VMStackFrameResponse) {
-			VMStackFrameResponse stackFrameResponse = (VMStackFrameResponse) response;
-			fDeferredExecution = stackFrameResponse.isDeferredExecution;
+		if(response instanceof VMStackFrameResponse stackFrameResponse) {
+            fDeferredExecution = stackFrameResponse.isDeferredExecution;
 			frame = stackFrameResponse.getFrame();
 		}
 		

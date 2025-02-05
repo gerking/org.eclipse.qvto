@@ -25,13 +25,8 @@ import org.eclipse.m2m.internal.qvt.oml.expressions.MappingBody;
 import org.eclipse.m2m.internal.qvt.oml.expressions.MappingCallExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Module;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ObjectExp;
-import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.AssignExp;
 import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.BlockExp;
-import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.BreakExp;
-import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.ContinueExp;
-import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.ImperativeIterateExp;
 import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.ImperativeLoopExp;
-import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.VariableInitExp;
 import org.eclipse.ocl.ecore.IteratorExp;
 import org.eclipse.ocl.ecore.OperationCallExp;
 import org.eclipse.ocl.expressions.OCLExpression;
@@ -52,11 +47,10 @@ public class ValidBreakpointLocator {
 		}
 
 		public void process(Visitable visitable, Visitable parent) {
-			if (visitable instanceof ASTNode == false) {
+			if (!(visitable instanceof ASTNode astNode)) {
 				return;
 			}
 			
-			ASTNode astNode = (ASTNode) visitable;
 			boolean found = false;
 			if(isBreakpointableElementStart(astNode)) {
 		        int line = lineNumbers.getLineNumber(astNode.getStartPosition());
@@ -100,28 +94,17 @@ public class ValidBreakpointLocator {
 	
 
 	static boolean isBreakpointableElementStart(ASTNode element) {
-		boolean breakpointable =
-            (element instanceof OCLExpression<?> ||
-			element instanceof ObjectExp ||
-			element instanceof AssignExp ||
-			element instanceof BreakExp ||
-			element instanceof ContinueExp ||
-			element instanceof VariableInitExp
-            ) && element instanceof BlockExp == false
-              && element instanceof ImperativeIterateExp == false
-              && element instanceof IteratorExp == false
-              && element instanceof ContextualProperty == false
-              && element instanceof ImperativeLoopExp == false;
-		
+		boolean breakpointable = element instanceof OCLExpression<?> && !(element instanceof BlockExp) && !(element instanceof IteratorExp)
+				&& !(element instanceof ContextualProperty) && !(element instanceof ImperativeLoopExp);
+
         if (breakpointable && (element instanceof ObjectExp)) {
-        	if(element.eContainer() instanceof MappingBody &&
+        	if(element.eContainer() instanceof MappingBody mappingBody &&
         		element.eContainingFeature() == ExpressionsPackage.eINSTANCE.getOperationBody_Content()) {
         		// Remark:
         		// Here we try to check if the object expression is implicit
         		// IOW, has no concrete syntaxt element => mapped to mapping
         		// body by its positions
-        		MappingBody mappingBody = (MappingBody) element.eContainer();
-        		ObjectExp objectExp = (ObjectExp) element;
+                ObjectExp objectExp = (ObjectExp) element;
         		return mappingBody.getStartPosition() != objectExp.getStartPosition();
         	}
         }
@@ -134,11 +117,9 @@ public class ValidBreakpointLocator {
 		if (element instanceof OperationCallExp) {
 			referredOperation = ((OperationCallExp) element).getReferredOperation();
 		}
-		
-		boolean breakpointable = element instanceof ImperativeOperation 
-				|| element instanceof MappingCallExp 
-				|| referredOperation instanceof ImperativeOperation;
 
-		return breakpointable;
+        return element instanceof ImperativeOperation
+                || element instanceof MappingCallExp
+                || referredOperation instanceof ImperativeOperation;
 	}
 }

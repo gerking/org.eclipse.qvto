@@ -91,14 +91,14 @@ public class QVTOToggleBreakpointAdapter implements IToggleBreakpointsTarget {
 		return getEditor(part) != null;
 	}
 		
-	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+	public void toggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
 	}
 
 	public boolean canToggleMethodBreakpoints(IWorkbenchPart part, ISelection selection) {
 		return false;
 	}
 
-	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) throws CoreException {
+	public void toggleWatchpoints(IWorkbenchPart part, ISelection selection) {
 	}
 
 	public boolean canToggleWatchpoints(IWorkbenchPart part, ISelection selection) {

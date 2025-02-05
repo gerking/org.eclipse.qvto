@@ -64,11 +64,7 @@ class VMInitializer implements VMProvider {
 				throw new IllegalStateException("Initialization already started"); //$NON-NLS-1$
 			}
 			
-			fInitThread = new Thread(new Runnable() {				
-				public void run() {
-					doInitialize();
-				}
-			});
+			fInitThread = new Thread(this::doInitialize);
 		}
 
 		fInitThread.start();		

@@ -146,7 +146,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 			}
 
 			if (enabled) {
-				installedBreakpoints.put(new Long(((QVTOBreakpoint) qvtBp).getID()), qvtBp);
+				installedBreakpoints.put(qvtBp.getID(), qvtBp);
 				try {
 					NewBreakpointData data = qvtBp.createNewBreakpointData();
 					data.targetURI = computeBreakpointURI(URI.createURI(data.targetURI, true)).toString();
@@ -163,19 +163,17 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		if (!allBpData.isEmpty()) {
 			VMBreakpointRequest breakpointRequest = VMBreakpointRequest
 					.createAdd(allBpData
-							.toArray(new NewBreakpointData[allBpData.size()]));
+							.toArray(new NewBreakpointData[0]));
 			try {
 				VMResponse response = fVM.sendRequest(breakpointRequest);
 				// 
 				fID2Breakpoint.clear();
-				if(response instanceof VMBreakpointResponse) {
-					VMBreakpointResponse bpResponse = (VMBreakpointResponse) response;
-					
-					for(long addedID : bpResponse.getAddedBreakpointsIDs()) {
-						Long key = new Long(addedID);
-						QVTOBreakpoint bp = installedBreakpoints.get(key);
+				if(response instanceof VMBreakpointResponse bpResponse) {
+
+                    for(long addedID : bpResponse.getAddedBreakpointsIDs()) {
+						QVTOBreakpoint bp = installedBreakpoints.get(addedID);
 						if(bp != null) {
-							fID2Breakpoint.put(key, bp);
+							fID2Breakpoint.put(addedID, bp);
 						}
 					}
 				}
@@ -225,16 +223,16 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		return null;
 	}
 
-	public boolean hasThreads() throws DebugException {
+	public boolean hasThreads() {
 		return !isTerminated();
 	}
 
-	public IThread[] getThreads() throws DebugException {
+	public IThread[] getThreads() {
 		return (fMainThread != null) ? new IThread[] { fMainThread }
 				: new IThread[0];
 	}
 
-	public String getName() throws DebugException {
+	public String getName() {
 		return "QVTO Debug target";
 	}
 
@@ -288,9 +286,8 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		fID2Breakpoint.clear();
 		
 		fireTerminateEvent();
-		if(fProcess instanceof QVTOVirtualProcess) {
-			QVTOVirtualProcess vp = (QVTOVirtualProcess) fProcess;
-			vp.terminated();
+		if(fProcess instanceof QVTOVirtualProcess vp) {
+            vp.terminated();
 		}
 	}
 
@@ -311,23 +308,21 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 	}
 
 	public void breakpointAdded(IBreakpoint breakpoint) {
-		if (breakpoint instanceof QVTOBreakpoint == false
+		if (!(breakpoint instanceof QVTOBreakpoint qvtBreakpoint)
 				|| !DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
 			return;
 		}
 
-		QVTOBreakpoint qvtBreakpoint = (QVTOBreakpoint) breakpoint;
-		try {
+        try {
 			NewBreakpointData bpData = qvtBreakpoint.createNewBreakpointData();
 			VMBreakpointRequest addBreakpointRequest = VMBreakpointRequest
 					.createAdd(bpData);
 
 			VMResponse response = sendRequest(addBreakpointRequest);
-			if(response instanceof VMBreakpointResponse) {
-				VMBreakpointResponse bpResponse = (VMBreakpointResponse) response;
-				long[] addedIDs = bpResponse.getAddedBreakpointsIDs();
+			if(response instanceof VMBreakpointResponse bpResponse) {
+                long[] addedIDs = bpResponse.getAddedBreakpointsIDs();
 				if(addedIDs.length > 0) {
-					fID2Breakpoint.put(new Long(addedIDs[0]), qvtBreakpoint);
+					fID2Breakpoint.put(addedIDs[0], qvtBreakpoint);
 				}
 			}
 		} catch (CoreException e) {
@@ -336,7 +331,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 	}
 
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
-		if (breakpoint instanceof QVTOBreakpoint == false
+		if (!(breakpoint instanceof QVTOBreakpoint)
 				|| !DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
 			return;
 		}
@@ -381,7 +376,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 	}
 
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
-		if (breakpoint instanceof QVTOBreakpoint) {
+		if (breakpoint instanceof QVTOBreakpoint qvtBreakpoint) {
 			if (delta == null) {
 				IMarker marker = breakpoint.getMarker();
 				if (marker.exists()) {
@@ -393,9 +388,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 					}
 				}
 			}
-			QVTOBreakpoint qvtBreakpoint = (QVTOBreakpoint) breakpoint;
-			fID2Breakpoint.remove(new Long(((QVTOBreakpoint) breakpoint)
-					.getID()));
+            fID2Breakpoint.remove(qvtBreakpoint.getID());
 
 			VMBreakpointRequest removeRequest = VMBreakpointRequest
 					.createRemove(qvtBreakpoint.getID());
@@ -411,7 +404,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		return false;
 	}
 
-	public void disconnect() throws DebugException {
+	public void disconnect() {
 	}
 
 	public boolean isDisconnected() {
@@ -422,24 +415,22 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		return false;
 	}
 
-	public IMemoryBlock getMemoryBlock(long startAddress, long length) throws DebugException {
+	public IMemoryBlock getMemoryBlock(long startAddress, long length) {
 		return null;
 	}
 
 	public void handleDebugEvents(DebugEvent[] events) {
-		for (int i = 0; i < events.length; i++) {
-			DebugEvent event = events[i];
-
-			if (event.getKind() == DebugEvent.TERMINATE) {
-				// respond
-				if ((fMainThread != null && event.getSource() == fMainThread)
-						|| (event.getSource() == fProcess)) {
-					if(!isTerminated()) {
-						terminated();
-					}
-				}
-			}
-		}
+        for (DebugEvent event : events) {
+            if (event.getKind() == DebugEvent.TERMINATE) {
+                // respond
+                if ((fMainThread != null && event.getSource() == fMainThread)
+                        || (event.getSource() == fProcess)) {
+                    if (!isTerminated()) {
+                        terminated();
+                    }
+                }
+            }
+        }
 	}
 
 	public void breakpointManagerEnablementChanged(boolean enabled) {
@@ -499,11 +490,10 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 				if (event instanceof VMResumeEvent) {
 					fIsSuspended = false;
 					fireResumeEvent(0);
-				} else if (event instanceof VMSuspendEvent) {
+				} else if (event instanceof VMSuspendEvent suspend) {
 					fIsSuspended = true;
-					
-					VMSuspendEvent suspend = (VMSuspendEvent) event;					
-					fireSuspendEvent(suspend.detail);
+
+                    fireSuspendEvent(suspend.detail);
 					
 					if (suspend.detail == VMSuspendEvent.BREAKPOINT_CONDITION_ERR) {
 						handleBreakpointConditionError(suspend);
@@ -562,10 +552,10 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 	}
 	
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (QvtOperationalEvaluationEnv.class == adapter) {
-			if (getVM() instanceof QVTOVirtualMachine) {
-				return ((QVTOVirtualMachine) getVM()).getEvaluationEnv();
+			if (getVM() instanceof QVTOVirtualMachine qvtoVirtualMachine) {
+				return adapter.cast(qvtoVirtualMachine.getEvaluationEnv());
 			}
 		}
 		return super.getAdapter(adapter);

@@ -34,7 +34,7 @@ public class DebugEvaluationEnvironment extends QvtOperationalEvaluationEnv impl
 
 	@Override
 	public QvtOperationalEvaluationEnv createDeferredExecutionEnvironment() {
-		QvtOperationalEvaluationEnv parent = (getRoot() == this) ? parent = null : getRoot();
+		QvtOperationalEvaluationEnv parent = (getRoot() == this) ? null : getRoot();
 		QvtOperationalEvaluationEnv result = new DebugEvaluationEnvironment(getContext(), parent, fID);		
 		return copyEnv(result);
 	}	

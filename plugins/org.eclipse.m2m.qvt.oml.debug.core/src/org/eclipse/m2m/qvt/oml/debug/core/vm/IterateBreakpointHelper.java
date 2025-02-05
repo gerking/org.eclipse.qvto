@@ -16,13 +16,11 @@ package org.eclipse.m2m.qvt.oml.debug.core.vm;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.m2m.internal.qvt.oml.ast.binding.ASTBindingHelper;
 import org.eclipse.m2m.internal.qvt.oml.common.util.LineNumberProvider;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Module;
-import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugCore;
 import org.eclipse.m2m.qvt.oml.ecore.ImperativeOCL.BlockExp;
 import org.eclipse.ocl.expressions.LoopExp;
 import org.eclipse.ocl.expressions.OCLExpression;
@@ -58,9 +56,8 @@ class IterateBreakpointHelper {
 
 		// ensure we can suspend after stepping within iterator if it's body
 		// is spread across multiple lines
-		if (body instanceof BlockExp) {
-			BlockExp blockExp = (BlockExp) body;
-			int bodyEndLine = lineNumProvider.getLineNumber(blockExp.getEndPosition());
+		if (body instanceof BlockExp blockExp) {
+            int bodyEndLine = lineNumProvider.getLineNumber(blockExp.getEndPosition());
 			if ((bodyEndLine == elementLine) || blockExp.getBody().isEmpty()) {
 				return null;
 			}
@@ -72,10 +69,8 @@ class IterateBreakpointHelper {
 
 
 		URI unitURI = currentLocation.getURI();
-		VMBreakpoint breakpoint = createIterateBreakpoint(unitURI,
-				iterateBreakpointedElement, elementLine);
 
-		return breakpoint;
+        return createIterateBreakpoint(unitURI, iterateBreakpointedElement, elementLine);
 	}		
 
 	boolean isIterateBreakpoint(VMBreakpoint breakpoint) {
@@ -83,13 +78,9 @@ class IterateBreakpointHelper {
 	}
 
 	VMBreakpoint createIterateBreakpoint(URI unitURI, ASTNode breakpointedElement, int line) {
-		VMBreakpoint breakpoint = null;
-		try {
-			breakpoint = fBPM.createVMPrivateBreakpoint(unitURI, breakpointedElement, line, false);
-			fBreakpoints.add(breakpoint);
-		} catch (CoreException e) {
-			QVTODebugCore.log(e.getStatus());
-		}
+		VMBreakpoint breakpoint;
+		breakpoint = fBPM.createVMPrivateBreakpoint(unitURI, breakpointedElement, line, false);
+		fBreakpoints.add(breakpoint);
 		return breakpoint;
 	}
 

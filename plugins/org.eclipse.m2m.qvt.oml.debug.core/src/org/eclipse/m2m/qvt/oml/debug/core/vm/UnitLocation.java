@@ -104,12 +104,11 @@ public class UnitLocation {
     
 	@Override
 	public boolean equals(Object another) {
-		if(another instanceof UnitLocation == false) {
+		if(!(another instanceof UnitLocation location)) {
 			return false;
 		}
 		
-		UnitLocation location = (UnitLocation) another;
-		return this == location || 
+		return this == location ||
 				(fOffset == location.fOffset
 				&& fDepth == location.fDepth
 				&& fEvalEnv == location.fEvalEnv

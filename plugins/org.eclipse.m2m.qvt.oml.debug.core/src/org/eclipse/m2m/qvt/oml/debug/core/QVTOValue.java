@@ -41,7 +41,7 @@ public class QVTOValue extends QVTODebugElement implements IValue {
 		this.frameID = frameID;
 	}
 	
-	public boolean hasVariables() throws DebugException {
+	public boolean hasVariables() {
 		return vmValue != null && vmValue.hasVariables;
 	}
 
@@ -53,14 +53,14 @@ public class QVTOValue extends QVTODebugElement implements IValue {
 			result.add(new QVTOVariable(getQVTODebugTarget(), nextVar, this.frameID));
 		}					
 		
-		return result.toArray(new IVariable[result.size()]);
+		return result.toArray(new IVariable[0]);
 	}
 
-	public String getValueString() throws DebugException {
+	public String getValueString() {
 		return (vmValue != null) ? String.valueOf(vmValue.value) : AbstractQVTStdlib.NULL_NAME;
 	}
 
-	public String getReferenceTypeName() throws DebugException {
+	public String getReferenceTypeName() {
 		return this.vmVar.type.actualType;
 	}		
 	
@@ -69,9 +69,8 @@ public class QVTOValue extends QVTODebugElement implements IValue {
     	VMDetailRequest request = new VMDetailRequest(varURI);
     	
     	VMResponse response = getQVTODebugTarget().sendRequest(request);
-    	if(response instanceof VMDetailResponse) {
-    		VMDetailResponse detailResponse = (VMDetailResponse) response;
-    		return detailResponse.getDetail();
+    	if(response instanceof VMDetailResponse detailResponse) {
+            return detailResponse.getDetail();
     	}
     	return ""; //$NON-NLS-1$
     }
@@ -92,9 +91,8 @@ public class QVTOValue extends QVTODebugElement implements IValue {
 		
 		VMResponse response = getQVTODebugTarget().sendRequest(request);
 
-		if(response instanceof VMVariableResponse) {
-			VMVariableResponse variableResponse = (VMVariableResponse) response;
-			if(variableResponse.childVariables != null) {
+		if(response instanceof VMVariableResponse variableResponse) {
+            if(variableResponse.childVariables != null) {
 				return Arrays.asList(variableResponse.childVariables);
 			}
 		}
@@ -102,7 +100,7 @@ public class QVTOValue extends QVTODebugElement implements IValue {
 		return Collections.emptyList();
 	}
 	
-	public boolean isAllocated() throws DebugException {
+	public boolean isAllocated() {
 		return true;
 	}
 	

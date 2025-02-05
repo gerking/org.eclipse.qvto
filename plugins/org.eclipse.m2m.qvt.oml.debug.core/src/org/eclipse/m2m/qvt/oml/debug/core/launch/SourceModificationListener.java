@@ -66,11 +66,10 @@ class SourceModificationListener implements IResourceChangeListener {
 		} else {
 			try {
 				delta.accept(new IResourceDeltaVisitor() {
-					public boolean visit(IResourceDelta delta) throws CoreException {
+					public boolean visit(IResourceDelta delta) {
 						IResource resource = delta.getResource();
-						if (resource instanceof IFile) {
-							IFile file = (IFile) resource;
-							boolean include = (delta.getFlags() & IResourceDelta.CONTENT) != 0;
+						if (resource instanceof IFile file) {
+                            boolean include = (delta.getFlags() & IResourceDelta.CONTENT) != 0;
 							if (include && fTransfFile.equals(file)) {
 								modified[0] = true;
 							}
@@ -102,9 +101,8 @@ class SourceModificationListener implements IResourceChangeListener {
 				resolved = handler.handleStatus(
 						QVTODebugConfiguration.MODIFIED_SOURCE_STATUS,
 						sourceFile.getFullPath());
-				if (resolved instanceof IStatus) {
-					IStatus resolvedStatus = (IStatus) resolved;
-					if (resolvedStatus.getSeverity() == IStatus.CANCEL) {
+				if (resolved instanceof IStatus resolvedStatus) {
+                    if (resolvedStatus.getSeverity() == IStatus.CANCEL) {
 						fTerminate.canTerminate();
 					}
 				}

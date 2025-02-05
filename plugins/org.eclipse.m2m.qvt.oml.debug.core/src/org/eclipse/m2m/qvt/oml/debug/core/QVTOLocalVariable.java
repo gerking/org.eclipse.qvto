@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOLocalValue.LocalValue;
@@ -26,7 +25,7 @@ public class QVTOLocalVariable extends QVTOVariable {
 	}
 	
 	@Override
-	public IValue getValue() throws DebugException {
+	public IValue getValue() {
 		if (fValue == null) {
 			LocalValue lv = new LocalValue();
 			lv.valueObject = vmVar.valueObject;

@@ -10,11 +10,7 @@
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -62,10 +58,8 @@ public class QVTODebugUtil {
 			
 			IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(javaURI);
 			List<IFile> result = new ArrayList<IFile>(files.length);
-			
-			for (IFile nextFile : files) {
-				result.add(nextFile);
-			}
+
+            result.addAll(Arrays.asList(files));
 			return result;
 		}
 		return Collections.emptyList();

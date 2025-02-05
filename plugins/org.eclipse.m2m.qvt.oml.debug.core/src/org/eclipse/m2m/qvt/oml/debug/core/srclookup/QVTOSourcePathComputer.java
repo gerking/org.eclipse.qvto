@@ -63,6 +63,6 @@ public class QVTOSourcePathComputer implements ISourcePathComputer {
 			result.addAll(Arrays.asList(fJavaSourcePathComputer.computeSourceContainers(configuration, monitor)));
 		}
 		
-		return result.toArray(new ISourceContainer[result.size()]);
+		return result.toArray(new ISourceContainer[0]);
 	}
 }

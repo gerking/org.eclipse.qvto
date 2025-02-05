@@ -25,7 +25,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
-import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOBreakpoint;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugElement;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugUtil;
@@ -56,7 +55,7 @@ public class QVTORunToLineAdapter implements IRunToLineTarget {
 			throw new CoreException(QVTODebugUIPlugin.createErrorStatus(DebugUIMessages.QVTORunToLineAdapter_NoDocument));
 		}
 		
-		IFile file = (IFile)input.getAdapter(IFile.class);
+		IFile file = input.getAdapter(IFile.class);
 		if (file == null) {
 			throw new CoreException(QVTODebugUIPlugin.createErrorStatus(DebugUIMessages.QVTORunToLineAdapter_NoFile)); 
 		}
@@ -79,12 +78,11 @@ public class QVTORunToLineAdapter implements IRunToLineTarget {
 
 		
 		IAdaptable adaptableTarget = (IAdaptable)target;
-		IDebugTarget debugTarget = (IDebugTarget) adaptableTarget.getAdapter(IDebugTarget.class);
+		IDebugTarget debugTarget = adaptableTarget.getAdapter(IDebugTarget.class);
 		if (debugTarget != null) {
             RunToLineHandler handler = new RunToLineHandler(debugTarget, target, qvtBreakpoint);
             handler.run(new NullProgressMonitor());
-			return;
-		}
+        }
 	}
 
 	public boolean canRunToLine(IWorkbenchPart part, ISelection selection, ISuspendResume target) {

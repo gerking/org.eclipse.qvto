@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -105,7 +106,7 @@ public class QVTODebugUIPlugin extends AbstractUIPlugin {
 	 * @return the active workbench window
 	 */
 	public static IWorkbenchWindow getActiveWorkbenchWindow() {
-		return getDefault().getWorkbench().getActiveWorkbenchWindow();
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 	}
 
 	/**
@@ -154,7 +155,7 @@ public class QVTODebugUIPlugin extends AbstractUIPlugin {
 		}
 	}
 
-	public static final Display getStandardDisplay() {
+	public static Display getStandardDisplay() {
 		Display display = Display.getCurrent();
 		if (display == null) {
 			display = Display.getDefault();
@@ -195,7 +196,7 @@ public class QVTODebugUIPlugin extends AbstractUIPlugin {
 		return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + imagePath); //$NON-NLS-1$
 	}
 	
-    private final ImageDescriptor overlayImage(String overImagePath, Image base, int quadrant) {
+	private ImageDescriptor overlayImage(String overImagePath, Image base, int quadrant) {
         ImageDescriptor decorator = imageDescriptor(overImagePath);
         return new DecorationOverlayIcon(base, decorator, quadrant);
     }	

@@ -30,7 +30,7 @@ public class VMBreakpointResponse extends VMResponse {
 		fAddedBreakpointsIDs = new long[addedBreakpointIDs.size()];
 		int i = 0;
 		for (Long id : addedBreakpointIDs) {
-			fAddedBreakpointsIDs[i++] = id.longValue();
+			fAddedBreakpointsIDs[i++] = id;
 		}
 	}
 

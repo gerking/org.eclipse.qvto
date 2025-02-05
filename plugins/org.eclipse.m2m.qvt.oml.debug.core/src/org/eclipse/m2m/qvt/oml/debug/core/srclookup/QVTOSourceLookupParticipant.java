@@ -11,7 +11,6 @@
 package org.eclipse.m2m.qvt.oml.debug.core.srclookup;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.sourcelookup.AbstractSourceLookupParticipant;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugCore;
@@ -28,10 +27,9 @@ public class QVTOSourceLookupParticipant extends AbstractSourceLookupParticipant
 		super();
 	}
 	
-    public String getSourceName(Object object) throws CoreException {    	
-    	if (object instanceof QVTOStackFrame) {
-			QVTOStackFrame frame = (QVTOStackFrame) object;
-			URI unitURI = frame.getUnitURI();
+    public String getSourceName(Object object) {
+    	if (object instanceof QVTOStackFrame frame) {
+            URI unitURI = frame.getUnitURI();
 
 			IFile sourceFile = findSourceFile(unitURI);
 			if(sourceFile != null) {

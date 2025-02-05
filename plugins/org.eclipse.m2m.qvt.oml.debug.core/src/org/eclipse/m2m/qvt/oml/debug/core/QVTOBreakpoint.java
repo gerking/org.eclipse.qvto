@@ -77,8 +77,6 @@ public class QVTOBreakpoint extends LineBreakpoint {
         final IFile sourceFile = QVTODebugUtil.toFile(sourceURI);
         final IResource markerResource = (sourceFile != null && !isRunToLine) ? sourceFile : ResourcesPlugin.getWorkspace().getRoot();
         
-        final Integer lineNum = new Integer(lineNumber);
-        
         IWorkspaceRunnable wr = new IWorkspaceRunnable() {
             public void run(IProgressMonitor monitor) throws CoreException {
 				// create the marker
@@ -94,7 +92,7 @@ public class QVTOBreakpoint extends LineBreakpoint {
                 }
 
                 attributes.put(IBreakpoint.ENABLED, Boolean.TRUE);
-				attributes.put(IMarker.LINE_NUMBER, lineNum);
+				attributes.put(IMarker.LINE_NUMBER, lineNumber);
                 attributes.put(IBreakpoint.ID, getModelIdentifier());
                 if(sourceFile == null || isRunToLine) {
                 	attributes.put(TARGET_URI_ATTR, sourceURI.toString());
@@ -125,7 +123,7 @@ public class QVTOBreakpoint extends LineBreakpoint {
     	return getMarker().getId();
     }
 
-    public URI getUnitURI() throws CoreException {
+    public URI getUnitURI() {
     	IMarker marker = getMarker();    
     	IResource res = marker.getResource();
     	if(res.getType() == IResource.FILE) {
@@ -186,10 +184,10 @@ public class QVTOBreakpoint extends LineBreakpoint {
         if (getHitCount() != count) {
             if (!isEnabled() && count > -1) {
 				setAttributes(new String[] { ENABLED, HIT_COUNT },
-						new Object[] { Boolean.TRUE, new Integer(count) });
+						new Object[] { Boolean.TRUE, count });
             } else {
 				setAttributes(new String[] { HIT_COUNT },
-						new Object[] { new Integer(count) });
+						new Object[] { count });
             }
         }
     }
@@ -207,7 +205,7 @@ public class QVTOBreakpoint extends LineBreakpoint {
     }
 
     public void setCondition(String condition) throws CoreException {
-        if (condition != null && condition.trim().length() == 0) {
+        if (condition != null && condition.trim().isEmpty()) {
             condition = null;
         }
         setAttribute(CONDITION, condition);

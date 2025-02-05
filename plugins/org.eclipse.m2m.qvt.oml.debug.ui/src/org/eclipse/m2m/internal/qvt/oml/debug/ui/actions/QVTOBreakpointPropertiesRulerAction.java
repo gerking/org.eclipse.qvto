@@ -26,8 +26,6 @@ import org.eclipse.ui.texteditor.IUpdate;
 
 public class QVTOBreakpointPropertiesRulerAction extends RulerBreakpointAction implements IUpdate {
     
-    private IBreakpoint fBreakpoint;
-
     public QVTOBreakpointPropertiesRulerAction(ITextEditor editor, IVerticalRulerInfo info) {
         super(editor, info); 
         setText(DebugUIMessages.QVTOBreakpointProperties_RulerActionLabel);
@@ -55,11 +53,7 @@ public class QVTOBreakpointPropertiesRulerAction extends RulerBreakpointAction i
      * @see IUpdate#update()
      */
     public void update() {
-        fBreakpoint = null;
         IBreakpoint breakpoint = getBreakpoint();
-        if (breakpoint != null && (breakpoint instanceof QVTOBreakpoint)) {
-            fBreakpoint = breakpoint;
-        }
-        setEnabled(fBreakpoint != null);
+		setEnabled(breakpoint instanceof QVTOBreakpoint);
     }
 }

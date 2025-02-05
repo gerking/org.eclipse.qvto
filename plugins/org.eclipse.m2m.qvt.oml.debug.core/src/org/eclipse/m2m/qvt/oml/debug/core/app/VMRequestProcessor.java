@@ -64,7 +64,7 @@ class VMRequestProcessor extends AbstractRequestProcessor {
 				return fVM.sendRequest(request);
 			}
 		} catch(IOException e) {
-			throw new CoreException(QVTODebugCore.getDefault().createStatus(IStatus.ERROR,
+			throw new CoreException(QVTODebugCore.createStatus(IStatus.ERROR,
 					e.getMessage(), e));
 		}
 
@@ -75,12 +75,7 @@ class VMRequestProcessor extends AbstractRequestProcessor {
 		int eventPort = SocketUtil.findFreePort();
 		if(eventPort != -1) {
 			// start event dispatcher
-			fEventDispatcher = new VMEventDispatcher(fVMProvider, eventPort,
-					new VMEventDispatcher.TerminationListener() {
-						public void terminated() {
-							terminate();
-						}
-					});					
+			fEventDispatcher = new VMEventDispatcher(fVMProvider, eventPort, this::terminate);
 			fEventDispatcher.start();
 			
 			return new VMConnectResponse(eventPort);

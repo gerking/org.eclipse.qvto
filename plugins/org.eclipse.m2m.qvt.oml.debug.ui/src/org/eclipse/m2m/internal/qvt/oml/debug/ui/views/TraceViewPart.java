@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.debug.ui.views;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.ui.AbstractDebugView;
@@ -30,7 +29,6 @@ import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.runtime.ui.trace.common.TraceActionBarContributor;
 import org.eclipse.m2m.internal.qvt.oml.runtime.ui.trace.common.TraceWorkbenchPart;
 import org.eclipse.m2m.internal.qvt.oml.trace.Trace;
-import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugCore;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOStackFrame;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOThread;
 import org.eclipse.swt.widgets.Composite;
@@ -105,18 +103,13 @@ public class TraceViewPart extends AbstractDebugView implements IDebugContextLis
             }
             
             IDebugTarget debugTarget = null;
-            if (firstElement instanceof QVTOThread) {
-            	QVTOThread qvtThread = (QVTOThread) firstElement;
-                try {
-                    IStackFrame[] stackFrames = qvtThread.getStackFrames();
-                    if (stackFrames.length == 0 
-                    		|| false == stackFrames[0] instanceof QVTOStackFrame) {
-                    	return;
-                    }
-                    debugTarget = ((QVTOStackFrame) stackFrames[0]).getDebugTarget();
-                } catch (DebugException e) {
-                	QVTODebugCore.log(e);
+            if (firstElement instanceof QVTOThread qvtThread) {
+                IStackFrame[] stackFrames = qvtThread.getStackFrames();
+                if (stackFrames.length == 0
+                        || !(stackFrames[0] instanceof QVTOStackFrame)) {
+                    return;
                 }
+                debugTarget = stackFrames[0].getDebugTarget();
             }
             else if (firstElement instanceof QVTOStackFrame) {
 				debugTarget = ((QVTOStackFrame) firstElement).getDebugTarget();
@@ -126,7 +119,7 @@ public class TraceViewPart extends AbstractDebugView implements IDebugContextLis
 			}
 
 			if (debugTarget != null) {
-            	QvtOperationalEvaluationEnv evalEnv = (QvtOperationalEvaluationEnv) debugTarget.getAdapter(QvtOperationalEvaluationEnv.class);
+            	QvtOperationalEvaluationEnv evalEnv = debugTarget.getAdapter(QvtOperationalEvaluationEnv.class);
             	if (evalEnv != null) {
 	                InternalEvaluationEnv internEnv = evalEnv.getAdapter(InternalEvaluationEnv.class);
 	                Trace trace = internEnv.getTraces();

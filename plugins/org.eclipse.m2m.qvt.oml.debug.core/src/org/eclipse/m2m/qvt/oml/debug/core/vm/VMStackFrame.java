@@ -129,9 +129,8 @@ public class VMStackFrame implements Serializable {
 				: MessageFormat.format("<{0}>", moduleName); //$NON-NLS-1$
 		
 		List<VMVariable> vars = VariableFinder.getVariables(evalEnv);
-		VMStackFrame vmStackFrame = new VMStackFrame(evalEnv.getID(), location.getURI().toString(), moduleName, 
-					operSignature, location.getLineNum(), vars.toArray(new VMVariable[vars.size()]));
-		return vmStackFrame;
+        return new VMStackFrame(evalEnv.getID(), location.getURI().toString(), moduleName,
+                    operSignature, location.getLineNum(), vars.toArray(new VMVariable[0]));
 	}
 	
 	static VMStackFrame[] create(List<UnitLocation> stack) {
@@ -143,15 +142,14 @@ public class VMStackFrame implements Serializable {
 			result.add(create(location, i++ == 0));
 		}
 
-		return result.toArray(new VMStackFrame[result.size()]);
+		return result.toArray(new VMStackFrame[0]);
 	}
 	
 	static UnitLocation lookupEnvironmentByID(long id, List<UnitLocation> stack) {
 		for (UnitLocation location : stack) {
 			QvtOperationalEvaluationEnv evalEnv = location.getEvalEnv();
-			if(evalEnv instanceof DebugEvaluationEnvironment) {
-				DebugEvaluationEnvironment debugEvalEnv = (DebugEvaluationEnvironment) evalEnv;
-				if(debugEvalEnv.getID() == id) {
+			if(evalEnv instanceof DebugEvaluationEnvironment debugEvalEnv) {
+                if(debugEvalEnv.getID() == id) {
 					return location;
 				}
 			}
@@ -161,26 +159,26 @@ public class VMStackFrame implements Serializable {
 	}
 	
 	private static String getOperationSignature(ImperativeOperation operation) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
     	EClassifier ctxType = QvtOperationalParserUtil.getContextualType(operation);        
         if (ctxType != null) {
-            buf.append(ctxType.getName()).append("::"); //$NON-NLS-1$            
+            builder.append(ctxType.getName()).append("::"); //$NON-NLS-1$
         }
 
-        buf.append(operation.getName());        
-        buf.append('(');
+        builder.append(operation.getName());
+        builder.append('(');
         
         int i = 0, n = operation.getEParameters().size();
         for (EParameter param : operation.getEParameters()) {
             EClassifier type = param.getEType();
-            buf.append(type.getName());            
+            builder.append(type.getName());
             if (i+1 < n) {
-                buf.append(", "); //$NON-NLS-1$
+                builder.append(", "); //$NON-NLS-1$
             }
             ++i;
         }
-        buf.append(')');
+        builder.append(')');
         
-        return buf.toString();
+        return builder.toString();
     }
 }

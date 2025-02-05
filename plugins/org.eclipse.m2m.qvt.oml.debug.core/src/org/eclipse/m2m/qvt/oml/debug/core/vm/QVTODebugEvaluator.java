@@ -98,7 +98,7 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 			terminate();
 		}
 		
-		if(request instanceof VMResumeRequest == false) {
+		if (!(request instanceof VMResumeRequest)) {
 			// TODO - decide a set of request we can handle during initial SUSPEND mode,
 			// or report fError
 			terminate();
@@ -202,7 +202,7 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 	}
 
 	
-	protected Object preElementVisit(ASTNode element) {
+	private Object preElementVisit(ASTNode element) {
 		setCurrentEnvInstructionPointer(element);
 		
 		QvtOperationalEvaluationEnv evalEnv = getOperationalEvaluationEnv();
@@ -245,7 +245,7 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 		return result;
 	}
 
-	protected Object postElementVisit(ASTNode element, Object preState, Object result) {
+	private Object postElementVisit(ASTNode element, Object preState, Object result) {
 		QvtOperationalEvaluationEnv evalEnv = getOperationalEvaluationEnv();
 		if (element instanceof Module) {
 			// 
@@ -284,16 +284,14 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 	}
 	
 	private void doProcessRequest(UnitLocation location, VMRequest request) {
-		if (request instanceof VMResumeRequest) {
-			VMResumeRequest resumeRequest = (VMResumeRequest) request;
-			fCurrentLocation = getCurrentLocation();
+		if (request instanceof VMResumeRequest resumeRequest) {
+            fCurrentLocation = getCurrentLocation();
 			fCurrentStepMode = resumeRequest.detail;
 			if (fCurrentStepMode == DebugEvent.UNSPECIFIED) {
 				fIterateBPHelper.removeAllIterateBreakpoints();
 			}
-		} else if (request instanceof VMSuspendRequest) {
-			VMSuspendRequest suspendRequest = (VMSuspendRequest) request;
-			suspendAndWaitForResume(location, suspendRequest.detail);
+		} else if (request instanceof VMSuspendRequest suspendRequest) {
+            suspendAndWaitForResume(location, suspendRequest.detail);
 		} else if (request instanceof VMTerminateRequest) {
 			terminate();
 		} else {
@@ -303,13 +301,13 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 	}
 
 	
-	protected void handleLocationChanged(ASTNode element, UnitLocation location, boolean isElementEnd) {
+	private void handleLocationChanged(ASTNode element, UnitLocation location, boolean isElementEnd) {
 		if (fCurrentLocation == null) {
 			return;
 		}
 		
-		if(false == (!isElementEnd ? ValidBreakpointLocator.isBreakpointableElementStart(element) : 
-			ValidBreakpointLocator.isBreakpointableElementEnd(element))) {
+		var isBreakpointableElementStartOrEnd = isElementEnd ? ValidBreakpointLocator.isBreakpointableElementEnd(element) : ValidBreakpointLocator.isBreakpointableElementStart(element);
+		if (!isBreakpointableElementStartOrEnd) {
 			return;
 		}
 
@@ -349,9 +347,9 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 				continue;
 			}
 					
-			Boolean isTriggered = null;
+			boolean isTriggered;
 			try {
-				isTriggered = Boolean.valueOf(breakpoint.hitAndCheckIfTriggered(this));
+				isTriggered = breakpoint.hitAndCheckIfTriggered(this);
 			} catch(CoreException e) {
 				IStatus status = e.getStatus();
 				String reason = null; //$NON-NLS-1$
@@ -402,11 +400,9 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 	}
 	
 	private void suspendAndWaitForResume(UnitLocation location, VMSuspendEvent suspendEvent) {		
-		try {			
-			VMSuspendEvent vmSuspend = suspendEvent;
-			
-			// send to the client runner, wait for resume
-			VMRequest nextRequest = fDebugShell.waitAndPopRequest(vmSuspend);			
+		try {
+            // send to the client runner, wait for resume
+			VMRequest nextRequest = fDebugShell.waitAndPopRequest(suspendEvent);
 			assert nextRequest != null;
 			
 			if(nextRequest instanceof VMResumeRequest) {
@@ -445,8 +441,7 @@ public final class QVTODebugEvaluator extends QvtOperationalEvaluationVisitorImp
 	}
 
 	private UnitLocation popLocation() {
-		UnitLocation removed = fLocationStack.remove(0);
-		return removed;
+        return fLocationStack.remove(0);
 	}
 
 	UnitLocation getCurrentLocation() {
