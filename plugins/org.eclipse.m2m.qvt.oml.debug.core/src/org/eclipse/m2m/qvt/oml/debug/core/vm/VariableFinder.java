@@ -133,7 +133,33 @@ public class VariableFinder {
 		String envVarName = varTreePath[0];
 		
 		Object rootObj = evalEnv.getValueOf(envVarName);
-		if(rootObj == null && !evalEnv.getNames().contains(envVarName)) {
+
+		if (rootObj == null) {
+			var rootEnvironment = evalEnv.getRoot();
+
+			// try the root environment, this is needed for variables like $1
+			rootObj = rootEnvironment.getValueOf(envVarName);
+
+			var currentEvalEnv = evalEnv;
+
+			// walk up the environments
+			while (currentEvalEnv != null && rootObj == null) {
+				currentEvalEnv = currentEvalEnv.getParent();
+				if (currentEvalEnv == null) {
+					// reached highest evalEnv
+					break;
+				}
+
+				rootObj = currentEvalEnv.getValueOf(envVarName);
+			}
+
+			if (currentEvalEnv != null) {
+				evalEnv = currentEvalEnv;
+			}
+		}
+
+
+		if (rootObj == null && !evalEnv.getNames().contains(envVarName)) {
 			rootObj = getModelParameterVariables(evalEnv).get(envVarName);
 			
 		}
