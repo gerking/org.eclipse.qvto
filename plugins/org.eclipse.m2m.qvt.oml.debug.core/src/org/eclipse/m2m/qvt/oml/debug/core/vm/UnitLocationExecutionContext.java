@@ -22,10 +22,12 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.TransformationInstance;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ContextualProperty;
+import org.eclipse.m2m.internal.qvt.oml.expressions.Library;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Module;
 import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
 import org.eclipse.ocl.Environment;
@@ -62,9 +64,11 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	
 	public List<EStructuralFeature> getAllFeatures(EClass eClass) {
         List<EStructuralFeature> features = new ArrayList<>(eClass.getEAllStructuralFeatures());
-		
-		if(eClass instanceof Module) {
+
+		if (eClass instanceof Module module) {
             features.removeIf(feature -> feature instanceof ContextualProperty);
+
+			collectFeaturesInImports(features, module);
 		}
 		
 		collectIntermediateProperties(features, eClass);
@@ -77,6 +81,16 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 
 	public Object getValue(EStructuralFeature feature, EObject target) {
 		return fEvalEnv.navigateProperty(feature, null, target);
+	}
+
+	private void collectFeaturesInImports(List<EStructuralFeature> features, Module module) {
+		for (var moduleImport : module.getModuleImport()) {
+			var importedModule = moduleImport.getImportedModule();
+			var featuresInModule = importedModule.getEAllStructuralFeatures();
+			features.addAll(featuresInModule);
+			
+			collectFeaturesInImports(features, importedModule);
+		}
 	}
 
 	private void collectIntermediateProperties(List<EStructuralFeature> properties, EClass targetClass) {

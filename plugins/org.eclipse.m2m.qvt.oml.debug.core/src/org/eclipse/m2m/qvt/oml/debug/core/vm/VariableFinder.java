@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModelInstance;
@@ -129,7 +130,7 @@ public class VariableFinder {
 
 	
 	private Object findStackObject(String[] varTreePath) {
-		QvtOperationalEvaluationEnv evalEnv = fFeatureAccessor.getEvalEnv();		
+		QvtOperationalEvaluationEnv evalEnv = fFeatureAccessor.getEvalEnv();
 		String envVarName = varTreePath[0];
 		
 		Object rootObj = evalEnv.getValueOf(envVarName);
@@ -504,9 +505,7 @@ public class VariableFinder {
 			String strVal = eClass.getName() + " @"
 					+ Integer.toHexString(System.identityHashCode(value));
 
-			boolean hasVariables = !eClass.getEAllStructuralFeatures()
-					.isEmpty() || value instanceof ModelInstance;
-			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables);
+			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables(eClass, variable, value));
 			vmType = new Value.Type(Value.Type.EOBJECT, eClass.getName(),
 					declaredTypeName);
 		} else if (value instanceof Collection<?> collection) {
@@ -541,6 +540,32 @@ public class VariableFinder {
 		variable.value = vmValue;
 	}
 	
+	private static boolean hasVariables(EObject eObject, VMVariable variable, Object value) {
+		if (!eObject.eClass().getEAllStructuralFeatures().isEmpty() || value instanceof ModelInstance) {
+			return true;
+		}
+
+		if (variable.name.equals(QvtOperationalEnv.THIS) && eObject instanceof ModuleInstance moduleInstance) {
+			return importsHaveVariables(moduleInstance.getImportedModules());
+		}
+
+		return false;
+	}
+
+	private static boolean importsHaveVariables(List<ModuleInstance> importedModules) {
+		for (var importedModuleInstance : importedModules) {
+			if (!importedModuleInstance.eClass().getEAllStructuralFeatures().isEmpty()) {
+				return true;
+			}
+
+			if (importsHaveVariables(importedModuleInstance.getImportedModules())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private static Map<String, ModelInstance> getModelParameterVariables(QvtOperationalEvaluationEnv evalEnv) {
 		InternalEvaluationEnv internEvalEnv = evalEnv.getAdapter(InternalEvaluationEnv.class);
 		ModuleInstance currentModule = internEvalEnv.getCurrentModule();		
