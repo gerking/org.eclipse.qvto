@@ -395,6 +395,20 @@ public class QvtEditor extends TextEditor implements IQVTReconcilingListener {
 		new SemanticHighlightingManager().install(this,
 				(SrcViewer) sourceViewer, myColorManager, getPreferenceStore());
     	
+		addReconcilingListener(new IQVTReconcilingListener() {
+
+			@Override
+			public void reconciled(CompiledUnit unit, IProgressMonitor monitor) {
+				((SrcViewer) sourceViewer).updateCodeMinings();
+			}
+
+			@Override
+			public void aboutToBeReconciled() {
+				// nothing to do
+			}
+		});
+
+		((SrcViewer) sourceViewer).updateCodeMinings();
     }
 
 	private void initASTProvider() {
