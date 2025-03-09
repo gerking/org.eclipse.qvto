@@ -31,6 +31,7 @@ import org.eclipse.m2m.internal.qvt.oml.expressions.MappingCallExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ObjectExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOStackFrame;
+import org.eclipse.ocl.ecore.LoopExp;
 import org.eclipse.ocl.expressions.VariableExp;
 import org.eclipse.ocl.utilities.ASTNode;
 import org.eclipse.ocl.utilities.Visitable;
@@ -91,6 +92,7 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 
 		Set<ObjectExp> objectExpressions = new HashSet<>();
 		Set<MappingCallExp> mappingCallExpressions = new HashSet<>();
+		Set<LoopExp> loopExpressions = new HashSet<>();
 
 		List<ICodeMining> codeMinings = new ArrayList<>();
 
@@ -132,6 +134,21 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 						mappingCallExpressions.add(mappingCallExp);
 						return;
 					}
+				} else if (astNode instanceof LoopExp loopExp) {
+					if (loopExp.getIterator().size() != 1) {
+						// only single variable loops can have anonymous iterators
+						return;
+					}
+
+					var variableName = loopExp.getIterator().get(0).getName();
+					if (!variableName.startsWith("temp")) {
+						return;
+					}
+
+					if (variableOfNameExists(variables, variableName)) {
+						loopExpressions.add(loopExp);
+						return;
+					}
 				}
 			}
 		});
@@ -153,6 +170,26 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 			var variable = (VariableExp<?, ?>) mappingCallExpression.getSource();
 			var label = variable.getName() + ".";
 			int start = mappingCallExpression.getStartPosition() + "map".length() + 1;
+			var codeMining = new DebugCodeMining(label, start, 1, this);
+			codeMinings.add(codeMining);
+		}
+
+		for (var loopExpression : loopExpressions) {
+			var variable = loopExpression.getIterator().get(0);
+			String type = variable.getType().getName();
+			String label = variable.getName() + " : " + type;
+
+			int start;
+			if (variable.getStartPosition() != -1) {
+				start = variable.getStartPosition();
+			} else {
+				// the variable does not have a start position, so we have to approximate it
+				// this approximation is off if there are spaces between the "->" and the loop
+				// expression for example
+				// +2 for the "->", +2 to be after the parenthesis
+				start = loopExpression.getSource().getEndPosition() + 2 + loopExpression.getName().length() + 2;
+			}
+
 			var codeMining = new DebugCodeMining(label, start, 1, this);
 			codeMinings.add(codeMining);
 		}
