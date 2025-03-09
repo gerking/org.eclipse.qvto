@@ -18,6 +18,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.codemining.AbstractCodeMiningProvider;
@@ -90,10 +91,6 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 
 		CompiledUnit compiledUnit = qvtEditor.getQVTDocumentProvider().getCompiledModule();
 
-		Set<ObjectExp> objectExpressions = new HashSet<>();
-		Set<MappingCallExp> mappingCallExpressions = new HashSet<>();
-		Set<LoopExp> loopExpressions = new HashSet<>();
-
 		List<ICodeMining> codeMinings = new ArrayList<>();
 
 		QvtOperationalAstWalker walker = new QvtOperationalAstWalker(new QvtOperationalAstWalker.NodeProcessor() {
@@ -106,50 +103,14 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 				
 				addModelParameterCodeMinings(astNode, variables, codeMinings);
 
+				// ignore nodes that are not in scope of the current debug line
 				if (astNode.getStartPosition() > finalLineEndOffset || astNode.getEndPosition() < finalLineStartOffset) {
 					return;
 				}
 
-				if (astNode instanceof ObjectExp objectExpression) {
-					var name = objectExpression.getName();
-
-					// only look at temp variables as otherwise we would create code-minings for the
-					// result variable as the bodies of mappings are also object expressions
-					if (!name.startsWith(QvtEnvironmentBase.GENERATED_NAME_SPECIAL_PREFIX + "temp")) {
-						return;
-					}
-
-					if (variableOfNameExists(variables, name)) {
-						objectExpressions.add(objectExpression);
-						return;
-					}
-				} else if (astNode instanceof MappingCallExp mappingCallExp) {
-					var variableName = ((VariableExp<?, ?>) mappingCallExp.getSource()).getName();
-
-					if (!variableName.startsWith("temp")) {
-						return;
-					}
-
-					if (variableOfNameExists(variables, variableName)) {
-						mappingCallExpressions.add(mappingCallExp);
-						return;
-					}
-				} else if (astNode instanceof LoopExp loopExp) {
-					if (loopExp.getIterator().size() != 1) {
-						// only single variable loops can have anonymous iterators
-						return;
-					}
-
-					var variableName = loopExp.getIterator().get(0).getName();
-					if (!variableName.startsWith("temp")) {
-						return;
-					}
-
-					if (variableOfNameExists(variables, variableName)) {
-						loopExpressions.add(loopExp);
-						return;
-					}
-				}
+				addObjectExpressionCodeMinings(astNode, variables, codeMinings);
+				addMappingCallCodeMinings(astNode, variables, codeMinings);
+				addLoopExpressionCodeMinings(astNode, variables, codeMinings, document);
 			}
 		});
 
@@ -157,43 +118,6 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 			module.accept(walker);
 		}
 		
-		// create code-minings for the found object expressions and mapping call
-		// expressions
-		for (var objectExpression : objectExpressions) {
-			var label = objectExpression.getName() + " : ";
-			int start = objectExpression.getStartPosition() + "object".length() + 1;
-			var codeMining = new DebugCodeMining(label, start, 1, this);
-			codeMinings.add(codeMining);
-		}
-
-		for (var mappingCallExpression : mappingCallExpressions) {
-			var variable = (VariableExp<?, ?>) mappingCallExpression.getSource();
-			var label = variable.getName() + ".";
-			int start = mappingCallExpression.getStartPosition() + "map".length() + 1;
-			var codeMining = new DebugCodeMining(label, start, 1, this);
-			codeMinings.add(codeMining);
-		}
-
-		for (var loopExpression : loopExpressions) {
-			var variable = loopExpression.getIterator().get(0);
-			String type = variable.getType().getName();
-			String label = variable.getName() + " : " + type;
-
-			int start;
-			if (variable.getStartPosition() != -1) {
-				start = variable.getStartPosition();
-			} else {
-				// the variable does not have a start position, so we have to approximate it
-				// this approximation is off if there are spaces between the "->" and the loop
-				// expression for example
-				// +2 for the "->", +2 to be after the parenthesis
-				start = loopExpression.getSource().getEndPosition() + 2 + loopExpression.getName().length() + 2;
-			}
-
-			var codeMining = new DebugCodeMining(label, start, 1, this);
-			codeMinings.add(codeMining);
-		}
-
 		return CompletableFuture.completedFuture(codeMinings);
 	}
 
@@ -210,6 +134,90 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 
 			var label = name + " : ";
 			int start = modelParameter.getStartPosition() + modelParameter.getKind().getLiteral().length() + 1;
+			var codeMining = new DebugCodeMining(label, start, 1, this);
+			codeMinings.add(codeMining);
+		}
+	}
+
+	private void addObjectExpressionCodeMinings(ASTNode astNode, List<IVariable> variables, List<ICodeMining> codeMinings) {
+		if (!(astNode instanceof ObjectExp objectExpression)) {
+			return;
+		}
+
+		var name = objectExpression.getName();
+
+		// only look at temp variables as otherwise we would create code-minings for the
+		// result variable as the bodies of mappings are also object expressions
+		if (!name.startsWith(QvtEnvironmentBase.GENERATED_NAME_SPECIAL_PREFIX + "temp")) {
+			return;
+		}
+
+		if (variableOfNameExists(variables, name)) {
+			var label = name + " : ";
+			int start = objectExpression.getStartPosition() + "object".length() + 1;
+			var codeMining = new DebugCodeMining(label, start, 1, this);
+			codeMinings.add(codeMining);
+		}
+	}
+
+	private void addMappingCallCodeMinings(ASTNode astNode, List<IVariable> variables, List<ICodeMining> codeMinings) {
+		if (!(astNode instanceof MappingCallExp mappingCallExpression)) {
+			return;
+		}
+
+		var variableName = ((VariableExp<?, ?>) mappingCallExpression.getSource()).getName();
+
+		if (!variableName.startsWith("temp")) {
+			return;
+		}
+
+		if (variableOfNameExists(variables, variableName)) {
+			var label = variableName + ".";
+			int start = mappingCallExpression.getStartPosition() + "map".length() + 1;
+			var codeMining = new DebugCodeMining(label, start, 1, this);
+			codeMinings.add(codeMining);
+		}
+	}
+
+	private void addLoopExpressionCodeMinings(ASTNode astNode, List<IVariable> variables, List<ICodeMining> codeMinings, IDocument document) {
+		if (!(astNode instanceof LoopExp loopExp)) {
+			return;
+		}
+
+		if (loopExp.getIterator().size() != 1) {
+			// only single variable loops can have anonymous iterators
+			return;
+		}
+
+		var variable = loopExp.getIterator().get(0);
+		if (!variable.getName().startsWith("temp")) {
+			return;
+		}
+
+		if (variableOfNameExists(variables, variable.getName())) {
+			String type = variable.getType().getName();
+			String label = variable.getName() + " : " + type;
+
+			int start;
+			if (variable.getStartPosition() != -1) {
+				start = variable.getStartPosition();
+			} else {
+				// the variable does not have a start position, so we have to approximate it
+				// for this we first calculate the minimum start position of the loop expression
+				// and then search for the next opening parenthesis
+				// +2 for the "->", +1 to be one before the opening parenthesis
+				int minStart = loopExp.getSource().getEndPosition() + 2 + loopExp.getName().length() + 1;
+				var findReplaceAdapter = new FindReplaceDocumentAdapter(document);
+				try {
+					var region = findReplaceAdapter.find(minStart, "(", true, false, false, false);
+					start = region.getOffset() + 1;
+				} catch (BadLocationException e) {
+					// should probably not happen, but just a fallback assume that the opening
+					// parenthesis is right after the loop expression name
+					start = minStart + 1;
+				}
+			}
+
 			var codeMining = new DebugCodeMining(label, start, 1, this);
 			codeMinings.add(codeMining);
 		}
