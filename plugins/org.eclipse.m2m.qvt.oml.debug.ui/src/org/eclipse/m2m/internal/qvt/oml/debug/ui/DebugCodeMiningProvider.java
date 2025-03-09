@@ -29,6 +29,7 @@ import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
 import org.eclipse.m2m.internal.qvt.oml.expressions.MappingCallExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ObjectExp;
+import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOStackFrame;
 import org.eclipse.ocl.expressions.VariableExp;
 import org.eclipse.ocl.utilities.ASTNode;
@@ -91,6 +92,8 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 		Set<ObjectExp> objectExpressions = new HashSet<>();
 		Set<MappingCallExp> mappingCallExpressions = new HashSet<>();
 
+		List<ICodeMining> codeMinings = new ArrayList<>();
+
 		QvtOperationalAstWalker walker = new QvtOperationalAstWalker(new QvtOperationalAstWalker.NodeProcessor() {
 
 			@Override
@@ -99,6 +102,8 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 					return;
 				}
 				
+				addModelParameterCodeMinings(astNode, variables, codeMinings);
+
 				if (astNode.getStartPosition() > finalLineEndOffset || astNode.getEndPosition() < finalLineStartOffset) {
 					return;
 				}
@@ -137,7 +142,6 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 		
 		// create code-minings for the found object expressions and mapping call
 		// expressions
-		List<ICodeMining> codeMinings = new ArrayList<>();
 		for (var objectExpression : objectExpressions) {
 			var label = objectExpression.getName() + " : ";
 			int start = objectExpression.getStartPosition() + "object".length() + 1;
@@ -154,6 +158,24 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 		}
 
 		return CompletableFuture.completedFuture(codeMinings);
+	}
+
+	private void addModelParameterCodeMinings(ASTNode astNode, List<IVariable> variables, List<ICodeMining> codeMinings) {
+		if (!(astNode instanceof OperationalTransformation transformation)) {
+			return;
+		}
+
+		for (var modelParameter : transformation.getModelParameter()) {
+			var name = modelParameter.getName();
+			if (!name.matches("\\$\\d+")) {
+				continue;
+			}
+
+			var label = name + " : ";
+			int start = modelParameter.getStartPosition() + modelParameter.getKind().getLiteral().length() + 1;
+			var codeMining = new DebugCodeMining(label, start, 1, this);
+			codeMinings.add(codeMining);
+		}
 	}
 
 	@Override
