@@ -75,6 +75,12 @@ public class QVTOStackFrame extends QVTODebugElement implements IStackFrame {
 	public IVariable[] getVariables() throws DebugException {
 		List<IVariable> result = new ArrayList<IVariable>();
 		for (VMVariable next : fUnderlyingFrame.getVisibleVariables()) {
+			var name = next.name;
+			// skip internal variables
+			if (name.startsWith("__qvtresult__") || name.startsWith("__result__") || name.equals("_intermediate")) { //$NON-NLS-1$
+				continue;
+			}
+
             result.add(new QVTOVariable(getQVTODebugTarget(), next, fUnderlyingFrame.id));
 		}
 		
