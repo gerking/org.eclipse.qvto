@@ -505,7 +505,7 @@ public class VariableFinder {
 			String strVal = eClass.getName() + " @"
 					+ Integer.toHexString(System.identityHashCode(value));
 
-			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables(eClass, variable, value));
+			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables(eObject, variable, value));
 			vmType = new Value.Type(Value.Type.EOBJECT, eClass.getName(),
 					declaredTypeName);
 		} else if (value instanceof Collection<?> collection) {
@@ -541,8 +541,12 @@ public class VariableFinder {
 	}
 	
 	private static boolean hasVariables(EObject eObject, VMVariable variable, Object value) {
-		if (!eObject.eClass().getEAllStructuralFeatures().isEmpty() || value instanceof ModelInstance) {
+		if (!eObject.eClass().getEAllStructuralFeatures().isEmpty()) {
 			return true;
+		}
+
+		if (eObject instanceof ModelInstance modelInstance) {
+			return !modelInstance.getExtent().getRootObjects().isEmpty();
 		}
 
 		if (variable.name.equals(QvtOperationalEnv.THIS) && eObject instanceof ModuleInstance moduleInstance) {
