@@ -184,6 +184,11 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 			return;
 		}
 
+		if (loopExp.getBody() instanceof MappingCallExp) {
+			// mapping calls are handled separately
+			return;
+		}
+
 		if (loopExp.getIterator().size() != 1) {
 			// only single variable loops can have anonymous iterators
 			return;
@@ -216,6 +221,11 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 					// parenthesis is right after the loop expression name
 					start = minStart + 1;
 				}
+			}
+
+			if (loopExp.getStartPosition() > start || loopExp.getEndPosition() < start) {
+				// Dont't add code mining if the start position is not in the loop expression
+				return;
 			}
 
 			var codeMining = new DebugCodeMining(label, start, 1, this);
