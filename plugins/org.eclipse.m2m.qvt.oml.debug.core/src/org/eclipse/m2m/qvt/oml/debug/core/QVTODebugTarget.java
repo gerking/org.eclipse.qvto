@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 R.Dvorak and others.
+ * Copyright (c) 2009, 2026 R.Dvorak and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -7,6 +7,8 @@
  *
  * Contributors:
  *     Radek Dvorak - initial API and implementation
+ *     Steffen Steudle - issue #1139
+ *     Christopher Gerking - issue #1139
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
@@ -19,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -327,7 +328,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 				VMBreakpointResponse bpResponse = (VMBreakpointResponse) response;
 				long[] addedIDs = bpResponse.getAddedBreakpointsIDs();
 				if(addedIDs.length > 0) {
-					fID2Breakpoint.put(new Long(addedIDs[0]), qvtBreakpoint);
+					fID2Breakpoint.put(Long.valueOf(addedIDs[0]), qvtBreakpoint);
 				}
 			}
 		} catch (CoreException e) {
@@ -382,20 +383,8 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (breakpoint instanceof QVTOBreakpoint) {
-			if (delta == null) {
-				IMarker marker = breakpoint.getMarker();
-				if (marker.exists()) {
-					try {
-						marker.delete();
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
 			QVTOBreakpoint qvtBreakpoint = (QVTOBreakpoint) breakpoint;
-			fID2Breakpoint.remove(new Long(((QVTOBreakpoint) breakpoint)
-					.getID()));
+			fID2Breakpoint.remove(Long.valueOf(qvtBreakpoint.getID()));
 
 			VMBreakpointRequest removeRequest = VMBreakpointRequest
 					.createRemove(qvtBreakpoint.getID());
@@ -561,11 +550,12 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		return null;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object getAdapter(Class adapter) {
+	public <T> T getAdapter(Class<T> adapter) {
 		if (QvtOperationalEvaluationEnv.class == adapter) {
 			if (getVM() instanceof QVTOVirtualMachine) {
-				return ((QVTOVirtualMachine) getVM()).getEvaluationEnv();
+				return (T) ((QVTOVirtualMachine) getVM()).getEvaluationEnv();
 			}
 		}
 		return super.getAdapter(adapter);

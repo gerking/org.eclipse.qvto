@@ -198,15 +198,15 @@ public class QVTOVirtualMachine implements IQVTOVirtualMachineShell {
 					VMBreakpoint breakpoint = fBreakpointManager.createBreakpoint(newBreakpoint);
 					
 					if(breakpoint != null) {
-						addedBpIDs.add(new Long(newBreakpoint.ID));
+						addedBpIDs.add(Long.valueOf(newBreakpoint.ID));
 						
 						QVTODebugCore.TRACE.trace(DebugOptions.VM,
-								"Installing breakpoing: " + " line:" //$NON-NLS-1$ //$NON-NLS-2$
+								"Installing breakpoint: " + " line:" //$NON-NLS-1$ //$NON-NLS-2$
 										+ newBreakpoint.line + " " //$NON-NLS-1$
 										+ newBreakpoint.targetURI);
 					} else {
 						QVTODebugCore.TRACE.trace(DebugOptions.VM,
-								"Failed to create breakpoing: " + " line:" //$NON-NLS-1$ //$NON-NLS-2$
+								"Failed to create breakpoint: " + " line:" //$NON-NLS-1$ //$NON-NLS-2$
 										+ newBreakpoint.line + " " //$NON-NLS-1$
 										+ newBreakpoint.targetURI);
 					}
