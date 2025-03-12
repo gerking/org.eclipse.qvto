@@ -25,7 +25,7 @@ import org.eclipse.ocl.ecore.EcoreEnvironment;
 
 public class PathNameInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof CSTNode) {
 			CSTNode syntaxElement = (CSTNode) element;
 			EModelElement referencedElement = PathNameHyperlinkDetector.findReferencedElementDefinition(syntaxElement, region);

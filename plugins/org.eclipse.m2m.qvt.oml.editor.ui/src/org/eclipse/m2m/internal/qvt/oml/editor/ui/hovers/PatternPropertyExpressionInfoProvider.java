@@ -27,7 +27,7 @@ import org.eclipse.ocl.ecore.EcoreEnvironment;
 public class PatternPropertyExpressionInfoProvider implements
 		IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof CSTNode) {
 			CSTNode syntaxElement = (CSTNode) element;
 			EStructuralFeature feature = ObjectPropertyHyperlinkDetector.findDefinition(syntaxElement);

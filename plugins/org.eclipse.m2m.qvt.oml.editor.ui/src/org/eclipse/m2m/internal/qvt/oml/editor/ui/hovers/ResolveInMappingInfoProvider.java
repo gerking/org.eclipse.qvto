@@ -22,7 +22,7 @@ import org.eclipse.ocl.ecore.EcoreEnvironment;
 
 public class ResolveInMappingInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		
 		if (element instanceof ResolveInExpCS) {
 			ResolveInExpCS syntaxElement = (ResolveInExpCS) element;

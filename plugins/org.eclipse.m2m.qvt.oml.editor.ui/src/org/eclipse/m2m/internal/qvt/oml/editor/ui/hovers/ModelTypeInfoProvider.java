@@ -23,7 +23,7 @@ import org.eclipse.ocl.ecore.EcoreEnvironment;
 
 public class ModelTypeInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof CSTNode) {
 			CSTNode syntaxElement = (CSTNode) element;
 			EPackage ePackage = ModelTypeHyperlinkDetector.findReferencedPackageDefinition(syntaxElement);
