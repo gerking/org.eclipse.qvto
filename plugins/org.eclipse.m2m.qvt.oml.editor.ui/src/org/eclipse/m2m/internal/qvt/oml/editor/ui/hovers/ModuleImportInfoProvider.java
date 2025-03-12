@@ -21,7 +21,7 @@ import org.eclipse.ocl.cst.CSTNode;
 
 public class ModuleImportInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof CSTNode) {
 			CSTNode syntaxElement = (CSTNode) element;
 			URI unitURI = ImportHyperlinkDetector.findDefinition(syntaxElement);

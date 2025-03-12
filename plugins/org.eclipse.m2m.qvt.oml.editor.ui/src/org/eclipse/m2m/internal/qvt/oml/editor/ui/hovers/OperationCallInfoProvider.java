@@ -22,7 +22,7 @@ import org.eclipse.ocl.cst.SimpleNameCS;
 
 public class OperationCallInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof SimpleNameCS) {
 			SimpleNameCS nameCS = (SimpleNameCS)element;
 			EOperation operation = OperationHyperlinkDetector.resolveOperationDecl(nameCS);

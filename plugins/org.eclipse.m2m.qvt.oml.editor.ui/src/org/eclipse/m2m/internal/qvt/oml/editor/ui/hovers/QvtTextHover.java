@@ -25,8 +25,11 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextHover;
+import org.eclipse.jface.text.ITextHoverExtension;
 import org.eclipse.jface.text.ITextHoverExtension2;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Position;
@@ -43,7 +46,7 @@ import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.cst.CSTNode;
 
 
-public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
+public class QvtTextHover implements ITextHover, ITextHoverExtension, ITextHoverExtension2 {
 	
 	private final static String QVT_EDITOR_ELEMENT_INFO_PROVIDERS_EXTENSION_POINT = "org.eclipse.m2m.qvt.oml.editor.ui.qvtEditorElementInfoProviders";
 
@@ -65,6 +68,8 @@ public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
     private final QvtDocumentProvider myDocumentProvider;
 	private final List<IElementInfoProvider> elementInfoProviders;
 	
+	private IElementInfoProvider lastUsedProvider;
+
     public QvtTextHover(final QvtDocumentProvider documentProvider) {
         myDocumentProvider = documentProvider;
 		elementInfoProviders = new ArrayList<>(DEFAULT_ELEMENT_INFO_PROVIDERS);
@@ -76,11 +81,16 @@ public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
         return new Region(offset, 0);
     }
         
-    public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
-    	return getHoverInfo(textViewer, hoverRegion);
+	public String getHoverInfo(final ITextViewer textViewer, final IRegion hoverRegion) {
+		// getHoverInfo2 javadoc:
+		// Callers should ignore the text returned by
+		// ITextHover.getHoverInfo(ITextViewer, IRegion).
+		return "";
     }
     
-    public String getHoverInfo(final ITextViewer textViewer, final IRegion hoverRegion) {
+	public Object getHoverInfo2(final ITextViewer textViewer, final IRegion hoverRegion) {
+		lastUsedProvider = null;
+
         if (checkCompiledUnit(myDocumentProvider.getCompiledModule()) && 
         	textViewer != null && textViewer.getDocument() != null) {
 	        
@@ -134,12 +144,13 @@ public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
     }
 
     
-    private String getElementsInfo(final List<CSTNode> elements, ITextViewer textViewer, IRegion hoverRegion) {
+	private Object getElementsInfo(final List<CSTNode> elements, ITextViewer textViewer, IRegion hoverRegion) {
     	for (CSTNode nextElement : elements) {
 			for (IElementInfoProvider provider : elementInfoProviders) {
     			try {
-    				String info = provider.getElementInfo(nextElement, textViewer, hoverRegion);
-    				if (info != null && info.length() > 0) {
+					Object info = provider.getElementInfo(nextElement, textViewer, hoverRegion);
+					if (info != null) {
+						lastUsedProvider = provider;
     					return info;
     				}
     			} catch (NullPointerException e) {
@@ -147,7 +158,7 @@ public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
     			}
     		}    		
 		}
-    	return ""; //$NON-NLS-1$
+		return null;
     }
     
     private boolean checkCompiledUnit(final CompiledUnit unit) {
@@ -175,5 +186,13 @@ public class QvtTextHover implements ITextHover, ITextHoverExtension2 {
 		}
 
 		return results;
+	}
+
+	@Override
+	public IInformationControlCreator getHoverControlCreator() {
+		if (lastUsedProvider == null) {
+			return parent -> new DefaultInformationControl(parent, (String) null);
+		}
+		return lastUsedProvider.getHoverControlCreator();
 	}
 }

@@ -35,7 +35,7 @@ public class VariableExpressionInfoProvider implements IElementInfoProvider {
 		super();
 	}
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof SimpleNameCS) {
 			SimpleNameCS nameCS = (SimpleNameCS) element;
 			CSTNode nodeCS = VariableHyperlinkDetector.resolveVariableDeclaration(nameCS);

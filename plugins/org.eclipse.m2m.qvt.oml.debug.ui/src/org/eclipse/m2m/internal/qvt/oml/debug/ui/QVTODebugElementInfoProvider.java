@@ -16,7 +16,7 @@ import org.eclipse.ocl.cst.SimpleNameCS;
 public class QVTODebugElementInfoProvider implements IElementInfoProvider {
 
 	@Override
-	public String getElementInfo(Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(Object element, ITextViewer textViewer, IRegion region) {
 		var debugContext = DebugUITools.getDebugContext();
 		if (debugContext == null) {
 			return null;

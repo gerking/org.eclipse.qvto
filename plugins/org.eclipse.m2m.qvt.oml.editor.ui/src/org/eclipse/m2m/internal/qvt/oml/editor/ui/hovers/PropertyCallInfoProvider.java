@@ -23,7 +23,7 @@ import org.eclipse.ocl.ecore.PropertyCallExp;
  */
 public class PropertyCallInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (false == element instanceof SimpleNameCS) {
 			return null;
 		}
