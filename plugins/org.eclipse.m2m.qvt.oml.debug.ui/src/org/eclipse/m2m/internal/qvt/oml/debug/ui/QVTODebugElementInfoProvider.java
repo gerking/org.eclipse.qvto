@@ -1,14 +1,13 @@
 package org.eclipse.m2m.internal.qvt.oml.debug.ui;
 
-import java.util.Optional;
-
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
+import org.eclipse.debug.internal.ui.hover.ExpressionInformationControlCreator;
 import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOStackFrame;
-import org.eclipse.m2m.qvt.oml.debug.core.QVTOValue;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOVariable;
 import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.cst.SimpleNameCS;
@@ -30,52 +29,52 @@ public class QVTODebugElementInfoProvider implements IElementInfoProvider {
 		var stackFrame = debugContext.getAdapter(QVTOStackFrame.class);
 
 		try {
-			Optional<QVTOVariable> qvtoVariable = getQVTOVariableFor(simpleName, stackFrame);
-			if (qvtoVariable.isEmpty()) {
-				return null;
-			}
-			var qvtoValue = (QVTOValue) qvtoVariable.orElseThrow().getValue();
-			var detail = qvtoValue.computeDetail();
-			return detail;
+			return getQVTOVariableFor(simpleName, stackFrame);
 		} catch (DebugException e) {
 			return null;
 		}
 	}
 
-	private static Optional<QVTOVariable> getQVTOVariableFor(SimpleNameCS simpleNameCS, QVTOStackFrame startingStackFrame) throws DebugException {
+	@SuppressWarnings("restriction")
+	@Override
+	public IInformationControlCreator getHoverControlCreator() {
+		return new ExpressionInformationControlCreator();
+	}
+
+	private static QVTOVariable getQVTOVariableFor(SimpleNameCS simpleNameCS, QVTOStackFrame startingStackFrame) throws DebugException {
 		for (var stackFrame : startingStackFrame.getThread().getStackFrames()) {
 			for (var variable : stackFrame.getVariables()) {
-				Optional<QVTOVariable> optionalQvtoVariable = tryGetQVTOVariableFor(simpleNameCS, variable);
+				QVTOVariable qvtoVariable = tryGetQVTOVariableFor(simpleNameCS, variable);
 
-				if (optionalQvtoVariable.isPresent()) {
-					return optionalQvtoVariable;
+				if (qvtoVariable != null) {
+					return qvtoVariable;
 				}
 
 				if (variable.getName().equals("result")) {
 					for (IVariable resultVariable : variable.getValue().getVariables()) {
-						Optional<QVTOVariable> optionalResultQvtoVariable = tryGetQVTOVariableFor(simpleNameCS, resultVariable);
+						QVTOVariable resultQvtoVariable = tryGetQVTOVariableFor(simpleNameCS, resultVariable);
 
-						if (optionalResultQvtoVariable.isPresent()) {
-							return optionalResultQvtoVariable;
+						if (resultQvtoVariable != null) {
+							return resultQvtoVariable;
 						}
 					}
 				}
 			}
 		}
 
-		return Optional.empty();
+		return null;
 	}
 
-	private static Optional<QVTOVariable> tryGetQVTOVariableFor(SimpleNameCS simpleNameCS, IVariable variable) throws DebugException {
+	private static QVTOVariable tryGetQVTOVariableFor(SimpleNameCS simpleNameCS, IVariable variable) {
 		if (!(variable instanceof QVTOVariable qvtoVariable)) {
-			return Optional.empty();
+			return null;
 		}
 
 		if (qvtoVariable.getName().equals(simpleNameCS.getValue())) {
-			return Optional.of(qvtoVariable);
+			return qvtoVariable;
 		}
 
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
