@@ -137,6 +137,10 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		HashMap<Long, QVTOBreakpoint> installedBreakpoints = new HashMap<Long, QVTOBreakpoint>();
 		List<NewBreakpointData> allBpData = new ArrayList<NewBreakpointData>();
 		
+		if (!DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
+			return;
+		}
+
 		for (QVTOBreakpoint qvtBp : QVTODebugCore.getQVTOBreakpoints(QVTOBreakpoint.class)) {
 			boolean enabled = false;
 			try {
@@ -448,7 +452,15 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 			if (enabled) {
 				breakpointAdded(breakpoint);
 			} else {
-				breakpointRemoved(breakpoint, null);
+				// we can't use breakpointRemoved() as it would remove the breakpoint completely and not just disable it
+				if (breakpoint instanceof QVTOBreakpoint qvtoBreakpoint) {
+					VMBreakpointRequest removeRequest = VMBreakpointRequest.createRemove(qvtoBreakpoint.getID());
+					try {
+						fVM.sendRequest(removeRequest);
+					} catch (IOException e) {
+						QVTODebugCore.log(e);
+					}
+				}
 			}
 		}
 	}
