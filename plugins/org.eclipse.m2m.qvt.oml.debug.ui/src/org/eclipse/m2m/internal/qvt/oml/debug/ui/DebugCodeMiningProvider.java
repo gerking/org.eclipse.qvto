@@ -165,7 +165,11 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 			return;
 		}
 
-		var variableName = ((VariableExp<?, ?>) mappingCallExpression.getSource()).getName();
+		if (!(mappingCallExpression.getSource() instanceof VariableExp<?, ?> variableExp)) {
+			return;
+		}
+
+		var variableName = variableExp.getName();
 
 		if (!variableName.startsWith("temp")) {
 			return;
