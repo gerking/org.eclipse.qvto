@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 public class DebuggerTest {
 
 	private static IFile simpleUmlToRdbTransformationFile;
+	private static IFile libraryWithPropertiesTransformationFile;
 
 	protected interface TestModel {
 		IFile transformationFile();
@@ -66,11 +67,29 @@ public class DebuggerTest {
 			}
 		};
 
+		static final TestModel LIBRARY_WITH_PROPERTIES = new TestModel() {
+
+			@Override
+			public IFile transformationFile() {
+				return libraryWithPropertiesTransformationFile;
+			}
+
+			@Override
+			public String targetModel1() {
+				return "platform:/resource/libraryWithProperties/source.ecore";
+			}
+
+			@Override
+			public String targetModel2() {
+				return "platform:/resource/libraryWithProperties/target.ecore";
+			}
+		};
 	}
 
 	@BeforeClass
 	public static void beforeClass() throws CoreException, IOException {
 		simpleUmlToRdbTransformationFile = setupSimpleUMLToRDBProject();
+		libraryWithPropertiesTransformationFile = setupDebuggerTestDataProject("libraryWithProperties", "LibraryWithProperties");
 	}
 
 	@After
@@ -191,6 +210,31 @@ public class DebuggerTest {
 		project.getFile("Simpleuml_To_Rdb.qvto").move(project.getFile("transformations/Simpleuml_To_Rdb.qvto").getFullPath(), true, null);
 
 		return project.getFile("transformations/Simpleuml_To_Rdb.qvto");
+	}
+
+	private static IFile setupDebuggerTestDataProject(String projectName, String transformationName) throws CoreException, IOException {
+		// create project
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		var project = root.getProject(projectName);
+		if (project.exists()) {
+			project.delete(true, true, null);
+		}
+		project.create(null);
+		project.open(null);
+
+		// add QVTO nature
+		var description = project.getDescription();
+		description.setNatureIds(new String[] { QVTOProjectPlugin.NATURE_ID });
+		project.setDescription(description, null);
+
+		// copy simpleuml2rdb example to project
+		var test = TestUtil.getPluginRelativeFile(AllTests.BUNDLE_ID + ".ui", "debuggerTestData");
+		var srcFolder = test.toPath().resolve("models/" + projectName).normalize();
+		var destFolder = project.getLocation().toFile();
+		FileUtil.copyFolder(srcFolder.toFile(), destFolder);
+		project.refreshLocal(IResource.DEPTH_INFINITE, null);
+
+		return project.getFile("transformations/" + transformationName + ".qvto");
 	}
 
 	private static void removeBreakpoints() throws CoreException {
