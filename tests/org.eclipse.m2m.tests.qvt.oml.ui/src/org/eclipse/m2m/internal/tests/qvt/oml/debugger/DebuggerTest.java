@@ -39,11 +39,38 @@ import org.junit.BeforeClass;
 
 public class DebuggerTest {
 
-	protected static IFile transformationFile;
+	private static IFile simpleUmlToRdbTransformationFile;
+
+	protected interface TestModel {
+		IFile transformationFile();
+
+		String targetModel1();
+
+		String targetModel2();
+
+		static final TestModel SIMPLE_UML_TO_RDB = new TestModel() {
+
+			@Override
+			public IFile transformationFile() {
+				return simpleUmlToRdbTransformationFile;
+			}
+
+			@Override
+			public String targetModel1() {
+				return "platform:/resource/SimpleUMLToRDB/pim.simpleuml";
+			}
+
+			@Override
+			public String targetModel2() {
+				return "platform:/resource/SimpleUMLToRDB/Simpleuml_To_Rdb.rdb";
+			}
+		};
+
+	}
 
 	@BeforeClass
 	public static void beforeClass() throws CoreException, IOException {
-		transformationFile = setupSimpleUMLToRDBProject();
+		simpleUmlToRdbTransformationFile = setupSimpleUMLToRDBProject();
 	}
 
 	@After
@@ -55,26 +82,32 @@ public class DebuggerTest {
 		void accept(DebugEvent event) throws DebugException;
 	}
 
-	record RunWithBreakPoints() {
+	record WithBreakpoints(TestModel testModel) {
 		protected void check(DebugEventConsumer consumer) throws CoreException, InterruptedException {
-			runDebugger(consumer);
+			runDebugger(consumer, testModel);
 		}
 	}
 
-	protected RunWithBreakPoints runWithBreakpoints(int... lineNumbers) {
-		for (int breakpoint : lineNumbers) {
-			try {
-				addBreakpoint(transformationFile, breakpoint);
-			} catch (CoreException e) {
-				fail("Failed to add breakpoint: " + e.getMessage());
+	record SelectedModel(TestModel testModel) {
+		protected WithBreakpoints withBreakPoints(int... lineNumbers) {
+			for (int breakpoint : lineNumbers) {
+				try {
+					addBreakpoint(testModel.transformationFile(), breakpoint);
+				} catch (CoreException e) {
+					fail("Failed to add breakpoint: " + e.getMessage());
+				}
 			}
-		}
 
-		return new RunWithBreakPoints();
+			return new WithBreakpoints(testModel);
+		}
 	}
 
-	private static void runDebugger(DebugEventConsumer consumer) throws CoreException, InterruptedException {
-		var launchConfig = createLaunchConfig(transformationFile);
+	protected SelectedModel testWithModel(TestModel testModel) {
+		return new SelectedModel(testModel);
+	}
+
+	private static void runDebugger(DebugEventConsumer consumer, TestModel testModel) throws CoreException, InterruptedException {
+		var launchConfig = createLaunchConfig(testModel);
 		var debugConfig = new QVTODebugConfiguration();
 		var launch = new Launch(launchConfig, ILaunchManager.DEBUG_MODE, new QVTOSourceLookupDirector());
 
@@ -114,16 +147,17 @@ public class DebuggerTest {
 		DebugPlugin.getDefault().removeDebugEventListener(listener);
 	}
 
-	private static ILaunchConfiguration createLaunchConfig(IFile testFile) throws CoreException {
+	private static ILaunchConfiguration createLaunchConfig(TestModel testModel) throws CoreException {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(QvtLaunchConfigurationDelegate.LAUNCH_CONFIGURATION_TYPE_ID);
 		var workingCopy = type.newInstance(null, "DebugLaunchConfig");
 
 		workingCopy.setAttribute(IQvtLaunchConstants.CONFIGURATION_PROPERTIES, Map.of());
-		workingCopy.setAttribute(IQvtLaunchConstants.MODULE, "/SimpleUMLToRDB/transformations/Simpleuml_To_Rdb.qvto");
+		var transformationFilePath = testModel.transformationFile().getFullPath().toString();
+		workingCopy.setAttribute(IQvtLaunchConstants.MODULE, transformationFilePath);
 		workingCopy.setAttribute(IQvtLaunchConstants.ELEM_COUNT, 2);
-		workingCopy.setAttribute(IQvtLaunchConstants.TARGET_MODEL + "1", "platform:/resource/SimpleUMLToRDB/pim.simpleuml#/");
-		workingCopy.setAttribute(IQvtLaunchConstants.TARGET_MODEL + "2", "platform:/resource/SimpleUMLToRDB/Simpleuml_To_Rdb.rdb");
+		workingCopy.setAttribute(IQvtLaunchConstants.TARGET_MODEL + "1", testModel.targetModel1());
+		workingCopy.setAttribute(IQvtLaunchConstants.TARGET_MODEL + "2", testModel.targetModel2());
 
 		return workingCopy.doSave();
 	}

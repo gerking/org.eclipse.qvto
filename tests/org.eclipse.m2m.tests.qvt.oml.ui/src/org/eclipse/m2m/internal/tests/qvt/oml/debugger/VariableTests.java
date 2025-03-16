@@ -11,7 +11,8 @@ public class VariableTests extends DebuggerTest {
 
 	@Test
 	public void testNoInternalVariablesShown() throws CoreException, InterruptedException {
-		runWithBreakpoints(41) //
+		testWithModel(TestModel.SIMPLE_UML_TO_RDB) //
+				.withBreakPoints(41) //
 				.check(event -> {
 					if (event.getKind() == DebugEvent.SUSPEND && event.getSource() instanceof QVTOThread thread) {
 						thread.stepInto();
