@@ -2,11 +2,10 @@ package org.eclipse.m2m.internal.qvt.oml.debug.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,6 +30,7 @@ import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
 import org.eclipse.m2m.internal.qvt.oml.expressions.MappingCallExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ObjectExp;
 import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
+import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugCore;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOStackFrame;
 import org.eclipse.ocl.ecore.LoopExp;
 import org.eclipse.ocl.expressions.VariableExp;
@@ -50,19 +50,19 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 			return CompletableFuture.completedFuture(List.of());
 		}
 		
-		var stackFrame = getCurrentStackFrame();
-		if (stackFrame == null) {
-			return CompletableFuture.completedFuture(List.of());
-		}
-
 		QvtEditor qvtEditor = (QvtEditor) super.getAdapter(ITextEditor.class);
 
 		if (qvtEditor == null) {
 			return CompletableFuture.completedFuture(List.of());
 		}
 		
+		QVTOStackFrame stackFrame;
 		List<IVariable> variables;
 		try {
+			stackFrame = getCurrentStackFrame();
+			if (stackFrame == null) {
+				return CompletableFuture.completedFuture(List.of());
+			}
 			variables = Arrays.asList(stackFrame.getVariables());
 		} catch (DebugException e) {
 			return CompletableFuture.completedFuture(List.of());
@@ -91,6 +91,10 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 
 		CompiledUnit compiledUnit = qvtEditor.getQVTDocumentProvider().getCompiledModule();
 
+		if (compiledUnit == null) {
+			return CompletableFuture.completedFuture(List.of());
+		}
+
 		List<ICodeMining> codeMinings = new ArrayList<>();
 
 		QvtOperationalAstWalker walker = new QvtOperationalAstWalker(new QvtOperationalAstWalker.NodeProcessor() {
@@ -104,8 +108,12 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 				addModelParameterCodeMinings(astNode, variables, codeMinings);
 
 				// ignore nodes that are not in scope of the current debug line
-				if (astNode.getStartPosition() > finalLineEndOffset || astNode.getEndPosition() < finalLineStartOffset) {
-					return;
+				int startPosition = astNode.getStartPosition();
+				int endPosition = astNode.getEndPosition();
+				if (startPosition >= 0 && endPosition >= 0) {
+					if (startPosition > finalLineEndOffset || endPosition < finalLineStartOffset) {
+						return;
+					}
 				}
 
 				addObjectExpressionCodeMinings(astNode, variables, codeMinings);
@@ -269,12 +277,38 @@ public class DebugCodeMiningProvider extends AbstractCodeMiningProvider {
 		}
 	}
 
-	private QVTOStackFrame getCurrentStackFrame() {
+	private QVTOStackFrame getCurrentStackFrame() throws DebugException {
 		var debugContext = DebugUITools.getDebugContext();
-		if (debugContext == null) {
+		if (debugContext != null) {
+			var stackFrame = debugContext.getAdapter(QVTOStackFrame.class);
+			if (stackFrame != null) {
+				return stackFrame;
+			}
+		}
+
+		var runningLaunches = Stream.of(DebugPlugin.getDefault().getLaunchManager().getLaunches()) //
+				.filter(Predicate.not(ILaunch::isTerminated)) //
+				.filter(launch -> ILaunchManager.DEBUG_MODE.equals(launch.getLaunchMode())) //
+				.filter(launch -> launch.getDebugTarget().getModelIdentifier().equals(QVTODebugCore.MODEL_ID)) //
+				.collect(Collectors.toList());
+
+		if (runningLaunches.size() != 1) {
 			return null;
 		}
-		return debugContext.getAdapter(QVTOStackFrame.class);
+
+		ILaunch launch = runningLaunches.get(0);
+		var debugTarget = launch.getDebugTarget();
+
+		if (debugTarget.getThreads().length == 0) {
+			return null;
+		}
+
+		var thread = debugTarget.getThreads()[0];
+		if (thread.getStackFrames().length == 0) {
+			return null;
+		}
+
+		return thread.getStackFrames()[0].getAdapter(QVTOStackFrame.class);
 	}
 
 }
