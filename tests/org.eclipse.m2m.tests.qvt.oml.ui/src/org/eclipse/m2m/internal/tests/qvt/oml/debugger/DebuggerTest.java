@@ -152,6 +152,8 @@ public class DebuggerTest {
 			Thread.sleep(10);
 		}
 
+		DebugPlugin.getDefault().removeDebugEventListener(listener);
+
 		if (!errors.isEmpty()) {
 			StringBuilder message = new StringBuilder("Multiple assertions failed:\n");
 			for (Throwable error : errors) {
@@ -162,8 +164,6 @@ public class DebuggerTest {
 			}
 			fail(message.toString());
 		}
-
-		DebugPlugin.getDefault().removeDebugEventListener(listener);
 	}
 
 	private static ILaunchConfiguration createLaunchConfig(TestModel testModel) throws CoreException {

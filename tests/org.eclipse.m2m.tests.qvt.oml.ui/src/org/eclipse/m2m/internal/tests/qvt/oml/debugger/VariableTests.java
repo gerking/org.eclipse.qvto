@@ -73,4 +73,46 @@ public class VariableTests extends DebuggerTest {
 					}
 				});
 	}
+
+	@Test
+	public void testHasVariablesCorrect() throws CoreException, InterruptedException {
+		testWithModel(TestModel.SIMPLE_UML_TO_RDB) //
+				.withBreakPoints(41) //
+				.check(event -> {
+					if (event.getKind() == DebugEvent.SUSPEND && event.getSource() instanceof QVTOThread thread) {
+						var stackFrame = thread.getStackFrames()[0];
+
+						Throwable throwable = null;
+
+						try {
+							var variables = stackFrame.getVariables();
+							for (var variable : variables) {
+								checkImpliationRecursive(variable);
+							}
+						} catch (Throwable e) {
+							throwable = e;
+						}
+
+						thread.stepInto();
+						if (throwable != null) {
+							throw new AssertionError(throwable);
+						}
+					}
+				});
+	}
+
+	private void checkImpliationRecursive(IVariable variable) throws DebugException {
+		var value = variable.getValue();
+		var variables = value.getVariables();
+		// hasVariables() => getVariables().length > 0
+		assertTrue(!value.hasVariables() || variables.length > 0);
+
+		for (var v : variables) {
+			if (v.getName().equals("owner")) {
+				// prevent loops
+				continue;
+			}
+			checkImpliationRecursive(v);
+		}
+	}
 }
