@@ -15,15 +15,18 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.debug.core.DebugEvent;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.Launch;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.internal.qvt.oml.common.launch.IQvtLaunchConstants;
+import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
 import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.internal.qvt.oml.project.QVTOProjectPlugin;
 import org.eclipse.m2m.internal.qvt.oml.runtime.launch.QvtLaunchConfigurationDelegate;
@@ -33,8 +36,11 @@ import org.eclipse.m2m.qvt.oml.debug.core.launch.QVTODebugConfiguration;
 import org.eclipse.m2m.qvt.oml.debug.core.srclookup.QVTOSourceLookupDirector;
 import org.eclipse.m2m.tests.qvt.oml.AllTests;
 import org.eclipse.m2m.tests.qvt.oml.util.TestUtil;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 public class DebuggerTest {
@@ -92,18 +98,40 @@ public class DebuggerTest {
 		libraryWithPropertiesTransformationFile = setupDebuggerTestDataProject("libraryWithProperties", "LibraryWithProperties");
 	}
 
+	@Before
+	public void before() throws CoreException {
+		DebugUIPlugin.getDefault().getPreferenceStore().setValue(IInternalDebugUIConstants.PREF_SWITCH_TO_PERSPECTIVE, MessageDialogWithToggle.NEVER);
+		DebugUIPlugin.getDefault().getPreferenceStore().setValue(IInternalDebugUIConstants.PREF_ACTIVATE_DEBUG_VIEW, false);
+		DebugUIPlugin.getDefault().getPreferenceStore().setValue(IInternalDebugUIConstants.PREF_SWITCH_PERSPECTIVE_ON_SUSPEND, MessageDialogWithToggle.NEVER);
+	}
+
 	@After
 	public void after() throws Exception {
 		removeBreakpoints();
 	}
 
 	interface DebugEventConsumer {
-		void accept(DebugEvent event) throws DebugException;
+		void accept(DebugEvent event) throws Exception;
+	}
+
+	interface DebugEventConsumerWithEditor {
+		void accept(DebugEvent event, QvtEditor editor) throws Exception;
 	}
 
 	record WithBreakpoints(TestModel testModel) {
 		protected void check(DebugEventConsumer consumer) throws CoreException, InterruptedException {
 			runDebugger(consumer, testModel);
+		}
+
+		protected void checkWithEditor(DebugEventConsumerWithEditor consumer) throws CoreException, InterruptedException {
+			Display.getDefault().syncExec(() -> {
+				try {
+					var editor = (QvtEditor) IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), testModel.transformationFile());
+					runDebugger(event -> consumer.accept(event, editor), testModel);
+				} catch (CoreException | InterruptedException e) {
+					e.printStackTrace();
+				}
+			});
 		}
 	}
 
@@ -130,6 +158,8 @@ public class DebuggerTest {
 		var debugConfig = new QVTODebugConfiguration();
 		var launch = new Launch(launchConfig, ILaunchManager.DEBUG_MODE, new QVTOSourceLookupDirector());
 
+		DebugPlugin.getDefault().getLaunchManager().addLaunch(launch);
+
 		var errors = new ArrayList<Throwable>();
 
 		IDebugEventSetListener listener = events -> {
@@ -144,7 +174,12 @@ public class DebuggerTest {
 
 		DebugPlugin.getDefault().addDebugEventListener(listener);
 
-		debugConfig.launch(launchConfig, ILaunchManager.DEBUG_MODE, launch, new NullProgressMonitor());
+		try {
+			debugConfig.launch(launchConfig, ILaunchManager.DEBUG_MODE, launch, new NullProgressMonitor());
+		} catch (CoreException e) {
+			DebugPlugin.getDefault().removeDebugEventListener(listener);
+			throw e;
+		}
 
 		while (!launch.isTerminated()) {
 			while (PlatformUI.getWorkbench().getDisplay().readAndDispatch()) {
