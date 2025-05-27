@@ -12,6 +12,8 @@
  *******************************************************************************/
 package org.eclipse.m2m.internal.qvt.oml.editor.ui;
 
+import java.util.concurrent.Callable;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -34,6 +36,7 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 	private IQVTReconcilingListener myReconcilingListener;	
 	private final ITextEditor myEditor;
 	private int myLoggedCompilationExceptionsCount = 0;
+	private final Object mySyncMonitor = new Object();
 
     public QvtReconcilingStrategy(final ITextEditor editor) {
         myEditor = editor;
@@ -81,14 +84,14 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
     }
 
 	private CompiledUnit getCompilationResult(boolean editingInQvtSourceContainer) {
-		CompiledUnit compilationResult;
 		QvtCompilerOptions options = new QvtCompilerOptions();
 		options.setShowAnnotations(editingInQvtSourceContainer);
 		options.setSourceLineNumbersEnabled(false);
 		options.enableCSTModelToken(true);
 		
-		compilationResult = QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
-		return compilationResult;
+		synchronized(mySyncMonitor) {
+			return QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
+		}
 	}
 
 	private void handleError(Exception ex) {
@@ -103,6 +106,12 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
 		    if (myLoggedCompilationExceptionsCount == MAX_LOGGED_COMPILATION_EXCEPTIONS) {
 		        Activator.log(new Status(IStatus.WARNING, Activator.PLUGIN_ID, Messages.QvtReconcilingStrategy_TooManyExceptions));
 		    }
+		}
+	}
+	
+	public <V> V synchronize(Callable<V> callable) throws Exception {
+		synchronized(mySyncMonitor) {
+			return callable.call();
 		}
 	}
 }

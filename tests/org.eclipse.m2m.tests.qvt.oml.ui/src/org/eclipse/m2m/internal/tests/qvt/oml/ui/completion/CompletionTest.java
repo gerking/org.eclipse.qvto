@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -45,6 +46,7 @@ import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtConfiguration;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
+import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtReconcilingStrategy;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.completion.QvtCompletionProcessor;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.completion.QvtCompletionProposal;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ModelType;
@@ -158,8 +160,18 @@ public class CompletionTest extends AbstractCompletionTest {
 		ISourceViewer sourceViewer = editor.getEditorSourceViewer();
 		IContentAssistant contentAssistant = qvtConfiguration.getContentAssistant(sourceViewer);
 		QvtCompletionProcessor processor = (QvtCompletionProcessor) contentAssistant.getContentAssistProcessor(IDocument.DEFAULT_CONTENT_TYPE);
+		QvtReconcilingStrategy strategy = (QvtReconcilingStrategy) qvtConfiguration.getReconciler(sourceViewer).getReconcilingStrategy("");
+		
+		Callable<ICompletionProposal[]> proposalsComputation = new Callable<ICompletionProposal[]>() {
+			
+			@Override
+			public ICompletionProposal[] call() {
+				return processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
+			}
+		};
+		
 		do {
-			ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
+			ICompletionProposal[] proposals = strategy.synchronize(proposalsComputation);
 			if(proposals != null) {
 				for (ICompletionProposal completionProposal : proposals) {
 					if (completionProposal instanceof QvtCompletionProposal) {
