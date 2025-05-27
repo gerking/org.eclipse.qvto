@@ -81,14 +81,14 @@ public class QvtReconcilingStrategy implements IReconcilingStrategy, IReconcilin
     }
 
 	private CompiledUnit getCompilationResult(boolean editingInQvtSourceContainer) {
-		CompiledUnit compilationResult;
 		QvtCompilerOptions options = new QvtCompilerOptions();
 		options.setShowAnnotations(editingInQvtSourceContainer);
 		options.setSourceLineNumbersEnabled(false);
 		options.enableCSTModelToken(true);
 		
-		compilationResult = QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
-		return compilationResult;
+		synchronized(this) { // synchronize reconciler with completion tests (fixes #1126)
+			return QvtCompilerFacade.getInstance().compile(myEditor, myDocument, options, myMonitor);
+		}
 	}
 
 	private void handleError(Exception ex) {
