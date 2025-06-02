@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IContainer;
@@ -32,6 +33,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.ecore.EClassifier;
@@ -43,6 +45,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.common.io.FileUtil;
+import org.eclipse.m2m.internal.qvt.oml.compiler.CompiledUnit;
+import org.eclipse.m2m.internal.qvt.oml.editor.ui.IQVTReconcilingListener;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtConfiguration;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.completion.QvtCompletionProcessor;
@@ -151,14 +155,38 @@ public class CompletionTest extends AbstractCompletionTest {
 	}
 
 	protected void initializeProposalProvider() throws Exception {
+		CountDownLatch reconciling = new CountDownLatch(1);
+		CountDownLatch proposalsComputation = new CountDownLatch(1);
+		
 		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 		IFile transformationFile = getTransformationFile();
-		QvtEditor editor = (QvtEditor) IDE.openEditor(page, transformationFile);
+		QvtEditor editor = (QvtEditor) IDE.openEditor(page, transformationFile);	
 		QvtConfiguration qvtConfiguration = editor.getQvtConfiguration();
 		ISourceViewer sourceViewer = editor.getEditorSourceViewer();
 		IContentAssistant contentAssistant = qvtConfiguration.getContentAssistant(sourceViewer);
 		QvtCompletionProcessor processor = (QvtCompletionProcessor) contentAssistant.getContentAssistProcessor(IDocument.DEFAULT_CONTENT_TYPE);
-		do {
+		
+		editor.addReconcilingListener(new IQVTReconcilingListener() {
+			
+			@Override
+			public void reconciled(CompiledUnit unit, IProgressMonitor monitor) {
+				reconciling.countDown();
+				
+				try {
+					proposalsComputation.await();
+				} catch(InterruptedException e) {
+					fail(e.getMessage());
+				}
+			}
+			
+			@Override
+			public void aboutToBeReconciled() {}
+		});
+		
+		editor.forceReconciling();
+		reconciling.await();
+				
+		do {					
 			ICompletionProposal[] proposals = processor.computeCompletionProposals((ITextViewer) sourceViewer, myOffset);
 			if(proposals != null) {
 				for (ICompletionProposal completionProposal : proposals) {
@@ -169,6 +197,8 @@ public class CompletionTest extends AbstractCompletionTest {
 				}
 			}
 		} while(processor.getCurrentCategory() != processor.getLastCategory());
+		
+		proposalsComputation.countDown();
 	}
 
 	protected String saveActualProposalStrings() throws Exception {
