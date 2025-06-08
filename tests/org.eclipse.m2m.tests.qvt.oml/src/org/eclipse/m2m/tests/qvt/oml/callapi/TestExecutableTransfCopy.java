@@ -157,7 +157,7 @@ public class TestExecutableTransfCopy extends TestCase {
     @Override
     @After
 	public void tearDown() throws Exception {
-    	FileUtil.delete(getDestFile(myData.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION));
+    	TestUtil.delete(getDestFile(myData.getName() + '.' + ExeXMISerializer.COMPILED_XMI_FILE_EXTENSION), myProject);
     }
     
     private IProject getProject() {

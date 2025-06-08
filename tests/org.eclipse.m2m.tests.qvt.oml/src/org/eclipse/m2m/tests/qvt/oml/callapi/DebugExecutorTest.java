@@ -131,7 +131,7 @@ public class DebugExecutorTest extends TestCase {
     	
     	myData.dispose(myProject);
         if (myDestFolder.exists()) {
-            FileUtil.delete(myDestFolder);
+            TestUtil.delete(myDestFolder, myProject);
         }
     	myData = null;
 	}

@@ -129,7 +129,7 @@ public class CompletionTest extends AbstractCompletionTest {
 			}
 		}
 
-		FileUtil.delete(getTransfromationContainer().getRawLocation().toFile());
+		TestUtil.delete(getTransfromationContainer().getRawLocation().toFile(), myTestProject);
 	}
 
 	@Override

@@ -486,7 +486,7 @@ public class TestQvtUnparser extends TestCase {
 		}
 		File destinationFolder = getDestinationFolder();
 		if (destinationFolder.exists()) {
-			FileUtil.delete(destinationFolder);
+			TestUtil.delete(destinationFolder, myProject);
 		}
 	}
 
@@ -495,12 +495,12 @@ public class TestQvtUnparser extends TestCase {
 	public void tearDown() throws Exception {
 		File destinationFolder = getDestinationFolder();
 		if (destinationFolder.exists()) {
-			FileUtil.delete(destinationFolder);
+			TestUtil.delete(destinationFolder, myProject);
 		}
 
 		File unparseFolder = getUnparseFolder();
 		if (unparseFolder.exists()) {
-			FileUtil.delete(unparseFolder);
+			TestUtil.delete(unparseFolder, myProject);
 		}
 	}
 

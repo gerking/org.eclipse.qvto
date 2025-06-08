@@ -58,7 +58,7 @@ public class UnitResolverFactoryTest extends TestCase {
 	protected void tearDown() throws Exception {
 		File destinationFolder = getDestinationFolder();
 		if (destinationFolder.exists()) {
-			FileUtil.delete(destinationFolder);
+			TestUtil.delete(destinationFolder, myProject);
 		}
 	}
 

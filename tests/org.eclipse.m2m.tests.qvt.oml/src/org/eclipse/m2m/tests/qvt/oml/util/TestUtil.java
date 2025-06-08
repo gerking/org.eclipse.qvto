@@ -551,5 +551,10 @@ public class TestUtil extends Assert {
 			manifest.delete(true, null);
 		}
 	}
+	
+	public static void delete(File file, TestProject project) throws CoreException {
+        FileUtil.delete(file);
+        project.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+    }
 
 }

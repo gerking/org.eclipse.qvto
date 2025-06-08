@@ -177,9 +177,9 @@ public abstract class TestTransformation extends TestCase {
     		return;
     	}
     	
-    	getData().dispose(myProject);
+    	myData.dispose(myProject);
         if (myDestFolder.exists()) {
-            FileUtil.delete(myDestFolder);
+            TestUtil.delete(myDestFolder, myProject);
         }
     	myData = null;
     }

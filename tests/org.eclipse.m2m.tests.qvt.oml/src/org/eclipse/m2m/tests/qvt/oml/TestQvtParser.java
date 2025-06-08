@@ -277,7 +277,7 @@ public class TestQvtParser extends TestCase {
 		if (myProject != null) {
 			File destinationFolder = getDestinationFolder();
 			if (destinationFolder.exists()) {
-				FileUtil.delete(destinationFolder);
+				TestUtil.delete(destinationFolder, myProject);
 			}
 			
 			TestUtil.disposeJava(myProject);
