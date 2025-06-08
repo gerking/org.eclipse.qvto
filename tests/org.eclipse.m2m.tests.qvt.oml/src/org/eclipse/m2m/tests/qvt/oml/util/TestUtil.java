@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -91,6 +92,7 @@ import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
+import org.eclipse.pde.internal.core.natures.PluginProject;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -444,8 +446,11 @@ public class TestUtil extends Assert {
 
 			assertFalse(javaProject.hasClasspathCycle(entries));
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, javaProject.getOutputLocation());
-			assertTrue(status.isOK());
+			assertTrue(status.getMessage(), status.isOK());
 			javaProject.setRawClasspath(entries, null);
+						
+			ICommand buildCommand = NatureUtils.findCommand(project, JavaCore.BUILDER_ID);
+			assertNotNull(buildCommand);
 
 			JavaCore.rebuildIndex(null);
 				
@@ -465,6 +470,12 @@ public class TestUtil extends Assert {
 		if (workspace.getRoot().exists(relativeDestinationPath)) {
 			
 			NatureUtils.addNature(project, IBundleProjectDescription.PLUGIN_NATURE);
+			
+			ICommand manifestCommand = NatureUtils.findCommand(project, PluginProject.MANIFEST_BUILDER_ID);
+			assertNotNull(manifestCommand);
+			
+			ICommand schemaCommand = NatureUtils.findCommand(project, PluginProject.SCHEMA_BUILDER_ID);
+			assertNotNull(schemaCommand);
 			
 			IFile pluginXml = PDEProject.getPluginXml(project);
 			IFile manifest = PDEProject.getManifest(project);
@@ -487,10 +498,10 @@ public class TestUtil extends Assert {
 					EPackage ePackage = EmfUtil.getFirstEPackageContent(resSet.getResource(fileUri, true));
 
 					IPluginElement element = pluginModel.createElement(pluginExtension);
-					element.setName("package");
-					element.setAttribute("uri", ePackage.getNsURI().toString());
-					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString());
-					element.setAttribute("class", "");
+					element.setName("package"); //$NON-NLS-1$
+					element.setAttribute("uri", ePackage.getNsURI().toString()); //$NON-NLS-1$
+					element.setAttribute("genModel", genmodelPath.removeFirstSegments(1).toString()); //$NON-NLS-1$
+					element.setAttribute("class", ""); //$NON-NLS-1$
 					pluginExtension.add(element);
 
 					URI platformUri = URI.createPlatformResourceURI(relativeDestinationPath.append(metamodelUri.toString()).toString(), false);
@@ -506,6 +517,9 @@ public class TestUtil extends Assert {
 
 			pluginModel.getExtensions().add(pluginExtension);
 			pluginModel.save();
+			
+			assertTrue(pluginXml.exists());
+			assertTrue(manifest.exists());			
 		}
 	}
 
@@ -520,6 +534,14 @@ public class TestUtil extends Assert {
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
 			NatureUtils.removeNature(desc, IBundleProjectDescription.PLUGIN_NATURE);
 			project.setDescription(desc, null);
+			
+			ICommand javaCommand = NatureUtils.findCommand(project, JavaCore.BUILDER_ID);
+			ICommand manifestCommand = NatureUtils.findCommand(project, PluginProject.MANIFEST_BUILDER_ID);
+			ICommand schemaCommand = NatureUtils.findCommand(project, PluginProject.SCHEMA_BUILDER_ID);
+			
+			assertNull(javaCommand);
+			assertNull(manifestCommand);
+			assertNull(schemaCommand);
 			
 
 			IFile pluginXml = PDEProject.getPluginXml(project.getProject());

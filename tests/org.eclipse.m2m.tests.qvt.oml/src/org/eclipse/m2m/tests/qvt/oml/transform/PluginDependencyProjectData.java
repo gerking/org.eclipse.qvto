@@ -10,6 +10,9 @@
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml.transform;
 
+import static org.junit.Assert.assertNull;
+
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -19,6 +22,7 @@ import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
+import org.eclipse.pde.internal.core.natures.PluginProject;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.junit.Assert;
@@ -88,6 +92,11 @@ public class PluginDependencyProjectData extends ReferencedProjectData {
 		
 		NatureUtils.removeNature(desc, IBundleProjectDescription.PLUGIN_NATURE);
 		project.setDescription(desc, null);
+		
+		ICommand manifestCommand = NatureUtils.findCommand(project, PluginProject.MANIFEST_BUILDER_ID);
+		ICommand schemaCommand = NatureUtils.findCommand(project, PluginProject.SCHEMA_BUILDER_ID);
+		assertNull(manifestCommand);
+		assertNull(schemaCommand);
 				
 		IFile myPluginXml = PDEProject.getPluginXml(project);
 		IFile myManifest = PDEProject.getManifest(project);		
