@@ -97,11 +97,9 @@ public abstract class TestTransformation extends TestCase {
         String name = getProjectName();
         myProject = TestProject.getExistingProject(name);
         if(myProject == null) {
-            myProject = new TestProject(name, new String[] {}, 0); 
+            myProject = new TestProject(name, new String[] {QVTOProjectPlugin.NATURE_ID}, 0); 
             myProject.getProject().setDefaultCharset(ModelTestData.ENCODING, null);
             
-    		NatureUtils.addNature(getProject(), QVTOProjectPlugin.NATURE_ID);
-    		
     		IProjectDescription description = getProject().getDescription();
     		ICommand[] buildSpec = description.getBuildSpec();
     		ICommand buildCommand = NatureUtils.findCommand(buildSpec, QVTOProjectPlugin.BUILDER_ID);

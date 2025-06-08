@@ -94,7 +94,6 @@ import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
-import org.eclipse.pde.internal.core.util.CoreUtility;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.junit.Assert;
 import org.osgi.framework.Bundle;
@@ -470,7 +469,7 @@ public class TestUtil extends Assert {
 
 		if (workspace.getRoot().exists(relativePath)) {
 
-			CoreUtility.addNatureToProject(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE, new NullProgressMonitor());
+			NatureUtils.addNature(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE);
 
 			IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
 			IFile manifest = PDEProject.getManifest(myProject.getProject());
@@ -524,6 +523,7 @@ public class TestUtil extends Assert {
 			javaProject.setOutputLocation(javaProject.getPath().append("bin"), monitor); //$NON-NLS-1$
 			IProjectDescription desc = project.getProject().getDescription();
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
+			NatureUtils.removeNature(desc, IBundleProjectDescription.PLUGIN_NATURE);
 			project.getProject().setDescription(desc, monitor);
 		}
 
