@@ -68,8 +68,6 @@ public class ReferencedProjectData extends FilesToFilesData {
 	
 	@Override
 	public void dispose(TestProject project) throws Exception {
-		super.dispose(project);
-
 		IProject myProject = project.getProject();
 		
 		IProjectDescription desc = myProject.getDescription();
@@ -83,6 +81,8 @@ public class ReferencedProjectData extends FilesToFilesData {
 			referencedDesc.setReferencedProjects(new IProject[] {});
 			referencedProject.setDescription(referencedDesc, null);
 		}
+		
+		super.dispose(project);
 	}
 
 }

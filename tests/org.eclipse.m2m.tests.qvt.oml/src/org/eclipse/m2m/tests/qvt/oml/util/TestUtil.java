@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.Job;
@@ -407,39 +406,36 @@ public class TestUtil extends Assert {
 	}
 
 	public static void prepareJava(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
+		IProject project = myProject.getProject();
 		IPath destPath = new Path(destFolder.getPath());
 
-		IWorkspace workspace = myProject.getProject().getWorkspace();
+		IWorkspace workspace = project.getWorkspace();
 		IPath workspacePath = workspace.getRoot().getLocation();
 
-		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
+		destPath = destPath.makeRelativeTo(workspacePath);
 
 		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 
 		if (workspace.getRoot().exists(srcPath)) {
-			IProjectDescription desc = myProject.getProject().getDescription();
-
-			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
-
-			IProgressMonitor monitor = new NullProgressMonitor();
-
-			myProject.getProject().setDescription(desc, monitor);
-
-			IJavaProject javaProject = JavaCore.create(myProject.getProject());
-
+			setupPluginXml(myProject, destFolder, metamodels, resSet);
+			
+			NatureUtils.addNature(project, JavaCore.NATURE_ID);
+			
+			IJavaProject javaProject = JavaCore.create(project);
+			
 			javaProject.setOption(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
 
 
 			IPath binPath = destPath.append("bin"); //$NON-NLS-1$
 
 			if (workspace.getRoot().exists(binPath)) {
-				javaProject.setOutputLocation(binPath, monitor);
+				javaProject.setOutputLocation(binPath.makeAbsolute(), null);
 			}
 
 			List<IClasspathEntry> classpath = new ArrayList<IClasspathEntry>(3);
 
 			IClasspathAttribute testAttribute = JavaCore.newClasspathAttribute(IClasspathAttribute.TEST, Boolean.toString(true));
-			classpath.add(JavaCore.newSourceEntry(srcPath, new IPath[] {}, new IPath[] {}, null, new IClasspathAttribute[] {testAttribute}));
+			classpath.add(JavaCore.newSourceEntry(srcPath.makeAbsolute(), new IPath[] {}, new IPath[] {}, null, new IClasspathAttribute[] {testAttribute}));
 
 			classpath.add(JavaRuntime.getDefaultJREContainerEntry());
 			classpath.add(ClasspathComputer.createContainerEntry());
@@ -449,34 +445,33 @@ public class TestUtil extends Assert {
 			assertFalse(javaProject.hasClasspathCycle(entries));
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, javaProject.getOutputLocation());
 			assertTrue(status.isOK());
-			javaProject.setRawClasspath(entries, monitor);
-
-			setupPluginXml(myProject, destFolder, metamodels, resSet);
+			javaProject.setRawClasspath(entries, null);
 
 			JavaCore.rebuildIndex(null);
-
-			TestUtil.buildProject(myProject.getProject());
+				
+			buildProject(project);
 		}
 	}
 
 	private static void setupPluginXml(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
-
-		IWorkspace workspace = myProject.getProject().getWorkspace();
+		IProject project = myProject.getProject();
+		
+		IWorkspace workspace = project.getWorkspace();
 		IPath workspacePath = workspace.getRoot().getLocation();
 
 		IPath destinationPath = new Path(destFolder.getPath());
-		IPath relativePath = destinationPath.makeRelativeTo(workspacePath).makeAbsolute();
-
-		if (workspace.getRoot().exists(relativePath)) {
-
-			NatureUtils.addNature(myProject.getProject(), IBundleProjectDescription.PLUGIN_NATURE);
-
-			IFile pluginXml = PDEProject.getPluginXml(myProject.getProject());
-			IFile manifest = PDEProject.getManifest(myProject.getProject());
+		IPath relativeDestinationPath = destinationPath.makeRelativeTo(workspacePath);
+		
+		if (workspace.getRoot().exists(relativeDestinationPath)) {
+			
+			NatureUtils.addNature(project, IBundleProjectDescription.PLUGIN_NATURE);
+			
+			IFile pluginXml = PDEProject.getPluginXml(project);
+			IFile manifest = PDEProject.getManifest(project);
 			WorkspacePluginModelBase pluginModel = new WorkspaceBundlePluginModel(manifest, pluginXml);
 
 			IPluginBase pluginBase = pluginModel.getPluginBase();
-			pluginBase.setId(myProject.getProject().getName());
+			pluginBase.setId(project.getName());
 			pluginBase.setVersion(Platform.getBundle(AllTests.BUNDLE_ID).getVersion().toString());
 
 			IPluginExtension pluginExtension = pluginModel.createExtension();
@@ -485,7 +480,7 @@ public class TestUtil extends Assert {
 			for (URI metamodelUri : metamodels) {
 				String metamodelFileName = metamodelUri.trimFileExtension().lastSegment();
 				URI genmodelUri = metamodelUri.trimSegments(1).appendSegment(metamodelFileName).appendFileExtension(GenModelPackage.eNAME);
-				IPath genmodelPath = relativePath.append(genmodelUri.toString());
+				IPath genmodelPath = relativeDestinationPath.append(genmodelUri.toString());
 
 				if (workspace.getRoot().exists(genmodelPath)) {
 					URI fileUri = URI.createFileURI(destinationPath.append(metamodelUri.toString()).toString());
@@ -498,7 +493,7 @@ public class TestUtil extends Assert {
 					element.setAttribute("class", "");
 					pluginExtension.add(element);
 
-					URI platformUri = URI.createPlatformResourceURI(relativePath.append(metamodelUri.toString()).toString(), false);
+					URI platformUri = URI.createPlatformResourceURI(relativeDestinationPath.append(metamodelUri.toString()).toString(), false);
 					resSet.getURIConverter().getURIMap().put(platformUri, fileUri);
 				}
 			}
@@ -514,24 +509,25 @@ public class TestUtil extends Assert {
 		}
 	}
 
-	public static void disposeJava(TestProject project) throws CoreException {
-
-		IJavaProject javaProject = JavaCore.create(project.getProject());
+	public static void disposeJava(TestProject testProject) throws CoreException {
+		IProject project = testProject.getProject();
+		IProjectDescription desc = project.getDescription();
+		IJavaProject javaProject = JavaCore.create(project);
+		
 		if (javaProject.exists()) {
-			IProgressMonitor monitor = new NullProgressMonitor();
-			javaProject.setRawClasspath(null, monitor);
-			javaProject.setOutputLocation(javaProject.getPath().append("bin"), monitor); //$NON-NLS-1$
-			IProjectDescription desc = project.getProject().getDescription();
+			javaProject.setRawClasspath(null, null);
+			javaProject.setOutputLocation(javaProject.getPath().append("bin"), null); //$NON-NLS-1$
 			NatureUtils.removeNature(desc, JavaCore.NATURE_ID);
 			NatureUtils.removeNature(desc, IBundleProjectDescription.PLUGIN_NATURE);
-			project.getProject().setDescription(desc, monitor);
+			project.setDescription(desc, null);
+			
+
+			IFile pluginXml = PDEProject.getPluginXml(project.getProject());
+			IFile manifest = PDEProject.getManifest(project.getProject());
+	
+			pluginXml.delete(true, null);
+			manifest.delete(true, null);
 		}
-
-		IFile pluginXml = PDEProject.getPluginXml(project.getProject());
-		IFile manifest = PDEProject.getManifest(project.getProject());
-
-		pluginXml.delete(true, null);
-		manifest.delete(true, null);
 	}
 
 }
