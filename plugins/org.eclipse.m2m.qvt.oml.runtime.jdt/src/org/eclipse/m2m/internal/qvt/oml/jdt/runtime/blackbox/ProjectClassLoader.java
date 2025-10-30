@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2022 Christopher Gerking and others.
+ * Copyright (c) 2016, 2025 Christopher Gerking and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -265,7 +265,7 @@ public class ProjectClassLoader extends URLClassLoader {
 				}
 			
 				locationPath = locationPath.removeLastSegments(1);
-			} while (!locationPath.isEmpty());
+			} while (locationPath.segmentCount() > 0);
 			
 			return null;
 		}
