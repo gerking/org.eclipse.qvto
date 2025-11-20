@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2009, 2018 Borland Software Corporation and others.
+ * Copyright (c) 2009, 2025 Borland Software Corporation and others.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -8,7 +8,7 @@
  *
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
- *     Christopher Gerking - bugs 394188, 537041
+ *     Christopher Gerking - bugs 394188, 537041, #1135
  *******************************************************************************/
 package org.eclipse.m2m.tests.qvt.oml.compile;
 
@@ -36,6 +36,7 @@ import junit.framework.TestCase;
 public class UnitResolverFactoryTest extends TestCase {
 
 	private TestProject myProject;
+	static final String DEPLOYED_PROJECT_NAME = "deployed"; //$NON-NLS-1$
 
 	public UnitResolverFactoryTest(String testName) {
 		super(testName);
@@ -44,7 +45,7 @@ public class UnitResolverFactoryTest extends TestCase {
 	@Override
 	@Before
 	protected void setUp() throws Exception {
-		String srcFolder = "deployed"; //$NON-NLS-1$
+		String srcFolder = DEPLOYED_PROJECT_NAME;
 		myProject = TestProject.getExistingProject(srcFolder);
 		if(myProject == null) {
 			myProject = new TestProject(srcFolder, new String[] { QVTOProjectPlugin.NATURE_ID }, 0);
@@ -57,6 +58,8 @@ public class UnitResolverFactoryTest extends TestCase {
 	@After
 	protected void tearDown() throws Exception {
 		File destinationFolder = getDestinationFolder();
+		
+		//FIXME: folder never exists in this test, so teardown is a no-op instruction
 		if (destinationFolder.exists()) {
 			FileUtil.delete(destinationFolder);
 		}
@@ -119,7 +122,7 @@ public class UnitResolverFactoryTest extends TestCase {
 
 
 	File getDestinationFolder() {
-		return new File(myProject.getProject().getLocation().toString() + "/deployed");
+		return new File(myProject.getProject().getLocation().toString() + "/" + DEPLOYED_PROJECT_NAME); //$NON-NLS-1$
 	}
 
 	private void copyData(String destPath, String srcPath) throws Exception {

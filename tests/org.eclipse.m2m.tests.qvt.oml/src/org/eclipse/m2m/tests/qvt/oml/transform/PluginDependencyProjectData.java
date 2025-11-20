@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022 Christopher Gerking and others.
+ * Copyright (c) 2022, 2025 Christopher Gerking and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
  * which accompanies this distribution, and is available at
@@ -13,12 +13,14 @@ package org.eclipse.m2m.tests.qvt.oml.transform;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.m2m.tests.qvt.oml.TestProject;
 import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
+import org.eclipse.pde.internal.core.natures.PluginProject;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.core.util.CoreUtility;
@@ -52,7 +54,9 @@ public class PluginDependencyProjectData extends ReferencedProjectData {
 		IProjectDescription desc = myProject.getDescription();
 		desc.setReferencedProjects(new IProject[] {});
 		myProject.setDescription(desc, null);
-		Assert.assertEquals(myProject.getReferencedProjects().length, 0);
+		
+		// avoid calling myProject.getReferencedProjects() directly as it might be out of date (#1135)
+		Assert.assertEquals(0, myProject.getDescription().getReferencedProjects().length);
 		
 		for (IProject referencedProject : referencedProjects) {
 							
@@ -77,6 +81,9 @@ public class PluginDependencyProjectData extends ReferencedProjectData {
 		}
 				
 		myPluginModel.save();
+		
+		// force rebuild of PDE's plugin registry (#1135)
+		myProject.build(IncrementalProjectBuilder.FULL_BUILD, PluginProject.MANIFEST_BUILDER_ID, null, null);
 	}
 		
 	@Override
