@@ -25,7 +25,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtEditor;
-import org.eclipse.m2m.internal.qvt.oml.emf.util.URIUtils;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTOBreakpoint;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugElement;
 import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugUtil;

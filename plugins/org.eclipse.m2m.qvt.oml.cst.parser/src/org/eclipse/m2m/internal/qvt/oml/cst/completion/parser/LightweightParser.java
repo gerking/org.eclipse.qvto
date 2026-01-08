@@ -59,7 +59,6 @@
 
 package org.eclipse.m2m.internal.qvt.oml.cst.completion.parser;
 
-import lpg.runtime.*;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.ocl.cst.BooleanLiteralExpCS;
@@ -70,7 +69,6 @@ import org.eclipse.ocl.cst.CollectionLiteralPartCS;
 import org.eclipse.ocl.cst.CollectionTypeCS;
 import org.eclipse.ocl.cst.CollectionTypeIdentifierEnum;
 import org.eclipse.ocl.cst.FeatureCallExpCS;
-import org.eclipse.ocl.cst.IfExpCS;
 import org.eclipse.ocl.cst.IntegerLiteralExpCS;
 import org.eclipse.ocl.cst.InvalidLiteralExpCS;
 import org.eclipse.ocl.cst.IsMarkedPreCS;
@@ -108,15 +106,9 @@ import lpg.runtime.RuleAction;
 import lpg.runtime.UndefinedEofSymbolException;
 import lpg.runtime.UnimplementedTerminalsException;	
 	
-import org.eclipse.ocl.ParserException;
 import lpg.runtime.Token;
 import lpg.runtime.BacktrackingParser;
-import lpg.runtime.PrsStream;
 import lpg.runtime.NotBacktrackParseTableException;
-import lpg.runtime.NullExportedSymbolsException;
-import lpg.runtime.NullTerminalSymbolsException;
-import lpg.runtime.UndefinedEofSymbolException;
-import lpg.runtime.UnimplementedTerminalsException;
 import org.eclipse.m2m.internal.qvt.oml.cst.AssertExpCS;
 import org.eclipse.m2m.internal.qvt.oml.cst.AssignStatementCS;	
 import org.eclipse.m2m.internal.qvt.oml.cst.LogExpCS;
@@ -126,8 +118,6 @@ import org.eclipse.m2m.internal.qvt.oml.cst.SwitchAltExpCS;
 import org.eclipse.m2m.internal.qvt.oml.cst.ScopedNameCS;
 import org.eclipse.m2m.internal.qvt.oml.cst.ForExpCS;
 import org.eclipse.m2m.internal.qvt.oml.cst.ImperativeIterateExpCS;
-import org.eclipse.m2m.internal.qvt.oml.cst.SwitchExpCS;
-	
 import org.eclipse.m2m.internal.qvt.oml.cst.CompleteSignatureCS;
 import org.eclipse.m2m.internal.qvt.oml.cst.DictLiteralPartCS;	
 import org.eclipse.m2m.internal.qvt.oml.cst.DirectionKindCS;
@@ -164,8 +154,6 @@ import org.eclipse.ocl.util.OCLStandardLibraryUtil;
 import org.eclipse.ocl.utilities.PredefinedType;
 import org.eclipse.ocl.Environment;
 
-import org.eclipse.m2m.internal.qvt.oml.cst.parser.QVTOParserprs;
-import org.eclipse.m2m.internal.qvt.oml.cst.parser.QVTOParsersym;
 import org.eclipse.m2m.internal.qvt.oml.cst.parser.QVTOLexer;	
 import org.eclipse.m2m.internal.qvt.oml.cst.parser.AbstractQVTParser;	
 

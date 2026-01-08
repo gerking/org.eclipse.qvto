@@ -26,8 +26,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalModuleEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.parser.ValidationMessages;
-import org.eclipse.m2m.internal.qvt.oml.ocl.transformations.LibraryCreationException;
-import org.eclipse.m2m.internal.qvt.oml.ocl.transformations.LibraryOperation;
 import org.eclipse.ocl.OCLInput;
 import org.eclipse.ocl.ParserException;
 import org.eclipse.ocl.ecore.CallOperationAction;
