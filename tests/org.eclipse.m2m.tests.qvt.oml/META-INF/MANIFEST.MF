@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.m2m.tests.qvt.oml;singleton:=true
-Bundle-Version: 3.11.1.qualifier
+Bundle-Version: 3.11.2.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
+Import-Package: lpg.runtime;version="[2.0.17,3.0.0)"
 Export-Package: generics;x-internal:=true,
  generics.impl;x-internal:=true,
  generics.util;x-internal:=true,
