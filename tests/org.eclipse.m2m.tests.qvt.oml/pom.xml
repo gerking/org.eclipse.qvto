@@ -4,12 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.eclipse.qvto-tests</groupId>
   <artifactId>org.eclipse.m2m.tests.qvt.oml</artifactId>
-  <version>3.11.1-SNAPSHOT</version>
+  <version>3.11.2-SNAPSHOT</version>
   <packaging>eclipse-test-plugin</packaging>
   <parent>
     <groupId>org.eclipse.qvto-tests</groupId>
     <artifactId>org.eclipse.qvto.tests-folder</artifactId>
-    <version>3.11.1-SNAPSHOT</version>
+    <version>3.11.2-SNAPSHOT</version>
   </parent>
   <build>
   <testOutputDirectory>${project.build.outputDirectory}</testOutputDirectory>
