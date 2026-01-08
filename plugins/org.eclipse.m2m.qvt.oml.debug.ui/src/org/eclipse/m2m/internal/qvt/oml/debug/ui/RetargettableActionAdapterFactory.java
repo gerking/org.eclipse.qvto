@@ -29,13 +29,12 @@ public class RetargettableActionAdapterFactory implements IAdapterFactory {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Object getAdapter(Object adaptableObject, Class adapterType) {
-        if (adaptableObject instanceof ITextEditor == false) {
+	public <T> T getAdapter(Object adaptableObject, Class<T> adapterType) {
+        if (!(adaptableObject instanceof ITextEditor editorPart)) {
 			return null;
         }
 		
-		ITextEditor editorPart = (ITextEditor) adaptableObject;
-        IResource resource = (IResource) editorPart.getEditorInput().getAdapter(IResource.class);
+        IResource resource = editorPart.getEditorInput().getAdapter(IResource.class);
         if (resource != null) {
             String editorID = editorPart.getEditorSite().getId();
 			if(!QVTODebugUIPlugin.DEBUG_EDITOR_ID.equals(editorID)) {
@@ -44,16 +43,15 @@ public class RetargettableActionAdapterFactory implements IAdapterFactory {
         }
 
         if(IRunToLineTarget.class == adapterType) {
-			return new QVTORunToLineAdapter();
+			return (T) new QVTORunToLineAdapter();
         } else  if(IToggleBreakpointsTarget.class == adapterType) {
-			return new QVTOToggleBreakpointAdapter();
+			return (T) new QVTOToggleBreakpointAdapter();
         } 
 
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Class[] getAdapterList() {
+	public Class<?>[] getAdapterList() {
 		return new Class[] { QVTOToggleBreakpointAdapter.class, QVTORunToLineAdapter.class };
 	}
 }

@@ -22,7 +22,6 @@ import org.eclipse.m2m.qvt.oml.debug.core.QVTODebugCore;
 
 public class VMServer {
 
-	private final int fEventPort;
 	private final int fRequestPort;
 	private final VMInitializer fVMProvider;
 	
@@ -33,9 +32,9 @@ public class VMServer {
 		
 		fVMProvider = vmProvider;
 		fRequestPort = requestPort;
-		fEventPort = SocketUtil.findFreePort();
+		int eventPort = SocketUtil.findFreePort();
 		
-		if(fEventPort == -1) {
+		if (eventPort == -1) {
 			throw new SocketException("Could find free port for the debugger"); //$NON-NLS-1$
 		}
 	}

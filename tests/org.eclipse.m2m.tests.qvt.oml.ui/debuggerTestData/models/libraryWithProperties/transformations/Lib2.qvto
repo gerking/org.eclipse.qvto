@@ -1,0 +1,3 @@
+library Lib2;
+
+property myProperty2 : String = "myProperty2 value";

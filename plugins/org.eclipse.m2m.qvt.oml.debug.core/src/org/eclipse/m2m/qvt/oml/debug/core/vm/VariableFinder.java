@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalStdLibrary;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModelInstance;
@@ -130,11 +130,37 @@ public class VariableFinder {
 
 	
 	private Object findStackObject(String[] varTreePath) {
-		QvtOperationalEvaluationEnv evalEnv = fFeatureAccessor.getEvalEnv();		
+		QvtOperationalEvaluationEnv evalEnv = fFeatureAccessor.getEvalEnv();
 		String envVarName = varTreePath[0];
 		
 		Object rootObj = evalEnv.getValueOf(envVarName);
-		if(rootObj == null && !evalEnv.getNames().contains(envVarName)) {
+
+		if (rootObj == null) {
+			var rootEnvironment = evalEnv.getRoot();
+
+			// try the root environment, this is needed for variables like $1
+			rootObj = rootEnvironment.getValueOf(envVarName);
+
+			var currentEvalEnv = evalEnv;
+
+			// walk up the environments
+			while (currentEvalEnv != null && rootObj == null) {
+				currentEvalEnv = currentEvalEnv.getParent();
+				if (currentEvalEnv == null) {
+					// reached highest evalEnv
+					break;
+				}
+
+				rootObj = currentEvalEnv.getValueOf(envVarName);
+			}
+
+			if (currentEvalEnv != null) {
+				evalEnv = currentEvalEnv;
+			}
+		}
+
+
+		if (rootObj == null && !evalEnv.getNames().contains(envVarName)) {
 			rootObj = getModelParameterVariables(evalEnv).get(envVarName);
 			
 		}
@@ -168,9 +194,8 @@ public class VariableFinder {
 			nextDeclaredType = QvtOperationalStdLibrary.INSTANCE.getElementType();
 		}
 		
-		if (parentObj instanceof EObject) {
-			EObject eObject = (EObject) parentObj;
-			EStructuralFeature eFeature = findFeature(varTreePath[pathIndex], eObject.eClass());
+		if (parentObj instanceof EObject eObject) {
+            EStructuralFeature eFeature = findFeature(varTreePath[pathIndex], eObject.eClass());
 			if (eFeature != null) {
 				Object value = this.fFeatureAccessor.getValue(eFeature, eObject);
 				childVar = createFeatureVar(eFeature, value, uri.toString());
@@ -178,9 +203,8 @@ public class VariableFinder {
 				nextDeclaredType = fFeatureAccessor.getOCLType(eFeature);
 			}
 			
-		} else if (parentObj instanceof Collection<?>) {
-			Collection<?> collection = (Collection<?>) parentObj;
-			int elementIndex = -1;
+		} else if (parentObj instanceof Collection<?> collection) {
+            int elementIndex;
 			try {
 				elementIndex = Integer.parseInt(varTreePath[pathIndex]);
 			} catch(NumberFormatException e) {
@@ -193,9 +217,8 @@ public class VariableFinder {
 				throw new IllegalArgumentException();
 			}
 						
-			if (optParentDeclaredType instanceof CollectionType) {
-				CollectionType type = (CollectionType) optParentDeclaredType;
-				nextDeclaredType = type.getElementType();
+			if (optParentDeclaredType instanceof CollectionType type) {
+                nextDeclaredType = type.getElementType();
 			} else if(nextDeclaredType == null) {
 				// FIXME
 				nextDeclaredType = this.fFeatureAccessor.getStandardLibrary().getOclAny();
@@ -298,20 +321,18 @@ public class VariableFinder {
 	}
 	
 	public void collectChildVars(Object root, String[] parentPath, EClassifier containerType, List<VMVariable> result) {
-		String childPath[] = new String[parentPath.length + 1];
+		String[] childPath = new String[parentPath.length + 1];
 		System.arraycopy(parentPath, 0, childPath, 0, parentPath.length);
 		
-		if(root instanceof ModelInstance) {
-			ModelInstance model = (ModelInstance) root;
-			root = model.getExtent().getRootObjects();
+		if(root instanceof ModelInstance model) {
+            root = model.getExtent().getRootObjects();
 			containerType = (EClassifier)EcoreEnvironmentFactory.INSTANCE
 					.createEnvironment().getOCLFactory().createSetType(
 							QvtOperationalStdLibrary.INSTANCE.getElementType());
 		}
 		
-		if (root instanceof EObject) {
-			EObject eObject = (EObject) root;
-			EClass eClass = eObject.eClass();
+		if (root instanceof EObject eObject) {
+            EClass eClass = eObject.eClass();
 
 			StringBuilder uriBuf = new StringBuilder();			
 			List<EStructuralFeature> eAllFeatures = fFeatureAccessor.getAllFeatures(eClass);
@@ -330,7 +351,7 @@ public class VariableFinder {
 				}
 							
 				int index = superClasses.indexOf(owner);
-				uriBuf.append(index < 0 ? 0 : index);
+				uriBuf.append(Math.max(index, 0));
 				uriBuf.append('.').append(feature.getName());
 				
 				childPath[childPath.length - 1] = uriBuf.toString();
@@ -339,9 +360,8 @@ public class VariableFinder {
 				
 				uriBuf.setLength(0);
 			}
-		} else if(root instanceof Collection<?>) {
-			Collection<?> elements = (Collection<?>) root;
-			EClassifier elementType = (containerType instanceof CollectionType) ? 
+		} else if(root instanceof Collection<?> elements) {
+            EClassifier elementType = (containerType instanceof CollectionType) ?
 					((CollectionType) containerType) .getElementType()
 					: fFeatureAccessor.getStandardLibrary().getOclAny();
 									
@@ -361,9 +381,8 @@ public class VariableFinder {
 					elementVar = createCollectionElementVar(i, element,
 							elementType, createURI(childPath).toString());
 				} else {
-					Object key = element;
-					Object value = asDictionary.get(element);
-					elementVar = createDictionaryElementVar(key, value, elementType, createURI(childPath).toString());
+                    Object value = asDictionary.get(element);
+					elementVar = createDictionaryElementVar(element, value, elementType, createURI(childPath).toString());
 				}
 				result.add(elementVar);
 				i++;
@@ -383,18 +402,16 @@ public class VariableFinder {
 	}
 
 	private Object getElement(Collection<?> collection, int index) {
-		if (collection instanceof EList<?>) {
-			EList<?> eList = (EList<?>) collection;
-			return eList.get(index);
+		if (collection instanceof EList<?> eList) {
+            return eList.get(index);
 		}
 
 		int curr = 0;
-		for (Iterator<?> it = collection.iterator(); it.hasNext();) {
-			Object object = it.next();
-			if (curr++ == index) {
-				return object;
-			}
-		}
+        for (Object object : collection) {
+            if (curr++ == index) {
+                return object;
+            }
+        }
 		return null;
 	}
 
@@ -483,20 +500,16 @@ public class VariableFinder {
 			vmType = new Value.Type(Value.Type.DATATYPE,
 					"OclIvalid", declaredTypeName); //$NON-NLS-1$
 			vmValue = Value.invalid();
-		} else if (value instanceof EObject) {
-			EObject eObject = (EObject) value;
-			EClass eClass = eObject.eClass();
+		} else if (value instanceof EObject eObject) {
+            EClass eClass = eObject.eClass();
 			String strVal = eClass.getName() + " @"
 					+ Integer.toHexString(System.identityHashCode(value));
 
-			boolean hasVariables = !eClass.getEAllStructuralFeatures()
-					.isEmpty() || value instanceof ModelInstance;
-			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables);
+			vmValue = new Value(Value.OBJECT_REF, strVal, hasVariables(eObject, variable, value));
 			vmType = new Value.Type(Value.Type.EOBJECT, eClass.getName(),
 					declaredTypeName);
-		} else if (value instanceof Collection<?>) {
-			Collection<?> collection = (Collection<?>) value;
-			Class<?> javaType = value.getClass();
+		} else if (value instanceof Collection<?> collection) {
+            Class<?> javaType = value.getClass();
 
 			StringBuilder strVal = new StringBuilder();
 			if (optDeclaredType != null) {
@@ -527,17 +540,46 @@ public class VariableFinder {
 		variable.value = vmValue;
 	}
 	
+	private static boolean hasVariables(EObject eObject, VMVariable variable, Object value) {
+		if (!eObject.eClass().getEAllStructuralFeatures().isEmpty()) {
+			return true;
+		}
+
+		if (eObject instanceof ModelInstance modelInstance) {
+			return !modelInstance.getExtent().getRootObjects().isEmpty();
+		}
+
+		if (variable.name.equals(QvtOperationalEnv.THIS) && eObject instanceof ModuleInstance moduleInstance) {
+			return importsHaveVariables(moduleInstance.getImportedModules());
+		}
+
+		return false;
+	}
+
+	private static boolean importsHaveVariables(List<ModuleInstance> importedModules) {
+		for (var importedModuleInstance : importedModules) {
+			if (!importedModuleInstance.eClass().getEAllStructuralFeatures().isEmpty()) {
+				return true;
+			}
+
+			if (importsHaveVariables(importedModuleInstance.getImportedModules())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	private static Map<String, ModelInstance> getModelParameterVariables(QvtOperationalEvaluationEnv evalEnv) {
 		InternalEvaluationEnv internEvalEnv = evalEnv.getAdapter(InternalEvaluationEnv.class);
 		ModuleInstance currentModule = internEvalEnv.getCurrentModule();		
-		if(currentModule instanceof TransformationInstance == false) {
+		if(!(currentModule instanceof TransformationInstance currentTransformation)) {
 			return Collections.emptyMap();
 		}
 
 		Map<String, ModelInstance> result = new HashMap<String, ModelInstance>(2);
-		TransformationInstance currentTransformation = (TransformationInstance) currentModule;
-	
-		for (ModelParameter modelParameter : currentTransformation.getTransformation().getModelParameter()) {
+
+        for (ModelParameter modelParameter : currentTransformation.getTransformation().getModelParameter()) {
 			ModelInstance modelInstance = currentTransformation.getModel(modelParameter);
 			String name = modelParameter.getName();
 			result.put(name, modelInstance);

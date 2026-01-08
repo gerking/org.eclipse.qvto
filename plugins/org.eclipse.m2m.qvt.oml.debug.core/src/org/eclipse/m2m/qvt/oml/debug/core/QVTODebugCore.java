@@ -158,7 +158,7 @@ public class QVTODebugCore extends Plugin {
 				if(mappedBaseURI.hasTrailingPathSeparator()) {
 					mappedBaseURI = mappedBaseURI.trimSegments(1);
 				}
-				return mappedBaseURI.appendSegments(segmentsList.toArray(new String[segmentsList.size()]));
+				return mappedBaseURI.appendSegments(segmentsList.toArray(new String[0]));
 			}
 		}
 			
@@ -183,7 +183,7 @@ public class QVTODebugCore extends Plugin {
 			if(mappedBaseURI != null) {
 				List<String> segmentsList = uri.segmentsList();				
 				segmentsList = segmentsList.subList(2, segmentsList.size());
-				URI mappedURI = mappedBaseURI.appendSegments(segmentsList.toArray(new String[segmentsList.size()]));			
+				URI mappedURI = mappedBaseURI.appendSegments(segmentsList.toArray(new String[0]));
 				sourceFile = QVTODebugUtil.toFile(mappedURI);
 			}
 		}
@@ -230,14 +230,10 @@ public class QVTODebugCore extends Plugin {
 	}
 	
 	private boolean isManifest(IResource resource) {
-		if (resource.getType() == IResource.FILE
-				&& resource.getName().equals("MANIFEST.MF") //$NON-NLS-1$
-				&& resource.getProjectRelativePath().equals(
-						new Path("META-INF/MANIFEST.MF"))) { //$NON-NLS-1$
-			return true;
-		}
-		return false;
-	}
+        return resource.getType() == IResource.FILE
+                && resource.getName().equals("MANIFEST.MF") //$NON-NLS-1$
+				&& resource.getProjectRelativePath().equals(new Path("META-INF/MANIFEST.MF")); //$NON-NLS-1$
+    }
 	
 	private IResourceChangeListener createResourceListen() {
 		return new IResourceChangeListener() {

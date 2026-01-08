@@ -82,7 +82,7 @@ public class QVTOVirtualProcess extends PlatformObject implements IProcess {
 		return null;
 	}
 
-	public int getExitValue() throws DebugException {
+	public int getExitValue() {
 		return 0;
 	}
 

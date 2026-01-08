@@ -27,6 +27,6 @@ public class VMDetailResponse extends VMResponse {
 
 	public String getDetail() {
 		return fDetail;
-	};
-	
+	}
+
 }

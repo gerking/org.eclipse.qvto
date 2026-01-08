@@ -32,7 +32,7 @@ public class QVTOLineBreakpointPage extends QVTOBreakpointPage {
     private Label fSuspendWhenLabel;
 
     protected void doStore() throws CoreException {
-        QVTOBreakpoint breakpoint= (QVTOBreakpoint) getBreakpoint();
+        QVTOBreakpoint breakpoint= getBreakpoint();
         super.doStore();
         if (fConditionEditor != null) {
             boolean enableCondition = fEnableConditionButton.getSelection();
@@ -52,8 +52,8 @@ public class QVTOLineBreakpointPage extends QVTOBreakpointPage {
 
     protected void createTypeSpecificLabels(Composite parent) {
         // Line number
-        QVTOBreakpoint breakpoint = (QVTOBreakpoint) getBreakpoint();
-        StringBuffer lineNumber = new StringBuffer(4);
+        QVTOBreakpoint breakpoint = getBreakpoint();
+        StringBuilder lineNumber = new StringBuilder(4);
         try {
             int lNumber = breakpoint.getLineNumber();
             if (lNumber > 0) {
@@ -62,7 +62,7 @@ public class QVTOLineBreakpointPage extends QVTOBreakpointPage {
         } catch (CoreException ce) {
             QVTODebugUIPlugin.log(ce);
         }
-        if (lineNumber.length() > 0) {
+        if (!lineNumber.isEmpty()) {
             createLabel(parent, DebugUIMessages.QVTOLineBreakpointPage_LineNumber); 
             Text text = SWTFactory.createText(parent, SWT.READ_ONLY, 1, lineNumber.toString());
             text.setBackground(parent.getBackground());
@@ -71,7 +71,7 @@ public class QVTOLineBreakpointPage extends QVTOBreakpointPage {
     
     protected void createTypeSpecificEditors(Composite parent) throws CoreException {
         setTitle(DebugUIMessages.QVTOLineBreakpointPage_LineBreakpoint);
-        QVTOBreakpoint breakpoint = (QVTOBreakpoint) getBreakpoint();
+        QVTOBreakpoint breakpoint = getBreakpoint();
         if (breakpoint.supportsCondition()) {
             createConditionEditor(parent);
         }
@@ -84,7 +84,7 @@ public class QVTOLineBreakpointPage extends QVTOBreakpointPage {
      * @throws CoreException if an exception occurs accessing the breakpoint
      */
     private void createConditionEditor(Composite parent) throws CoreException {
-        QVTOBreakpoint breakpoint = (QVTOBreakpoint) getBreakpoint();
+        QVTOBreakpoint breakpoint = getBreakpoint();
         String label = DebugUIMessages.QVTOLineBreakpointPage_EnableCondition; 
         
         Composite conditionComposite = SWTFactory.createGroup(parent, EMPTY_STRING, 1, 1, GridData.FILL_BOTH);

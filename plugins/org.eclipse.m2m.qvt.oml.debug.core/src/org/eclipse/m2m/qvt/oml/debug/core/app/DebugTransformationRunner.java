@@ -10,7 +10,6 @@
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core.app;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -41,7 +40,7 @@ public class DebugTransformationRunner extends TransformationRunner {
 		
 		fErrorLog = new PrintWriter(new OutputStream() {
 			@Override
-			public void write(int b) throws IOException {
+			public void write(int b) {
 				// do nothing I'm a <null> log
 			}
 		}, true);

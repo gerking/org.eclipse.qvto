@@ -77,7 +77,7 @@ public class QVTOBreakpointPage extends PropertyPage {
                 if (delOnCancel) {
                     // if this breakpoint is being created, remove the "delete on cancel" attribute
                     // and register with the breakpoint manager
-                    breakpoint.getMarker().setAttribute(ATTR_DELETE_ON_CANCEL, (String)null);
+                    breakpoint.getMarker().setAttribute(ATTR_DELETE_ON_CANCEL, null);
                     breakpoint.setRegistered(true);
                 }
                 doStore();
@@ -120,7 +120,7 @@ public class QVTOBreakpointPage extends PropertyPage {
         if (fErrorMessages.isEmpty()) {
             addErrorMessage(null);
         } else {
-            addErrorMessage((String) fErrorMessages.get(fErrorMessages.size() - 1));
+            addErrorMessage(fErrorMessages.get(fErrorMessages.size() - 1));
         }
     }
     
@@ -158,7 +158,7 @@ public class QVTOBreakpointPage extends PropertyPage {
                 hitCount = Integer.parseInt(fHitCountText.getText());
             } 
             catch (NumberFormatException e) {
-                QVTODebugUIPlugin.log(new Status(IStatus.ERROR, QVTODebugUIPlugin.PLUGIN_ID, IStatus.ERROR, MessageFormat.format("JavaBreakpointPage allowed input of invalid string for hit count value: {0}.", new Object[] { fHitCountText.getText() }), e));  //$NON-NLS-1$
+                QVTODebugUIPlugin.log(new Status(IStatus.ERROR, QVTODebugUIPlugin.PLUGIN_ID, IStatus.ERROR, MessageFormat.format("JavaBreakpointPage allowed input of invalid string for hit count value: {0}.", fHitCountText.getText()), e));  //$NON-NLS-1$
             }
         }
         breakpoint.setHitCount(hitCount);
@@ -187,7 +187,7 @@ public class QVTOBreakpointPage extends PropertyPage {
                 getShell().addShellListener(new ShellListener() {
                     public void shellActivated(ShellEvent e) {
                         Shell shell = (Shell)e.getSource();
-                        shell.setText(MessageFormat.format(DebugUIMessages.QVTOBreakpointPage_CreateBreakpointForModule, new Object[]{getName(getBreakpoint())})); 
+                        shell.setText(MessageFormat.format(DebugUIMessages.QVTOBreakpointPage_CreateBreakpointForModule, getName(getBreakpoint())));
                         shell.removeShellListener(this);
                     }
                     public void shellClosed(ShellEvent e) {
@@ -213,7 +213,7 @@ public class QVTOBreakpointPage extends PropertyPage {
      * @return the name of the element
      */
     private String getName(IAdaptable element) {
-        IWorkbenchAdapter adapter = (IWorkbenchAdapter) element.getAdapter(IWorkbenchAdapter.class);
+        IWorkbenchAdapter adapter = element.getAdapter(IWorkbenchAdapter.class);
         if (adapter != null) {
             return adapter.getLabel(element);
         } 
@@ -253,7 +253,7 @@ public class QVTOBreakpointPage extends PropertyPage {
         int hitCount = getBreakpoint().getHitCount();
         String hitCountString= EMPTY_STRING;
         if (hitCount > 0) {
-            hitCountString = new Integer(hitCount).toString();
+			hitCountString = Integer.toString(hitCount);
             fHitCountButton.setSelection(true);
         } else {
             fHitCountButton.setSelection(false);
@@ -279,7 +279,7 @@ public class QVTOBreakpointPage extends PropertyPage {
             return;
         }
         String hitCountText= fHitCountText.getText();
-        int hitCount= -1;
+        int hitCount;
         try {
             hitCount = Integer.parseInt(hitCountText);
         } 

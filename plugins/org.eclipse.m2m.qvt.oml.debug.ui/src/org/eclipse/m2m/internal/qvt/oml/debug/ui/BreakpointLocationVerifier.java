@@ -77,15 +77,13 @@ class BreakpointLocationVerifier {
 	
 	IStatus run()  {
 		IStatus status = checkBreakpointableElements();
-		if(!status.isOK()) {				
-			if (fBreakpoint != null) {
-				try {
-					DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(fBreakpoint, true);
-				} catch (CoreException e) {
-					QVTODebugUIPlugin.log(e.getStatus());
-				}
-			}
-		}
+		if(!status.isOK()) {
+            try {
+                DebugPlugin.getDefault().getBreakpointManager().removeBreakpoint(fBreakpoint, true);
+            } catch (CoreException e) {
+                QVTODebugUIPlugin.log(e.getStatus());
+            }
+        }
 		return status;
 	}
 	
@@ -116,7 +114,7 @@ class BreakpointLocationVerifier {
 				.getBreakpointableElementsForLine(compilationUnit,
 						getLineNumberProvider(doc), lineNumber);                    	 
 		if(elements.isEmpty()) {
-            report(NLS.bind(fInvalidLocationMessage, new Integer(lineNumber)));
+			report(NLS.bind(fInvalidLocationMessage, lineNumber));
             return canceled();
 		}
 

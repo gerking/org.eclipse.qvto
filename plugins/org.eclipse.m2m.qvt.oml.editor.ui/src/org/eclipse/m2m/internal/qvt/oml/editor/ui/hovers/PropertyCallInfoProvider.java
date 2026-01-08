@@ -13,6 +13,7 @@ package org.eclipse.m2m.internal.qvt.oml.editor.ui.hovers;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.cst.SimpleNameCS;
 import org.eclipse.ocl.ecore.PropertyCallExp;
 
@@ -22,7 +23,7 @@ import org.eclipse.ocl.ecore.PropertyCallExp;
  */
 public class PropertyCallInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (false == element instanceof SimpleNameCS) {
 			return null;
 		}

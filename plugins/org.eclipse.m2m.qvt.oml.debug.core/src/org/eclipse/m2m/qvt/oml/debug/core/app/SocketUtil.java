@@ -31,19 +31,10 @@ public class SocketUtil {
 	 * @since 3.0
 	 */
 	public static int findFreePort() {
-		ServerSocket socket= null;
-		try {
-			socket= new ServerSocket(0);
-			return socket.getLocalPort();
-		} catch (IOException e) { 
-		} finally {
-			if (socket != null) {
-				try {
-					socket.close();
-				} catch (IOException e) {
-				}
-			}
-		}
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+        }
 		return -1;		
 	}	
 

@@ -37,7 +37,7 @@ import org.eclipse.ocl.utilities.Visitable;
 
 class ASTElementContextEnv extends QvtOperationalEnv {
 
-	private final class EnvVariableCollector extends QvtOperationalAstWalker {
+	private static final class EnvVariableCollector extends QvtOperationalAstWalker {
 		private final EObject astContext;
 		private final List<Variable> varStack;
 		private final List<Variable> result;
@@ -82,10 +82,9 @@ class ASTElementContextEnv extends QvtOperationalEnv {
 		public Object visitVariableInitExp(VariableInitExp variableInitExp) {
 			Variable var = variableInitExp.getReferredVariable();
 			varStack.add(var);
-			Object result = super.visitVariableInitExp(variableInitExp);
-			// Note: no remove is needed, the scope handling for BlockExp
+            // Note: no remove is needed, the scope handling for BlockExp
 			// will handle that
-			return result;
+			return super.visitVariableInitExp(variableInitExp);
 		}
 
 		@Override
@@ -101,9 +100,9 @@ class ASTElementContextEnv extends QvtOperationalEnv {
 		@Override
 		public Object visitObjectExp(ObjectExp objectExp) {
 			Variable var = objectExp.getReferredObject();
-			varStack.add((Variable) var);
+			varStack.add(var);
 			Object result = super.visitObjectExp(objectExp);
-			varStack.remove((Variable) var);
+			varStack.remove(var);
 			return result;
 		}
 
@@ -217,7 +216,7 @@ class ASTElementContextEnv extends QvtOperationalEnv {
 
 	@Override
 	public boolean hasErrors() {
-		return fErrors.length() > 0;
+		return !fErrors.isEmpty();
 	}
 
 	@Override

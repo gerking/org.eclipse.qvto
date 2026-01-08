@@ -41,12 +41,11 @@ public class QVTOWatchExpressionDelegate implements IWatchExpressionDelegate {
             }
         }
         
-        if(frame instanceof QVTOStackFrame == false) {
+        if(!(frame instanceof QVTOStackFrame qvtFrame)) {
             myListener.watchEvaluationFinished(null);
             return;
         }
         
-        QVTOStackFrame qvtFrame = (QVTOStackFrame)frame;
         evaluate(qvtFrame);
     }
     

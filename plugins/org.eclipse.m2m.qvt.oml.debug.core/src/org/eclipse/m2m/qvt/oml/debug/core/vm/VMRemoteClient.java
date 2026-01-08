@@ -51,9 +51,8 @@ class VMRemoteClient {
 						
 		VMResponse response = sendRequest(new VMConnectRequest());
 		
-		if(response instanceof VMConnectResponse) {
-			VMConnectResponse connectResponse = (VMConnectResponse) response;
-			fEventPort = connectResponse.getEventPort();
+		if(response instanceof VMConnectResponse connectResponse) {
+            fEventPort = connectResponse.getEventPort();
 		} else {
 			// FIXME
 			throw new IOException("No free port for event dispatcher");
@@ -90,19 +89,19 @@ class VMRemoteClient {
 			
 			Object readObject = fResponseIn.readObject();
 
-			if(readObject instanceof VMResponse == false) {
+			if(!(readObject instanceof VMResponse vmResponse)) {
 				// FIXME -  report invalid response
 				return VMResponse.createERROR();
 			}
 			
-			return (VMResponse) readObject;
+			return vmResponse;
 			
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e.toString());
 		}
 	}
 	
-	void close() throws IOException {
+	void close() {
 		SocketUtil.close(fRequestOut);
 		SocketUtil.close(fResponseIn);
 		SocketUtil.close(fRequestSocket);

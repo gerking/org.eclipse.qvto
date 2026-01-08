@@ -11,7 +11,6 @@
 package org.eclipse.m2m.qvt.oml.debug.core.vm;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
@@ -23,10 +22,12 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EParameter;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.InternalEvaluationEnv;
+import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.ModuleInstance;
 import org.eclipse.m2m.internal.qvt.oml.evaluator.TransformationInstance;
 import org.eclipse.m2m.internal.qvt.oml.expressions.ContextualProperty;
+import org.eclipse.m2m.internal.qvt.oml.expressions.Library;
 import org.eclipse.m2m.internal.qvt.oml.expressions.Module;
 import org.eclipse.m2m.internal.qvt.oml.expressions.OperationalTransformation;
 import org.eclipse.ocl.Environment;
@@ -62,16 +63,12 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	}
 	
 	public List<EStructuralFeature> getAllFeatures(EClass eClass) {
-		List<EStructuralFeature> features = new ArrayList<EStructuralFeature>();
-		features.addAll(eClass.getEAllStructuralFeatures());
-		
-		if(eClass instanceof Module) {
-			for (Iterator<EStructuralFeature> it = features.iterator(); it.hasNext();) {
-				EStructuralFeature feature = it.next();
-				if(feature instanceof ContextualProperty) {
-					it.remove();
-				}
-			}
+        List<EStructuralFeature> features = new ArrayList<>(eClass.getEAllStructuralFeatures());
+
+		if (eClass instanceof Module module) {
+            features.removeIf(feature -> feature instanceof ContextualProperty);
+
+			collectFeaturesInImports(features, module);
 		}
 		
 		collectIntermediateProperties(features, eClass);
@@ -86,9 +83,18 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 		return fEvalEnv.navigateProperty(feature, null, target);
 	}
 
+	private void collectFeaturesInImports(List<EStructuralFeature> features, Module module) {
+		for (var moduleImport : module.getModuleImport()) {
+			var importedModule = moduleImport.getImportedModule();
+			var featuresInModule = importedModule.getEAllStructuralFeatures();
+			features.addAll(featuresInModule);
+			
+			collectFeaturesInImports(features, importedModule);
+		}
+	}
+
 	private void collectIntermediateProperties(List<EStructuralFeature> properties, EClass targetClass) {
-		QvtOperationalEvaluationEnv evalEnv = fEvalEnv;		
-		InternalEvaluationEnv internEvalEnv = evalEnv.getAdapter(InternalEvaluationEnv.class);
+        InternalEvaluationEnv internEvalEnv = fEvalEnv.getAdapter(InternalEvaluationEnv.class);
 		
 		ModuleInstance currentModule = internEvalEnv.getCurrentModule();
 		// check if we are in transformation execution context
@@ -101,9 +107,8 @@ public class UnitLocationExecutionContext implements VMFrameExecutionContext {
 	private void collectIntermediateProperties(List<EStructuralFeature> properties, EClass targetClass, TransformationInstance scopeModule) {
 		OperationalTransformation operationalTransformation = scopeModule.getTransformation();
 		for (EStructuralFeature nextProperty : operationalTransformation.getIntermediateProperty()) {
-			if(nextProperty instanceof ContextualProperty) {
-				ContextualProperty ctxProperty = (ContextualProperty) nextProperty;
-				if(ctxProperty.getContext().isSuperTypeOf(targetClass)) {            
+			if(nextProperty instanceof ContextualProperty ctxProperty) {
+                if(ctxProperty.getContext().isSuperTypeOf(targetClass)) {
 		        	properties.add(ctxProperty);
 				}
 			}

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class VMBreakpointRequest extends VMRequest {
 
-	public static enum ActionKind {
+	public enum ActionKind {
 		ADD,
 		REMOVE,
 		CHANGE
@@ -28,7 +28,7 @@ public class VMBreakpointRequest extends VMRequest {
 	
 	private final long fBreakpointID;
 	private final ActionKind actionKind;	
-	private final BreakpointData data[];
+	private final BreakpointData[] data;
 	
 	
 	private VMBreakpointRequest(long uniqueID, ActionKind actionKind) {
@@ -37,7 +37,7 @@ public class VMBreakpointRequest extends VMRequest {
 		this.data = null;
 	}
 	
-	private VMBreakpointRequest(long uniqueID, BreakpointData data[], ActionKind actionKind) {
+	private VMBreakpointRequest(long uniqueID, BreakpointData[] data, ActionKind actionKind) {
 		this.actionKind = actionKind;
 		this.data = data;
 		this.fBreakpointID = uniqueID;
@@ -77,6 +77,6 @@ public class VMBreakpointRequest extends VMRequest {
 	}	
 
 	public static VMBreakpointRequest createChange(long id, BreakpointData bpData) {
-		return new VMBreakpointRequest((long)-1, new BreakpointData[] { bpData }, ActionKind.CHANGE);
+		return new VMBreakpointRequest(-1, new BreakpointData[] { bpData }, ActionKind.CHANGE);
 	}	
 }

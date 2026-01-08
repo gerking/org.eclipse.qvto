@@ -63,7 +63,7 @@ public class QVTOApplication implements IApplication {
 		super();
 	}
 
-	public Object start(IApplicationContext context) throws Exception {
+	public Object start(IApplicationContext context) {
 		int exitCode = 0;
 		if (processCommandLine(context)) {
 			try {
@@ -78,7 +78,7 @@ public class QVTOApplication implements IApplication {
 			System.err.println(getCommandLineUsage());
 		}
 
-		return new Integer(exitCode);
+		return exitCode;
 
 	}
 
@@ -129,8 +129,7 @@ public class QVTOApplication implements IApplication {
 		}
 
 		if (isValueSpecArg(ARG_TRANSFORMATION, nextArg)) {
-			String val = getArgValue(ARG_TRANSFORMATION, nextArg);
-			factory.transformationURI = val;
+            factory.transformationURI = getArgValue(ARG_TRANSFORMATION, nextArg);
 
 		} else if (isValueSpecArg(ARG_PARAM, nextArg)) {
 			String val = getArgValue(ARG_PARAM, nextArg);
@@ -151,8 +150,7 @@ public class QVTOApplication implements IApplication {
 			factory.isIncrementalUpdate = true;
 
 		} else if (isValueSpecArg(ARG_TRACE, nextArg)) {
-			String val = getArgValue(ARG_TRACE, nextArg);
-			factory.traceFileURI = val;
+            factory.traceFileURI = getArgValue(ARG_TRACE, nextArg);
 
 		} else if (ARG_HELP.equals(nextArg)) {
 			System.out.println(getCommandLineUsage());
@@ -167,8 +165,7 @@ public class QVTOApplication implements IApplication {
 
 	protected TransformationRunner createRunner() throws DiagnosticException {
 
-		TransformationRunner runner = getRunnerFactory().createRunner();
-		return runner;
+        return getRunnerFactory().createRunner();
 	}
 	
 	protected ExecutionContext createExecutionContext() {

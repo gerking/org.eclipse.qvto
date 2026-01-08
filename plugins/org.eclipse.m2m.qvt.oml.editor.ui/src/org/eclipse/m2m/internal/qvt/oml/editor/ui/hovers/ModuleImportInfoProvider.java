@@ -15,12 +15,13 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.m2m.internal.qvt.oml.editor.ui.hyperlinks.ImportHyperlinkDetector;
+import org.eclipse.m2m.qvt.oml.editor.ui.hovers.IElementInfoProvider;
 import org.eclipse.ocl.cst.CSTNode;
 
 
 public class ModuleImportInfoProvider implements IElementInfoProvider {
 
-	public String getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
+	public Object getElementInfo(final Object element, ITextViewer textViewer, IRegion region) {
 		if (element instanceof CSTNode) {
 			CSTNode syntaxElement = (CSTNode) element;
 			URI unitURI = ImportHyperlinkDetector.findDefinition(syntaxElement);

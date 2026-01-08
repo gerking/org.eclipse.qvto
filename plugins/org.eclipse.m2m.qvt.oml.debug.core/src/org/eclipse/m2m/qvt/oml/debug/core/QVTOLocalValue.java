@@ -13,7 +13,6 @@ package org.eclipse.m2m.qvt.oml.debug.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
@@ -36,7 +35,7 @@ public class QVTOLocalValue extends QVTOValue {
 	}
 	
 	@Override
-	public IVariable[] getVariables() throws DebugException {
+	public IVariable[] getVariables() {
 		List<VMVariable> variables = requestVariables();
 		List<IVariable> result = new ArrayList<IVariable>();
 		
@@ -44,11 +43,11 @@ public class QVTOLocalValue extends QVTOValue {
 			result.add(new QVTOLocalVariable(getQVTODebugTarget(), nextVar, myFrameID, myExecContext));
 		}					
 		
-		return result.toArray(new IVariable[result.size()]);
+		return result.toArray(new IVariable[0]);
 	}
 	
 	@Override
-	protected List<VMVariable> requestVariables() throws DebugException {
+	protected List<VMVariable> requestVariables() {
 		List<VMVariable> vars = new ArrayList<VMVariable>();
 		new VariableFinder(myExecContext, true).collectChildVars(vmVar.valueObject,
 				VariableFinder.getVariablePath(VariableFinder.parseURI(vmVar.variableURI)), null, vars);
@@ -57,7 +56,7 @@ public class QVTOLocalValue extends QVTOValue {
 	
 	private static VMVariable createVmVar(String[] varPath, LocalValue evalResult, QvtOperationalEvaluationEnv evalEnv) {
 		VMVariable var = new VMVariable();
-		var.name = varPath.length > 0 ? varPath[varPath.length-1] : String.valueOf(null);
+		var.name = varPath.length > 0 ? varPath[varPath.length-1] : String.valueOf((Object) null);
 		var.kind = VMVariable.LOCAL;
 		var.variableURI = VariableFinder.createURI(varPath).toString();
 		var.valueObject = evalResult.valueObject;

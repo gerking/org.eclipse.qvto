@@ -24,7 +24,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnv;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEnvFactory;
 import org.eclipse.m2m.internal.qvt.oml.ast.env.QvtOperationalEvaluationEnv;
-import org.eclipse.m2m.internal.qvt.oml.evaluator.QvtOperationalEvaluationVisitor;
 import org.eclipse.m2m.qvt.oml.util.IContext;
 import org.eclipse.ocl.Environment;
 import org.eclipse.ocl.EvaluationEnvironment;
@@ -48,9 +47,8 @@ public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
 	public EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> createEvaluationEnvironment(
 			EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> parent) {
 
-		if(parent instanceof QvtOperationalEvaluationEnv) {
-			QvtOperationalEvaluationEnv qvtParentEnv = (QvtOperationalEvaluationEnv) parent;
-			return new DebugEvaluationEnvironment(qvtParentEnv.getContext(), qvtParentEnv, envUIDGenerator++);
+		if(parent instanceof QvtOperationalEvaluationEnv qvtParentEnv) {
+            return new DebugEvaluationEnvironment(qvtParentEnv.getContext(), qvtParentEnv, envUIDGenerator++);
 		}
 
 		return super.createEvaluationEnvironment(parent);
@@ -66,7 +64,7 @@ public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
 			EvaluationEnvironment<EClassifier, EOperation, EStructuralFeature, EClass, EObject> evalEnv,
 			Map<? extends EClass, ? extends Set<? extends EObject>> extentMap) {
 
-		if ((env instanceof QvtOperationalEnv == false) || (evalEnv instanceof QvtOperationalEvaluationEnv == false)) {
+		if (!(env instanceof QvtOperationalEnv) || !(evalEnv instanceof QvtOperationalEvaluationEnv)) {
 			return super.createEvaluationVisitor(env, evalEnv, extentMap);
 		}
 		
@@ -79,8 +77,7 @@ public final class DebugEnvironmentFactory extends QvtOperationalEnvFactory {
 	    
 		QVTODebugEvaluator evaluatorVisitor = new QVTODebugEvaluator((QvtOperationalEnv) env, 
 				(QvtOperationalEvaluationEnv) evalEnv, debuggerShell);
-		
-		QvtOperationalEvaluationVisitor result = evaluatorVisitor.createDebugInterceptor();
-		return result;
+
+        return evaluatorVisitor.createDebugInterceptor();
 	}
 }

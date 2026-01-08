@@ -128,8 +128,7 @@ class VMEventDispatcher {
 					fRunning = false;
 					fReady = false;
 					terminated();
-					continue;
-				}
+                }
 			}
 				
 			QVTODebugCore.TRACE.trace(DebugOptions.VM,

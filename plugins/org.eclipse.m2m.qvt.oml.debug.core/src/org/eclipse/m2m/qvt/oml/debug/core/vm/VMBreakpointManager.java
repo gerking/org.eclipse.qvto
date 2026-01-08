@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.m2m.internal.qvt.oml.common.util.LineNumberProvider;
@@ -52,7 +51,7 @@ public class VMBreakpointManager {
 	
 	public synchronized List<VMBreakpoint> getBreakpoints(ASTNode e) {
 		VMBreakpoint breakpoint = fElement2Breakpoint.get(e);
-		return (breakpoint != null) ? Collections.singletonList(breakpoint) : Collections.<VMBreakpoint>emptyList();
+		return (breakpoint != null) ? Collections.singletonList(breakpoint) : Collections.emptyList();
 	}
 	
 	
@@ -82,7 +81,7 @@ public class VMBreakpointManager {
     }
 
     
-    public synchronized VMBreakpoint createVMPrivateBreakpoint(URI unitURI, ASTNode element, int line, boolean isTemporary) throws CoreException {
+    public synchronized VMBreakpoint createVMPrivateBreakpoint(URI unitURI, ASTNode element, int line, boolean isTemporary) {
         NewBreakpointData bpData = new NewBreakpointData();
         bpData.ID = --fPrivateBreakpointID;
         bpData.targetURI = unitURI.toString();
@@ -95,7 +94,7 @@ public class VMBreakpointManager {
     
 
 	public synchronized VMBreakpoint[] getAllBreakpoints() {
-		return fElement2Breakpoint.values().toArray(new VMBreakpoint[fElement2Breakpoint.size()]);
+		return fElement2Breakpoint.values().toArray(new VMBreakpoint[0]);
 	}
     
 	public synchronized ASTNode getBreakpointableElement(URI targetURI, int lineNumber) {

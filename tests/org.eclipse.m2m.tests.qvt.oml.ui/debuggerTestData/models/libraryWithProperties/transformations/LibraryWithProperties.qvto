@@ -1,0 +1,12 @@
+import Lib;
+
+modeltype MySource uses "http://www.eclipse.org/emf/2002/Ecore";
+modeltype MyTarget uses "http://www.eclipse.org/emf/2002/Ecore";
+
+
+transformation LibraryWithProperties(source : MySource, target : MyTarget) {
+
+    main() {
+        log("");
+    }
+}

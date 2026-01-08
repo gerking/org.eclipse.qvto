@@ -9,8 +9,10 @@
  * Contributors:
  *     Borland Software Corporation - initial API and implementation
  *******************************************************************************/
-package org.eclipse.m2m.internal.qvt.oml.editor.ui.hovers;
+package org.eclipse.m2m.qvt.oml.editor.ui.hovers;
 
+import org.eclipse.jface.text.DefaultInformationControl;
+import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 
@@ -18,5 +20,20 @@ import org.eclipse.jface.text.ITextViewer;
  * @author vrepeshko
  */
 public interface IElementInfoProvider {
-	String getElementInfo(Object element, ITextViewer textViewer, IRegion region);
+	Object getElementInfo(Object element, ITextViewer textViewer, IRegion region);
+
+	/**
+	 * @return the priority of this info provider by which the info providers get
+	 *         sorted. A higher int is a higher priority
+	 */
+	default int getPriority() {
+		return 0;
+	}
+
+	/**
+	 * @see org.eclipse.jface.text.ITextHoverExtension#getHoverControlCreator()
+	 */
+	default IInformationControlCreator getHoverControlCreator() {
+		return parent -> new DefaultInformationControl(parent, (String) null);
+	}
 }

@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
  <extension-point id="codeCompletionCollectors" name="%codeCompletionCollectors" schema="schema/codeCompletionCollectors.exsd"/>
+ <extension-point id="qvtEditorElementInfoProviders" name="%qvtEditorElementInfoProviders" schema="schema/qvtEditorElementInfoProviders.exsd"/>
  <extension point="org.eclipse.core.filebuffers.documentSetup">
     <participant
           class="org.eclipse.m2m.internal.qvt.oml.editor.ui.QvtDocumentSetupParticipant"
