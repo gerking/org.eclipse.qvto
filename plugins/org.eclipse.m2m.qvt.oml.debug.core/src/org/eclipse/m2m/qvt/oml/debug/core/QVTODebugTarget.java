@@ -7,8 +7,8 @@
  *
  * Contributors:
  *     Radek Dvorak - initial API and implementation
- *     Steffen Steudle - issue #1139
- *     Christopher Gerking - issue #1139
+ *     Steffen Steudle - issues #1139, #1140
+ *     Christopher Gerking - issues #1139, #1140
  *******************************************************************************/
 package org.eclipse.m2m.qvt.oml.debug.core;
 
@@ -134,7 +134,13 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 		return sourceURI;
 	}
 	
+	private boolean skipAllBreakpoints() {
+		return !DebugPlugin.getDefault().getBreakpointManager().isEnabled();
+	}
+	
 	private void installVMBreakpoints() {
+		if (skipAllBreakpoints()) return;
+		
 		HashMap<Long, QVTOBreakpoint> installedBreakpoints = new HashMap<Long, QVTOBreakpoint>();
 		List<NewBreakpointData> allBpData = new ArrayList<NewBreakpointData>();
 		
@@ -147,7 +153,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 			}
 
 			if (enabled) {
-				installedBreakpoints.put(new Long(((QVTOBreakpoint) qvtBp).getID()), qvtBp);
+				installedBreakpoints.put(Long.valueOf(((QVTOBreakpoint) qvtBp).getID()), qvtBp);
 				try {
 					NewBreakpointData data = qvtBp.createNewBreakpointData();
 					data.targetURI = computeBreakpointURI(URI.createURI(data.targetURI, true)).toString();
@@ -173,7 +179,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 					VMBreakpointResponse bpResponse = (VMBreakpointResponse) response;
 					
 					for(long addedID : bpResponse.getAddedBreakpointsIDs()) {
-						Long key = new Long(addedID);
+						Long key = Long.valueOf(addedID);
 						QVTOBreakpoint bp = installedBreakpoints.get(key);
 						if(bp != null) {
 							fID2Breakpoint.put(key, bp);
@@ -313,7 +319,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 
 	public void breakpointAdded(IBreakpoint breakpoint) {
 		if (breakpoint instanceof QVTOBreakpoint == false
-				|| !DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
+				|| skipAllBreakpoints()) {
 			return;
 		}
 
@@ -338,7 +344,7 @@ public class QVTODebugTarget extends QVTODebugElement implements IQVTODebugTarge
 
 	public void breakpointChanged(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (breakpoint instanceof QVTOBreakpoint == false
-				|| !DebugPlugin.getDefault().getBreakpointManager().isEnabled()) {
+				|| skipAllBreakpoints()) {
 			return;
 		}
 
