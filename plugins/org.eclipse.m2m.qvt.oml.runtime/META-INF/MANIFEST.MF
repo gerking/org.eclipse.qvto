@@ -6,6 +6,7 @@ Bundle-Version: 3.11.0.qualifier
 Bundle-Activator: org.eclipse.m2m.internal.qvt.oml.runtime.QvtRuntimePlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
+Import-Package: org.xml.sax
 Export-Package: org.eclipse.m2m.internal.qvt.oml.runtime;x-internal:=true,
  org.eclipse.m2m.internal.qvt.oml.runtime.generator;x-friends:="org.eclipse.m2m.tests.qvt.oml",
  org.eclipse.m2m.internal.qvt.oml.runtime.launch;

@@ -7,7 +7,9 @@ Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.m2m.internal.qvt.oml.QvtPlugin$Implementation
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Import-Package: lpg.runtime;version="[2.0.17,3.0.0)"
+Import-Package: lpg.runtime;version="[2.0.17,3.0.0)",
+  org.xml.sax,
+  org.xml.sax.helpers
 Export-Package: org.eclipse.m2m.internal.qvt.oml;
   x-friends:="org.eclipse.m2m.qvt.oml.debug.core,
    org.eclipse.m2m.qvt.oml.editor.ui,
