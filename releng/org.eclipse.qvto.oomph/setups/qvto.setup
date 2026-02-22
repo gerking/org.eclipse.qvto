@@ -11,7 +11,7 @@
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
     xmlns:setup.targlets="http://www.eclipse.org/oomph/setup/targlets/1.0"
     xmlns:setup.workingsets="http://www.eclipse.org/oomph/setup/workingsets/1.0"
-    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/JDT.ecore http://www.eclipse.org/oomph/predicates/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 http://git.eclipse.org/c/oomph/org.eclipse.oomph.git/plain/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/SetupWorkingSets.ecore"
+    xsi:schemaLocation="http://www.eclipse.org/oomph/setup/git/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/Git.ecore http://www.eclipse.org/oomph/setup/jdt/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/JDT.ecore http://www.eclipse.org/oomph/predicates/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/Predicates.ecore http://www.eclipse.org/oomph/setup/projects/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/Projects.ecore http://www.eclipse.org/oomph/setup/targlets/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/SetupTarglets.ecore http://www.eclipse.org/oomph/setup/workingsets/1.0 https://raw.githubusercontent.com/eclipse-oomph/oomph/master/setups/models/SetupWorkingSets.ecore"
     name="qvto"
     label="QVTo">
   <setupTask
@@ -50,7 +50,7 @@
   <setupTask
       xsi:type="setup:VariableTask"
       name="eclipse.target.platform"
-      defaultValue="2025-12"
+      defaultValue="2026-03"
       storageURI="scope://Workspace"/>
   <setupTask
       xsi:type="setup.p2:P2Task">
@@ -97,6 +97,13 @@
             url="https://download.eclipse.org/releases/latest"/>
         <repository
             url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+      </repositoryList>
+      <repositoryList
+          name="2026-03">
+        <repository
+            url="https://download.eclipse.org/releases/2026-03"/>
+        <repository
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/2026-03"/>
       </repositoryList>
       <repositoryList
           name="2025-12">
@@ -405,7 +412,7 @@
             xsi:type="predicates:NotPredicate">
           <operand
               xsi:type="predicates:NamePredicate"
-              pattern="org.eclipse.qvto.examples.*"/>
+              pattern="org\.eclipse\.qvto\.examples\..*"/>
         </predicate>
       </sourceLocator>
       <description>Development Projects</description>
@@ -415,64 +422,28 @@
       <workingSet
           name="${scope.project.root.label} Plugins">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml*"/>
-        <predicate
-            xsi:type="predicates:NotPredicate">
-          <operand
-              xsi:type="predicates:OrPredicate">
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.*\.releng"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.examples.blackbox"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.econ2009.tutorial"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.samples"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.qvt.oml.samples.simpleuml2rdb"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.m2m.tests.*"/>
-            <operand
-                xsi:type="predicates:NamePredicate"
-                pattern="org.eclipse.qvto.*"/>
-          </operand>
-        </predicate>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/plugins/.*"/>
       </workingSet>
       <workingSet
           name="${scope.project.root.label} Tests">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.tests.*"/>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/tests/.*"/>
       </workingSet>
       <workingSet
           name="${scope.project.root.label} Examples">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.econ2009.tutorial"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.samples"/>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/examples/.*"/>
       </workingSet>
     </setupTask>
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.11.2"
+        label="3.11.2 (2026-03)"/>
     <stream
         name="3.11.1"
         label="3.11.1 (2025-12)"/>
@@ -550,34 +521,28 @@
       <workingSet
           name="${scope.project.root.label} Doc">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*\.doc"/>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/doc/.*"/>
       </workingSet>
       <workingSet
           name="${scope.project.root.label} Features">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*-feature"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.*\.feature"/>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/features/.*"/>
       </workingSet>
       <workingSet
           name="${scope.project.root.label} Releng">
         <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.qvto.oomph"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.qvto.releng.*"/>
-        <predicate
-            xsi:type="predicates:NamePredicate"
-            pattern="org.eclipse.m2m.qvt.oml.tools.coverage.releng"/>
+            xsi:type="predicates:LocationPredicate"
+            pattern=".*/org\.eclipse\.qvto/releng/.*"/>
       </workingSet>
     </setupTask>
     <stream
         name="master"
         label="Master (Latest)"/>
+    <stream
+        name="3.11.2"
+        label="3.11.2 (2026-03)"/>
     <stream
         name="3.11.1"
         label="3.11.1 (2025-12)"/>
