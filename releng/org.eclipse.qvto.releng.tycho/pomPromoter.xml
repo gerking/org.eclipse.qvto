@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.eclipse.qvto</groupId>
-	<artifactId>org.eclipse.qvto.releng.promote</artifactId>
+	<artifactId>org.eclipse.qvto.releng.tycho</artifactId>
 	<version>3.11.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<!-- based on releng/org.eclipse.nebula.site/promotion/pom.xml and https://eclipse.dev/justj/?page=tools --> 
@@ -21,7 +21,7 @@
 		
 		The "JustJ for QVTo" Eclipse launch supports regular Java debugging."
 		-->
-		<BUILD_COMMIT>-commit https://git.eclipse.org/c/mmt/org.eclipse.qvto.git/commit/?id=${env.GIT_COMMIT}</BUILD_COMMIT>
+		<BUILD_COMMIT>-commit https://github.com/eclipse-qvto/org.eclipse.qvto/commit/?id=${env.GIT_COMMIT}</BUILD_COMMIT>
 		<BUILD_PROMOTE>https://ci.eclipse.org/qvto/job/qvto-master/lastSuccessfulBuild/artifact/releng/org.eclipse.ocl.releng.build-site/target/repository</BUILD_PROMOTE>
 		<BUILD_REMOTE>-remote genie.qvt-oml@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/mmt/qvto</BUILD_REMOTE>
 		<BUILD_ROOT>${project.build.directory}/justj-sync</BUILD_ROOT>
