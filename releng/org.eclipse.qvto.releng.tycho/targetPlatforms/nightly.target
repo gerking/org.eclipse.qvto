@@ -21,9 +21,9 @@
   </location>
   <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
     <unit id="com.google.guava" version="0.0.0"/>
-    <repository location="https://download.eclipse.org/tools/orbit/downloads/latest-I"/>
-    <repository location="https://download.eclipse.org/tools/orbit/downloads/latest-S"/>
-    <repository location="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+    <repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/nightly/latest"/>
+    <repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/milestone/latest"/>
+    <repository location="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/release/latest"/>
   </location>
   <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
     <unit id="javax.annotation" version="0.0.0"/>

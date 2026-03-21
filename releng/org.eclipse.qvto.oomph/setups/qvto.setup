@@ -96,7 +96,7 @@
         <repository
             url="https://download.eclipse.org/releases/latest"/>
         <repository
-            url="https://download.eclipse.org/tools/orbit/downloads/latest-R"/>
+            url="https://download.eclipse.org/tools/orbit/simrel/orbit-aggregation/release/latest"/>
       </repositoryList>
       <repositoryList
           name="2026-03">
