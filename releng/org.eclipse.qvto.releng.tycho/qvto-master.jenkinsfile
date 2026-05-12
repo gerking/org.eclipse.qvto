@@ -74,10 +74,12 @@ Replay a Stable / Milestone qvto-promoter build to promote a Release.
 							${targetPhase} \
 							-P${BUILD_TYPE} \
 							-Psign
+						cd releng/org.eclipse.qvto.releng.build-site/target/repository
+						zip -r ../../../../p2repo.zip .
 						'''
 				}
-				archiveArtifacts allowEmptyArchive: true, artifacts: 'releng/org.eclipse.qvto.releng.build-site/target/repository/**/*'
 				archiveArtifacts allowEmptyArchive: true, artifacts: 'tests/*/target/**/surefire-reports/**/TEST-*.xml'
+				archiveArtifacts allowEmptyArchive: true, artifacts: 'p2repo.zip'
 			}
 		}
 		//
@@ -92,12 +94,13 @@ Replay a Stable / Milestone qvto-promoter build to promote a Release.
 				script {
 					def List job_params = [
 						string(name: 'BUILD_COMMIT', value: '-commit https://github.com/eclipse-qvto/org.eclipse.qvto/commit/' + env.GIT_COMMIT),
-						string(name: 'BUILD_PROMOTE', value: env.BUILD_URL + 'artifact/releng/org.eclipse.qvto.releng.build-site/target/repository'),
+						string(name: 'BUILD_NUMBER', value: env.BUILD_NUMBER),
 						string(name: 'BUILD_REMOTE', value: '-remote genie.qvt-oml@projects-storage.eclipse.org:/home/data/httpd/download.eclipse.org/mmt/qvto'),
 						string(name: 'BUILD_ROOT', value: '/home/jenkins/agent/workspace/justj-promoter/justj-sync'),
 						string(name: 'BUILD_TIMESTAMP', value: '-timestamp ' + env.BUILD_TIMESTAMP),
 						string(name: 'BUILD_TYPE', value: env.BUILD_TYPE),
-						string(name: 'BUILD_URL', value: env.BUILD_URL)
+						string(name: 'BUILD_URL', value: env.BUILD_URL),
+						string(name: 'JOB_NAME', value: env.JOB_NAME)
 					]
 					echo job_params.toString()
 					build job: "qvto-promoter", parameters: job_params
