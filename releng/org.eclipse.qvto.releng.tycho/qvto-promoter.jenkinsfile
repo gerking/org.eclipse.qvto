@@ -7,6 +7,7 @@ pipeline {
 		buildDiscarder(logRotator(numToKeepStr: '5'))
 		disableConcurrentBuilds()
 		skipDefaultCheckout false
+		quietPeriod(300)						// 120 is not long enough to allow Jenkins to update upstream build reliably
 	}
 
 	tools {
@@ -17,7 +18,7 @@ pipeline {
 	parameters {
 		choice(
 			name: '_BUILD_TYPE',
-			choices: ['nightly', 'milestone', 'release'],
+			choices: ['nightly', 'milestone', 'release', 'reload'],
 			description: '''
 <ul>
 <li> N - Nightly build
