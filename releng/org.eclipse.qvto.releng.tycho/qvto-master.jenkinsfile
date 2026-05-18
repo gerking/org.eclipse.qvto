@@ -53,30 +53,31 @@ Replay a Stable / Milestone qvto-promoter build to promote a Release.
 		//
 		//	Do the regular project build and test.
 		//
+					//	if [[ $BUILD_TYPE == 'milestone' ]]; then
+					//		targetPhase='deploy' -- See https://bugs.eclipse.org/bugs/show_bug.cgi?id=562307 for what needs to be done to make deploy work.
+					//	else
+					//		targetPhase='verify'
+					//	fi
 		stage('Build') {
 			when {
 				expression { return params.BUILD_TYPE != 'reload' && currentBuild.getPreviousBuild() != null }
 			}
 			steps {
 				wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
-					sh '''
-						if [[ $BUILD_TYPE == 'milestone' ]]; then
-							targetPhase='deploy'
-						else
-							targetPhase='verify'
-						fi
+					sh """
 						mvn	\
 							-f releng/org.eclipse.qvto.releng.tycho/pom.xml \
 							--no-transfer-progress \
 							-DBUILD_TYPE=${BUILD_TYPE} \
 							--show-version \
+							-Dorg.eclipse.equinox.p2.transport.ecf.retry=100 \
 							clean \
-							${targetPhase} \
+							verify \
 							-P${BUILD_TYPE} \
 							-Psign
 						cd releng/org.eclipse.qvto.releng.build-site/target/repository
 						zip -r ../../../../p2repo.zip .
-						'''
+						"""
 				}
 				archiveArtifacts allowEmptyArchive: true, artifacts: 'tests/*/target/**/surefire-reports/**/TEST-*.xml'
 				archiveArtifacts allowEmptyArchive: true, artifacts: 'p2repo.zip'
