@@ -9,6 +9,7 @@ pipeline {
 	}
 
 	options {
+		copyArtifactPermission('qvto-promoter');
 		buildDiscarder(logRotator(numToKeepStr: '5'))
 		disableConcurrentBuilds()
 		skipDefaultCheckout false
