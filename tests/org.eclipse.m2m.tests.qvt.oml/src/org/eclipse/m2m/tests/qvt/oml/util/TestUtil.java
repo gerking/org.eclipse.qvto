@@ -512,6 +512,12 @@ public class TestUtil extends Assert {
 
 			pluginModel.getExtensions().add(pluginExtension);
 			pluginModel.save();
+			
+			// Refresh model's underlying resource (#1147)
+			IResource modelResource = pluginModel.getUnderlyingResource();
+			if (modelResource != null) {
+				modelResource.refreshLocal(IResource.DEPTH_INFINITE, null);
+			}
 		}
 	}
 
