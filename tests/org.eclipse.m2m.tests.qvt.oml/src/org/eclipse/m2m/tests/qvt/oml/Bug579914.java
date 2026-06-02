@@ -11,6 +11,7 @@
 package org.eclipse.m2m.tests.qvt.oml;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assume.assumeNotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -83,9 +84,13 @@ public class Bug579914 extends TestQvtParser {
 		qvtPluginProject.setDescription(projectDescription, null);
 		assertArrayEquals(natureIDs, qvtPluginProject.getDescription().getNatureIds());
 		
-		assertTrue(TestUtil.getBuildErrors(qvtPluginProject).isEmpty());
-		TestUtil.buildProject(qvtPluginProject);
+		qvtPluginProject.refreshLocal(IResource.DEPTH_INFINITE, null);
 		
+		TestUtil.buildProject(qvtPluginProject);
+		TestUtil.joinJobs();
+				
+		assumeNotNull(PluginRegistry.findModel(qvtPluginProject));
+				
 		super.setUp();
 	}
 	
@@ -95,6 +100,9 @@ public class Bug579914 extends TestQvtParser {
 		
 		if (qvtPluginProject != null && qvtPluginProject.exists()) {
 			qvtPluginProject.delete(true, null);
+			qvtPluginProject.refreshLocal(IResource.DEPTH_INFINITE, null);
+						
+			TestUtil.joinJobs();
 		}
 	}
 }

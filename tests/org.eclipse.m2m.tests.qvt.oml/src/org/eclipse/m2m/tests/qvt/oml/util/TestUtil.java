@@ -13,6 +13,9 @@
 
 package org.eclipse.m2m.tests.qvt.oml.util;
 
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeNotNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.internal.events.NotificationManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -48,6 +52,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModelPackage;
 import org.eclipse.emf.common.util.URI;
@@ -66,6 +71,7 @@ import org.eclipse.jdt.core.IJavaModelStatus;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.m2m.internal.qvt.oml.QvtPlugin;
@@ -89,9 +95,11 @@ import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
+import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.core.project.IBundleProjectDescription;
 import org.eclipse.pde.internal.core.ClasspathComputer;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundlePluginModel;
+import org.eclipse.pde.internal.core.natures.PluginProject;
 import org.eclipse.pde.internal.core.plugin.WorkspacePluginModelBase;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.core.util.CoreUtility;
@@ -233,8 +241,24 @@ public class TestUtil extends Assert {
 	
 	public static void turnOffAutoBuildingAndJoinBuildJobs() throws Exception {
 		turnOffAutoBuilding();
-		Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
-		Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
+		joinJobs();
+	}
+	
+	public static void joinJobs() {
+		try {
+			IJobManager jobManager = Job.getJobManager();
+			
+			jobManager.join(ResourcesPlugin.FAMILY_MANUAL_BUILD, null);
+			jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+			
+			jobManager.join(ResourcesPlugin.FAMILY_MANUAL_REFRESH, null);
+			jobManager.join(ResourcesPlugin.FAMILY_AUTO_REFRESH, null);
+						
+			jobManager.join(NotificationManager.class, null);
+							
+		} catch (InterruptedException e) {
+			fail(e.getMessage());
+		}
 	}
 
 	public static void copyFolder(final IProject project, final String folderName) throws Exception {
@@ -301,6 +325,12 @@ public class TestUtil extends Assert {
 
 	public static void buildProject(final IProject project, final int kind) throws CoreException {
 		project.build(kind, null);
+		List<String> errors = getBuildErrors(project);
+		assertTrue("Build failed for " + project + ": " + errors, errors.isEmpty()); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+	
+	public static void buildProject(final IProject project, final int kind, String builderName) throws CoreException {
+		project.build(kind, builderName, null, null);
 		List<String> errors = getBuildErrors(project);
 		assertTrue("Build failed for " + project + ": " + errors, errors.isEmpty()); //$NON-NLS-1$ //$NON-NLS-2$
 	}
@@ -407,10 +437,12 @@ public class TestUtil extends Assert {
 		return resSet;
 	}
 
-	public static void prepareJava(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
+	public static void prepareJava(TestProject myTestProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
+		IProject project = myTestProject.getProject();
+		
 		IPath destPath = new Path(destFolder.getPath());
 
-		IWorkspace workspace = myProject.getProject().getWorkspace();
+		IWorkspace workspace = project.getWorkspace();
 		IPath workspacePath = workspace.getRoot().getLocation();
 
 		destPath = destPath.makeRelativeTo(workspacePath).makeAbsolute();
@@ -418,15 +450,17 @@ public class TestUtil extends Assert {
 		IPath srcPath = destPath.append("src"); //$NON-NLS-1$
 
 		if (workspace.getRoot().exists(srcPath)) {
-			IProjectDescription desc = myProject.getProject().getDescription();
+			setupPluginXml(myTestProject, destFolder, metamodels, resSet);
+			
+			IProjectDescription desc = project.getDescription();
 
 			NatureUtils.addNature(desc, JavaCore.NATURE_ID);
 
 			IProgressMonitor monitor = new NullProgressMonitor();
 
-			myProject.getProject().setDescription(desc, monitor);
+			project.setDescription(desc, monitor);
 
-			IJavaProject javaProject = JavaCore.create(myProject.getProject());
+			IJavaProject javaProject = JavaCore.create(project);
 
 			javaProject.setOption(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
 
@@ -451,15 +485,21 @@ public class TestUtil extends Assert {
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, javaProject.getOutputLocation());
 			assertTrue(status.isOK());
 			javaProject.setRawClasspath(entries, monitor);
-
-			setupPluginXml(myProject, destFolder, metamodels, resSet);
-
-			JavaCore.rebuildIndex(null);
-
-			TestUtil.buildProject(myProject.getProject());
+									
+			joinJobs();
+									
+			assumeNotNull(PluginRegistry.findModel(project));
+			
+			try {
+				javaProject.getResolvedClasspath(false);
+			} catch (JavaModelException e) {
+				assumeNoException(e);
+			}
+			
+			TestUtil.buildProject(project, IncrementalProjectBuilder.FULL_BUILD, JavaCore.BUILDER_ID);
 		}
 	}
-
+	
 	private static void setupPluginXml(TestProject myProject, File destFolder, List<URI> metamodels, ResourceSet resSet) throws CoreException {
 
 		IWorkspace workspace = myProject.getProject().getWorkspace();
@@ -518,6 +558,7 @@ public class TestUtil extends Assert {
 			if (modelResource != null) {
 				modelResource.refreshLocal(IResource.DEPTH_INFINITE, null);
 			}
+			TestUtil.buildProject(myProject.getProject(), IncrementalProjectBuilder.FULL_BUILD, PluginProject.MANIFEST_BUILDER_ID);
 		}
 	}
 

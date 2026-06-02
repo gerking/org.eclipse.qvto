@@ -83,6 +83,8 @@ public class ReferencedProjectData extends FilesToFilesData {
 			referencedDesc.setReferencedProjects(new IProject[] {});
 			referencedProject.setDescription(referencedDesc, null);
 		}
+		
+		referencedProjectTestCase.tearDown();
 	}
 
 }
