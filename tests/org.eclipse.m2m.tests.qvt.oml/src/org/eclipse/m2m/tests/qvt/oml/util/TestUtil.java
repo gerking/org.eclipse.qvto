@@ -13,9 +13,6 @@
 
 package org.eclipse.m2m.tests.qvt.oml.util;
 
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeNotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -483,17 +480,17 @@ public class TestUtil extends Assert {
 
 			assertFalse(javaProject.hasClasspathCycle(entries));
 			IJavaModelStatus status = JavaConventions.validateClasspath(javaProject, entries, javaProject.getOutputLocation());
-			assertTrue(status.isOK());
+			assertTrue(status.getMessage(), status.isOK());
 			javaProject.setRawClasspath(entries, monitor);
 									
 			joinJobs();
 									
-			assumeNotNull(PluginRegistry.findModel(project));
+			assertNotNull(PluginRegistry.findModel(project));
 			
 			try {
 				javaProject.getResolvedClasspath(false);
 			} catch (JavaModelException e) {
-				assumeNoException(e);
+				fail(e.getMessage());
 			}
 			
 			TestUtil.buildProject(project, IncrementalProjectBuilder.FULL_BUILD, JavaCore.BUILDER_ID);

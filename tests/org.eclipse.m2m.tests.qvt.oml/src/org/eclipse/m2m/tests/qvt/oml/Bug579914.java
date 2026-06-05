@@ -11,7 +11,6 @@
 package org.eclipse.m2m.tests.qvt.oml;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assume.assumeNotNull;
 
 import java.io.File;
 import java.util.Arrays;
@@ -89,7 +88,7 @@ public class Bug579914 extends TestQvtParser {
 		TestUtil.buildProject(qvtPluginProject);
 		TestUtil.joinJobs();
 				
-		assumeNotNull(PluginRegistry.findModel(qvtPluginProject));
+		assertNotNull(PluginRegistry.findModel(qvtPluginProject));
 				
 		super.setUp();
 	}
